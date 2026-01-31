@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>👶 우리 아기 맞이 준비물 (V14)</title>
+    <title>👶 우리 아기 맞이 준비물 (V15)</title>
     <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -15,7 +15,7 @@
             --bg-color: #F7F8FA;
             --text-color: #333;
             --price-color: #FF6B6B;
-            --carrot-color: #FF8A3D; /* 당근마켓 색상 */
+            --carrot-color: #FF8A3D;
         }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Pretendard', sans-serif; background-color: var(--bg-color); margin: 0; padding: 0; color: var(--text-color); }
@@ -80,8 +80,6 @@
         .tag.model { background: #ECEFF1; color: #455A64; font-weight: 600; }
         .tag.price { background: #fff0f0; color: var(--price-color); font-weight: 600; }
         .tag.count { background: #e8f5e9; color: #2e7d32; }
-        
-        /* 🥕 당근 태그 스타일 */
         .tag.carrot { background: #FFF3E0; color: #FF8A3D; font-weight: 800; border: 1px solid #FFCCBC; }
 
         .link-btn { text-decoration: none; background: #E3F2FD; color: #1565C0; padding: 3px 6px; border-radius: 4px; font-size: 11px; font-weight: bold; }
@@ -107,6 +105,15 @@
         .excel-btn.upload { background: #2980b9; box-shadow: 0 4px 10px rgba(41, 128, 185, 0.3); }
         .file-input-hidden { display: none; }
 
+        /* 자동 등록 버튼 스타일 */
+        .auto-fill-btn {
+            display: block; width: 90%; margin: 20px auto;
+            padding: 15px; background: #6c5ce7; color: white;
+            border: none; border-radius: 12px; font-weight: bold; font-size: 16px;
+            cursor: pointer; box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3);
+        }
+        .auto-fill-btn:active { transform: scale(0.98); }
+
         /* 모달 */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 200; align-items: center; justify-content: center; }
         .modal { background: white; width: 90%; max-width: 400px; padding: 25px; border-radius: 20px; max-height: 90vh; overflow-y: auto; }
@@ -123,8 +130,6 @@
         .btn { flex: 1; padding: 14px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
         .btn-cancel { background: #f5f5f5; color: #666; }
         .btn-confirm { background: var(--main-color); color: white; }
-        
-        /* 체크박스 옵션 행 */
         .option-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; background: #f9f9f9; padding: 10px; border-radius: 8px; }
         .option-label { display: flex; align-items: center; font-size: 14px; color: #555; cursor: pointer; }
         .option-chk { width: 18px; height: 18px; margin-right: 8px; cursor: pointer; accent-color: var(--main-color); }
@@ -152,7 +157,11 @@
         </div>
 
         <div id="contentArea"></div>
-        <div id="emptyGuide" style="text-align:center; padding:60px; color:#aaa; display:none; font-size:14px;"><p>아직 등록된 항목이 없어요.</p></div>
+        
+        <div id="emptyGuide" style="text-align:center; padding:60px; color:#aaa; display:none; font-size:14px;">
+            <p>아직 등록된 항목이 없어요.</p>
+            <button class="auto-fill-btn" onclick="uploadInitialData()">📝 물품 리스트 80종 자동 등록하기</button>
+        </div>
 
         <div class="excel-zone">
             <h3>📊 엑셀 대량 등록</h3>
@@ -160,6 +169,10 @@
             <button class="excel-btn" onclick="downloadTemplate()">📥 양식 다운로드</button>
             <button class="excel-btn upload" onclick="document.getElementById('excelInput').click()">📤 작성한 엑셀 업로드</button>
             <input type="file" id="excelInput" class="file-input-hidden" accept=".xlsx, .xls" onchange="handleExcelUpload(this)">
+        </div>
+        
+        <div style="text-align:center; margin-top:20px;">
+             <button class="auto-fill-btn" style="background:#a29bfe; font-size:13px; padding:10px; width:auto; display:inline-block;" onclick="if(confirm('중복될 수 있습니다. 추가하시겠습니까?')) uploadInitialData()">📥 리스트 강제 추가</button>
         </div>
     </div>
 
@@ -238,7 +251,7 @@
         const db = getDatabase(app);
         const dbRef = ref(db, 'baby_checklist_v6'); 
 
-        // 아이콘 데이터 (축약됨, V13의 방대한 아이콘과 동일)
+        // 아이콘 DB (축약됨)
         const iconDB = [
             {icon:'👶', t:'아기 베이비 얼굴 신생아'}, {icon:'👧', t:'여자 아이 딸'}, {icon:'🧒', t:'아이 어린이'}, {icon:'👦', t:'남자 아이 아들'}, 
             {icon:'🤰', t:'임신 임산부 엄마'}, {icon:'🤱', t:'수유 모유 엄마'}, {icon:'👼', t:'천사 아기'}, {icon:'🏥', t:'병원 소아과 조리원'}, 
@@ -315,9 +328,7 @@
                     let tags = '';
                     if(item.brand) tags += `<span class="tag brand">${item.brand}</span> `;
                     if(item.model) tags += `<span class="tag model">${item.model}</span> `;
-                    // 🥕 당근 태그 추가
                     if(item.isCarrot) tags += `<span class="tag carrot">🥕 당근</span> `;
-                    
                     if(item.price) tags += `<span class="tag price">${Number(price).toLocaleString()}원</span> `;
                     if(item.link) tags += `<a href="${item.link}" target="_blank" class="link-btn">🔗 구매</a>`;
 
@@ -388,107 +399,101 @@
             window.toggleEditMode(document.getElementById('editModeSwitch').checked);
         }
 
-        window.filterIcons = (keyword, targetGridId) => {
-            if(!keyword) { renderIcons(iconDB, targetGridId); return; }
-            const filtered = iconDB.filter(item => item.t.includes(keyword) || item.icon.includes(keyword));
-            renderIcons(filtered, targetGridId);
-        };
-
-        function renderIcons(list, targetGridId) {
-            const grid = document.getElementById(targetGridId);
-            grid.innerHTML = '';
-            list.forEach(item => {
-                const el = document.createElement('div');
-                el.className = `icon-opt ${item.icon === selectedIcon ? 'selected' : ''}`;
-                el.innerText = item.icon;
-                el.onclick = () => { selectedIcon = item.icon; Array.from(grid.children).forEach(c => c.classList.remove('selected')); el.classList.add('selected'); };
-                grid.appendChild(el);
-            });
-        }
-
-        // 아이템 추가 모달 열기
-        window.openAddItem = (catId) => {
-            document.getElementById('itemModal').style.display = 'flex';
-            document.getElementById('itemModalTitle').innerText = '✨ 물품 등록';
-            document.getElementById('targetCatId').value = catId;
-            document.getElementById('targetItemId').value = '';
-            document.getElementById('itemName').value = '';
-            document.getElementById('itemBrand').value = '';
-            document.getElementById('itemModel').value = '';
-            document.getElementById('itemMemo').value = '';
-            document.getElementById('itemCount').value = '1';
-            document.getElementById('itemPrice').value = '';
-            document.getElementById('itemLink').value = '';
+        // ==========================================
+        // 🚀 아이콘 완벽 매칭 자동 등록 로직
+        // ==========================================
+        window.uploadInitialData = async () => {
+            alert("리스트와 아이콘을 매칭하여 등록합니다! (약 5~10초 소요)");
             
-            // 체크박스 초기화
-            document.getElementById('itemIsCarrot').checked = false; 
-            document.getElementById('itemShowNaver').checked = true;
-            
-            selectedIcon = '👶';
-            renderIcons(iconDB, 'itemIconGrid');
-        };
+            // 모든 아이템에 개별 아이콘 할당
+            const initialData = [
+                {
+                    name: "출산가방/엄마용품", icon: "🏥",
+                    items: [
+                        {n:"산모수첩", i:"📒"}, {n:"신분증/지갑", i:"💳"}, {n:"휴대폰/충전기", i:"📱"},
+                        {n:"마스크", i:"😷"}, {n:"구부러지는 빨대", i:"🥤"}, {n:"물티슈/마이비데", i:"🧻"},
+                        {n:"철분제(엄마영양제)", i:"💊"}, {n:"가습기", i:"💧"}, {n:"스킨케어/세면도구", i:"🧴"},
+                        {n:"수유나시/브라/패드", i:"👙"}, {n:"제왕절개 팬티", i:"🩲"}, {n:"양말/목수건", i:"🧦"},
+                        {n:"생리대/맘스안심팬티", i:"🩸"}, {n:"양배추 가슴팩", i:"🥬"}, {n:"산후복대", i:"🤕"},
+                        {n:"손목보호대", i:"🤲"}, {n:"압박스타킹", i:"👢"}, {n:"디데이달력", i:"📅"}, {n:"볼펜/슬리퍼", i:"🖊️"}
+                    ]
+                },
+                {
+                    name: "위생/케어", icon: "🩹",
+                    items: [
+                        {n:"손수건 10장", i:"🧣"}, {n:"유산균", i:"🦠"}, {n:"손톱케어 4종", i:"✂️"},
+                        {n:"체온계", i:"🌡️"}, {n:"온습도계", i:"💧"}, {n:"알콜스왑", i:"🏥"}, {n:"배꼽소독솜", i:"☁️"}
+                    ]
+                },
+                {
+                    name: "수유용품", icon: "🍼",
+                    items: [
+                        {n:"모유저장팩", i:"🧊"}, {n:"수유컵", i:"🥛"}, {n:"수유쿠션", i:"🍩"},
+                        {n:"유축기", i:"🤱"}, {n:"분유제조기", i:"🤖"}, {n:"분유쉐이커", i:"🥤"},
+                        {n:"젖병(큰거/작은거)", i:"🍼"}, {n:"분유", i:"🥫"}, {n:"분유포트", i:"🫖"},
+                        {n:"젖꼭지", i:"🍼"}, {n:"젖병솔/집게", i:"🖌️"}, {n:"젖병건조대", i:"🌵"},
+                        {n:"젖병소독기", i:"✨"}, {n:"젖병세정제", i:"🧼"}, {n:"휴대용젖병", i:"🍼"},
+                        {n:"보온병", i:"🌡️"}, {n:"공갈젖꼭지(쪽쪽이)", i:"👶"}
+                    ]
+                },
+                {
+                    name: "목욕/세탁", icon: "🛁",
+                    items: [
+                        {n:"기저귀", i:"🩲"}, {n:"아기비데", i:"🚿"}, {n:"천기저귀", i:"⬜"},
+                        {n:"아기욕조", i:"🛁"}, {n:"신생아면봉", i:"👂"}, {n:"건티슈", i:"🧻"},
+                        {n:"세탁세제", i:"🧴"}, {n:"무형광 세탁망", i:"🕸️"}, {n:"장난감 소독제", i:"🔫"},
+                        {n:"바스&샴푸", i:"🧴"}, {n:"로션/오일/수딩젤", i:"🧴"}, {n:"기저귀발진크림", i:"🥫"}, {n:"비판텐 연고", i:"💊"}
+                    ]
+                },
+                {
+                    name: "가구/침구/의류", icon: "🛏️",
+                    items: [
+                        {n:"아기침대", i:"🛏️"}, {n:"기저귀갈이대", i:"🚼"}, {n:"트롤리(덮개형)", i:"🛒"},
+                        {n:"아기수납장", i:"🗄️"}, {n:"아기옷걸이", i:"🧥"}, {n:"범보의자", i:"🪑"},
+                        {n:"방수패드", i:"🚫"}, {n:"블랭킷/이불", i:"🛌"}, {n:"바디슈트", i:"👕"},
+                        {n:"배냇저고리/우주복", i:"👘"}, {n:"턱받이", i:"👶"}, {n:"내복", i:"👕"}, {n:"양말", i:"🧦"}
+                    ]
+                },
+                {
+                    name: "외출/가전/기타", icon: "🚗",
+                    items: [
+                        {n:"바구니카시트", i:"🧺"}, {n:"카시트", i:"🚗"}, {n:"유모차", i:"🛒"},
+                        {n:"유모차라이너", i:"💺"}, {n:"통풍시트", i:"❄️"}, {n:"아기띠", i:"🐨"},
+                        {n:"차량스티커", i:"🔰"}, {n:"차량햇빛가리개", i:"☀️"}, {n:"기저귀가방", i:"🎒"},
+                        {n:"하이체어", i:"🪑"}, {n:"빨래건조대", i:"🧺"}, {n:"백색소음기", i:"📻"}, {n:"모빌", i:"🎠"}
+                    ]
+                }
+            ];
 
-        // 아이템 수정 모달 열기
-        window.openEditItem = (catId, itemId) => {
-            const item = currentData[catId].items[itemId];
-            if(!item) return;
-            document.getElementById('itemModal').style.display = 'flex';
-            document.getElementById('itemModalTitle').innerText = '✏️ 물품 수정';
-            document.getElementById('targetCatId').value = catId;
-            document.getElementById('targetItemId').value = itemId;
-            document.getElementById('itemName').value = item.name;
-            document.getElementById('itemBrand').value = item.brand || '';
-            document.getElementById('itemModel').value = item.model || '';
-            document.getElementById('itemMemo').value = item.memo || '';
-            document.getElementById('itemCount').value = item.count || 1;
-            document.getElementById('itemPrice').value = item.price || '';
-            document.getElementById('itemLink').value = item.link || '';
-            
-            // 저장된 값 불러오기
-            document.getElementById('itemIsCarrot').checked = (item.isCarrot === true);
-            document.getElementById('itemShowNaver').checked = (item.showNaver !== false);
-
-            selectedIcon = item.icon || '👶';
-            renderIcons(iconDB, 'itemIconGrid');
-        };
-
-        window.saveItem = () => {
-            const catId = document.getElementById('targetCatId').value;
-            const itemId = document.getElementById('targetItemId').value;
-            const newData = {
-                name: document.getElementById('itemName').value,
-                brand: document.getElementById('itemBrand').value,
-                model: document.getElementById('itemModel').value,
-                memo: document.getElementById('itemMemo').value,
-                count: document.getElementById('itemCount').value,
-                price: document.getElementById('itemPrice').value,
-                link: document.getElementById('itemLink').value,
-                icon: selectedIcon,
-                checked: false,
-                order: 999,
-                // 체크박스 값 저장
-                isCarrot: document.getElementById('itemIsCarrot').checked,
-                showNaver: document.getElementById('itemShowNaver').checked
-            };
-            if(!newData.name) return alert('이름 입력!');
-
-            if(itemId) {
-                const existing = currentData[catId].items[itemId];
-                newData.checked = existing.checked;
-                newData.order = existing.order || 999;
-                update(ref(db, `baby_checklist_v6/${catId}/items/${itemId}`), newData);
-            } else {
-                push(ref(db, `baby_checklist_v6/${catId}/items`), newData);
+            for (let i = 0; i < initialData.length; i++) {
+                const cat = initialData[i];
+                const newCatRef = await push(ref(db, 'baby_checklist_v6'), {
+                    name: cat.name, icon: cat.icon, order: i
+                });
+                const catId = newCatRef.key;
+                if(cat.items && cat.items.length > 0) {
+                    for (let j = 0; j < cat.items.length; j++) {
+                        const item = cat.items[j];
+                        await push(ref(db, `baby_checklist_v6/${catId}/items`), {
+                            name: item.n, // 이름
+                            icon: item.i, // 개별 아이콘
+                            checked: false, order: j, count: 1,
+                            showNaver: true
+                        });
+                    }
+                }
             }
-            window.closeModal('itemModal');
+            alert("✅ 모든 아이템이 아이콘과 함께 등록되었습니다!");
         };
 
-        // ... 기존 함수들 유지 (Sortable, Excel, Category 등) ...
+        // ... 나머지 함수들 (변경 없음) ...
         function initCategorySortable() { const el = document.getElementById('contentArea'); catSortable = new Sortable(el, { handle: '.drag-handle-cat', animation: 150, ghostClass: 'sortable-ghost', disabled: !document.getElementById('editModeSwitch').checked, onStart:()=>{document.body.classList.add('is-dragging')}, onEnd:()=>{document.body.classList.remove('is-dragging'); updateCategoryOrder(Array.from(el.children).map(div => div.getAttribute('data-id')))}}); }
         function updateCategoryOrder(newIds){ const updates={}; newIds.forEach((catId,idx)=>{updates[`baby_checklist_v6/${catId}/order`]=idx;}); update(ref(db),updates); }
         function initItemSortable(el, catId){ const sortable=new Sortable(el,{handle:'.drag-handle', animation:150, ghostClass:'sortable-ghost', disabled:!document.getElementById('editModeSwitch').checked, onStart:()=>{document.body.classList.add('is-dragging')}, onEnd:()=>{document.body.classList.remove('is-dragging'); updateItemOrder(catId, Array.from(el.children).map(li=>li.getAttribute('data-id')))}}); el.sortableInstance=sortable; }
         function updateItemOrder(catId,newIds){ const updates={}; newIds.forEach((itemId,idx)=>{updates[`baby_checklist_v6/${catId}/items/${itemId}/order`]=idx;}); update(ref(db),updates); }
         window.toggleEditMode = (isChecked) => { if(isChecked) { document.body.classList.add('is-edit-mode'); if(catSortable) catSortable.option("disabled", false); document.querySelectorAll('.item-list').forEach(el => el.sortableInstance?.option("disabled", false)); } else { document.body.classList.remove('is-edit-mode'); if(catSortable) catSortable.option("disabled", true); document.querySelectorAll('.item-list').forEach(el => el.sortableInstance?.option("disabled", true)); } };
+        window.filterIcons = (keyword, targetGridId) => { if(!keyword) { renderIcons(iconDB, targetGridId); return; } const filtered = iconDB.filter(item => item.t.includes(keyword) || item.icon.includes(keyword)); renderIcons(filtered, targetGridId); };
+        function renderIcons(list, targetGridId) { const grid = document.getElementById(targetGridId); grid.innerHTML = ''; list.forEach(item => { const el = document.createElement('div'); el.className = `icon-opt ${item.icon === selectedIcon ? 'selected' : ''}`; el.innerText = item.icon; el.onclick = () => { selectedIcon = item.icon; Array.from(grid.children).forEach(c => c.classList.remove('selected')); el.classList.add('selected'); }; grid.appendChild(el); }); }
         window.toggleCheck=(catId,itemId,checked)=>update(ref(db,`baby_checklist_v6/${catId}/items/${itemId}`),{checked});
         window.deleteCategory=(id)=>{if(confirm('삭제하시겠습니까?')) remove(ref(db,`baby_checklist_v6/${id}`));};
         window.deleteItem=(catId,itemId)=>{if(confirm('삭제하시겠습니까?')) remove(ref(db,`baby_checklist_v6/${catId}/items/${itemId}`));};
@@ -496,6 +501,9 @@
         window.openCatModal = () => { document.getElementById('catModal').style.display = 'flex'; document.getElementById('catModalTitle').innerText = '📂 카테고리 추가'; document.getElementById('editCatId').value = ''; document.getElementById('catName').value = ''; selectedIcon = '👶'; renderIcons(iconDB, 'catIconGrid'); };
         window.openEditCategory = (catId) => { const cat = currentData[catId]; if(!cat) return; document.getElementById('catModal').style.display = 'flex'; document.getElementById('catModalTitle').innerText = '✏️ 카테고리 수정'; document.getElementById('editCatId').value = catId; document.getElementById('catName').value = cat.name; selectedIcon = cat.icon || '👶'; renderIcons(iconDB, 'catIconGrid'); };
         window.saveCategory = () => { const name = document.getElementById('catName').value; const editId = document.getElementById('editCatId').value; if(!name) return alert('이름 입력!'); if(editId) { update(ref(db, `baby_checklist_v6/${editId}`), { name, icon: selectedIcon }); } else { push(ref(db, 'baby_checklist_v6'), { name, icon: selectedIcon, order: 999 }); } window.closeModal('catModal'); };
+        window.openAddItem=(catId)=>{document.getElementById('itemModal').style.display='flex'; document.getElementById('itemModalTitle').innerText='✨ 물품 등록'; document.getElementById('targetCatId').value=catId; document.getElementById('targetItemId').value=''; document.getElementById('itemName').value=''; document.getElementById('itemBrand').value=''; document.getElementById('itemModel').value=''; document.getElementById('itemMemo').value=''; document.getElementById('itemCount').value='1'; document.getElementById('itemPrice').value=''; document.getElementById('itemLink').value=''; document.getElementById('itemIsCarrot').checked=false; document.getElementById('itemShowNaver').checked=true; selectedIcon='👶'; renderIcons(iconDB,'itemIconGrid');};
+        window.openEditItem=(catId,itemId)=>{const item=currentData[catId].items[itemId]; if(!item)return; document.getElementById('itemModal').style.display='flex'; document.getElementById('itemModalTitle').innerText='✏️ 물품 수정'; document.getElementById('targetCatId').value=catId; document.getElementById('targetItemId').value=itemId; document.getElementById('itemName').value=item.name; document.getElementById('itemBrand').value=item.brand||''; document.getElementById('itemModel').value=item.model||''; document.getElementById('itemMemo').value=item.memo||''; document.getElementById('itemCount').value=item.count||1; document.getElementById('itemPrice').value=item.price||''; document.getElementById('itemLink').value=item.link||''; document.getElementById('itemIsCarrot').checked=(item.isCarrot===true); document.getElementById('itemShowNaver').checked=(item.showNaver!==false); selectedIcon=item.icon||'👶'; renderIcons(iconDB,'itemIconGrid');};
+        window.saveItem=()=>{const catId=document.getElementById('targetCatId').value; const itemId=document.getElementById('targetItemId').value; const newData={name:document.getElementById('itemName').value, brand:document.getElementById('itemBrand').value, model:document.getElementById('itemModel').value, memo:document.getElementById('itemMemo').value, count:document.getElementById('itemCount').value, price:document.getElementById('itemPrice').value, link:document.getElementById('itemLink').value, icon:selectedIcon, checked:false, order:999, isCarrot:document.getElementById('itemIsCarrot').checked, showNaver:document.getElementById('itemShowNaver').checked}; if(!newData.name)return alert('이름 입력!'); if(itemId){const existing=currentData[catId].items[itemId]; newData.checked=existing.checked; newData.order=existing.order||999; update(ref(db,`baby_checklist_v6/${catId}/items/${itemId}`),newData);}else{push(ref(db,`baby_checklist_v6/${catId}/items`),newData);} window.closeModal('itemModal');};
         window.downloadTemplate=()=>{const header=["카테고리","물품명","브랜드","모델명","수량","예상가격","구매링크","메모"]; const example=["위생/케어","아기 면봉","마이비","",1,5000,"http://...","신생아용 얇은거"]; const wb=XLSX.utils.book_new(); const ws=XLSX.utils.aoa_to_sheet([header,example]); XLSX.utils.book_append_sheet(wb,ws,"육아템_양식"); XLSX.writeFile(wb,"육아준비물_양식.xlsx");};
         window.handleExcelUpload=(input)=>{const file=input.files[0]; if(!file)return; const reader=new FileReader(); reader.onload=async(e)=>{const data=new Uint8Array(e.target.result); const workbook=XLSX.read(data,{type:'array'}); const firstSheet=workbook.Sheets[workbook.SheetNames[0]]; const rows=XLSX.utils.sheet_to_json(firstSheet,{header:1}); if(rows.length<2){alert("데이터 없음");return;} const dataRows=rows.slice(1); const grouped={}; dataRows.forEach(row=>{const catName=row[0]; const itemName=row[1]; if(!catName||!itemName)return; if(!grouped[catName])grouped[catName]=[]; grouped[catName].push({name:itemName, brand:row[2]||"", model:row[3]||"", count:row[4]||1, price:row[5]||"", link:row[6]||"", memo:row[7]||"", showNaver:true});}); if(confirm(`${Object.keys(grouped).length}개 카테고리 등록?`)){for(const catName of Object.keys(grouped)){const newCatRef=await push(ref(db,'baby_checklist_v6'),{name:catName, icon:"👶", order:999}); const catId=newCatRef.key; for(const item of grouped[catName]){await push(ref(db,`baby_checklist_v6/${catId}/items`),{...item, checked:false, order:999});}} alert("업로드 완료!"); input.value="";}}; reader.readAsArrayBuffer(file);};
         window.searchNaver=()=>{const n=document.getElementById('itemName').value; const b=document.getElementById('itemBrand').value; const m=document.getElementById('itemModel').value; if(!n)return alert('이름 입력!'); window.open(`https://search.shopping.naver.com/search/all?query=${encodeURIComponent([b,m,n].filter(Boolean).join(' '))}`,'_blank');};
