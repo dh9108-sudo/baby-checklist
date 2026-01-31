@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>👶 우리 아기 맞이 준비물 (V11)</title>
+    <title>👶 우리 아기 맞이 준비물 (V12)</title>
     <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     
     <style>
         :root {
@@ -56,7 +57,6 @@
         .item { padding: 15px 20px; border-bottom: 1px solid #f9f9f9; background: white; }
         .item.sortable-ghost { opacity: 0.4; background: #eee; }
         .item-top { display: flex; align-items: flex-start; }
-        
         .drag-handle { display: none; color: #ccc; font-size: 20px; margin-right: 15px; cursor: grab; padding-top: 2px; }
 
         .chk-wrap { width: 22px; height: 22px; margin-right: 12px; position: relative; flex-shrink: 0; margin-top: 2px;}
@@ -94,13 +94,18 @@
         .btn-add-item { width: 100%; padding: 12px; background: white; border: none; color: var(--main-color); font-weight: bold; cursor: pointer; border-top: 1px solid #f0f0f0; font-size: 13px; }
         .fab-btn { position: fixed; bottom: 30px; right: 25px; background: var(--main-color); color: white; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; box-shadow: 0 4px 15px rgba(255, 135, 141, 0.4); border: none; cursor: pointer; z-index: 99; }
 
-        .auto-fill-btn {
-            display: block; width: 90%; margin: 20px auto;
-            padding: 15px; background: #6c5ce7; color: white;
-            border: none; border-radius: 12px; font-weight: bold; font-size: 16px;
-            cursor: pointer; box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3);
+        /* 엑셀 관리 영역 */
+        .excel-zone {
+            background: white; margin: 20px; padding: 20px; border-radius: 16px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03); text-align: center;
         }
-        .auto-fill-btn:active { transform: scale(0.98); }
+        .excel-btn {
+            background: #27ae60; color: white; border: none; padding: 10px 15px;
+            border-radius: 8px; font-weight: bold; cursor: pointer; margin: 5px;
+            font-size: 14px; box-shadow: 0 4px 10px rgba(39, 174, 96, 0.3);
+        }
+        .excel-btn.upload { background: #2980b9; box-shadow: 0 4px 10px rgba(41, 128, 185, 0.3); }
+        .file-input-hidden { display: none; }
 
         /* 모달 */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 200; align-items: center; justify-content: center; }
@@ -142,11 +147,17 @@
         
         <div id="emptyGuide" style="text-align:center; padding:60px; color:#aaa; display:none; font-size:14px;">
             <p>아직 등록된 항목이 없어요.</p>
-            <button class="auto-fill-btn" onclick="uploadInitialData()">📝 보내주신 리스트 자동 등록하기</button>
         </div>
 
-        <div style="text-align:center; margin-top:30px;">
-            <button class="auto-fill-btn" style="background:#a29bfe; font-size:14px; padding:10px;" onclick="if(confirm('리스트를 추가하시겠습니까?')) uploadInitialData()">📥 리스트 일괄 추가 (중복 주의)</button>
+        <div class="excel-zone">
+            <h3>📊 엑셀 대량 등록</h3>
+            <p style="font-size:12px; color:#666; margin-bottom:15px;">
+                PC에서 엑셀로 편하게 작성해서 올리세요.<br>
+                1. 양식 다운로드 → 2. 작성 → 3. 업로드
+            </p>
+            <button class="excel-btn" onclick="downloadTemplate()">📥 양식 다운로드</button>
+            <button class="excel-btn upload" onclick="document.getElementById('excelInput').click()">📤 작성한 엑셀 업로드</button>
+            <input type="file" id="excelInput" class="file-input-hidden" accept=".xlsx, .xls" onchange="handleExcelUpload(this)">
         </div>
     </div>
 
@@ -169,11 +180,9 @@
         <div class="modal">
             <h3 id="itemModalTitle">✨ 물품 등록</h3>
             <input type="hidden" id="targetCatId"><input type="hidden" id="targetItemId">
-            
             <div class="input-label">아이콘 선택</div>
             <div class="icon-grid" id="itemIconGrid"></div>
             <div class="input-group"><input type="text" id="itemName" class="input-field" placeholder="물품명 (예: 체온계)"></div>
-            
             <div style="display:flex; gap:10px; margin-bottom:12px;">
                 <div style="flex:1"><label class="input-label">브랜드</label><input type="text" id="itemBrand" class="input-field" placeholder="예: 브라운"></div>
                 <div style="flex:1"><label class="input-label">모델명</label><input type="text" id="itemModel" class="input-field" placeholder="예: IRT-6520"></div>
@@ -263,9 +272,8 @@
                     if(item.price) tags += `<span class="tag price">${Number(price).toLocaleString()}원</span> `;
                     if(item.link) tags += `<a href="${item.link}" target="_blank" class="link-btn">🔗 구매</a>`;
 
-                    // ✅ V11: 버튼 표시 여부 확인 (기존 데이터 호환을 위해 undefined는 true로 처리)
+                    // 네이버 버튼 표시 여부
                     const showNaver = (item.showNaver !== false); 
-
                     if(showNaver) {
                         let queryParts = [item.brand, item.model, item.name].filter(Boolean);
                         const searchUrl = `https://search.shopping.naver.com/search/all?query=${encodeURIComponent(queryParts.join(' '))}`;
@@ -320,7 +328,6 @@
             });
 
             if(!catSortable) initCategorySortable();
-
             const percent = totalCount === 0 ? 0 : Math.round((checkedCount / totalCount) * 100);
             document.getElementById('progressBar').style.width = `${percent}%`;
             document.getElementById('percentTxt').innerText = `${percent}%`;
@@ -330,54 +337,89 @@
             window.toggleEditMode(document.getElementById('editModeSwitch').checked);
         }
 
-        window.uploadInitialData = async () => {
-            alert("리스트 업로드를 시작합니다!");
-            const initialData = [
-                {
-                    name: "출산가방/엄마용품", icon: "🏥",
-                    items: ["산모수첩","신분증/지갑","휴대폰/충전기","마스크","구부러지는 빨대","물티슈/마이비데","철분제(엄마영양제)","가습기","스킨케어/세면도구","수유나시/브라/수유패드","제왕절개 팬티","양말/목수건","생리대/맘스안심팬티","양배추 가슴팩","산후복대","손목보호대","압박스타킹","디데이달력","볼펜/슬리퍼"]
-                },
-                {
-                    name: "위생/케어", icon: "🩹",
-                    items: ["손수건 10장","유산균","손톱케어 4종","체온계","온습도계","알콜스왑","배꼽소독솜"]
-                },
-                {
-                    name: "수유용품", icon: "🍼",
-                    items: ["모유저장팩","수유컵","수유쿠션","유축기","분유제조기","분유쉐이커","젖병(큰거/작은거)","분유","분유포트","젖꼭지","젖병솔/집게","젖병건조대","젖병소독기","젖병세정제","휴대용젖병","보온병","공갈젖꼭지(쪽쪽이)"]
-                },
-                {
-                    name: "목욕/세탁", icon: "🛁",
-                    items: ["기저귀","아기비데","천기저귀","아기욕조","신생아면봉","건티슈","세탁세제","무형광 세탁망","장난감 소독제","바스&샴푸","로션/오일/수딩젤","기저귀발진크림","비판텐 연고"]
-                },
-                {
-                    name: "가구/침구/의류", icon: "🛏️",
-                    items: ["아기침대","기저귀갈이대","트롤리(덮개형)","아기수납장","아기옷걸이","범보의자","방수패드","블랭킷/이불","바디슈트","배냇저고리/우주복","턱받이","내복","양말"]
-                },
-                {
-                    name: "외출/가전/기타", icon: "🚗",
-                    items: ["바구니카시트","카시트","유모차","유모차라이너","통풍시트","아기띠","차량스티커","차량햇빛가리개","기저귀가방","하이체어","빨래건조대","백색소음기","모빌"]
-                }
-            ];
-
-            for (let i = 0; i < initialData.length; i++) {
-                const cat = initialData[i];
-                const newCatRef = await push(ref(db, 'baby_checklist_v6'), {
-                    name: cat.name, icon: cat.icon, order: i
-                });
-                const catId = newCatRef.key;
-                if(cat.items && cat.items.length > 0) {
-                    for (let j = 0; j < cat.items.length; j++) {
-                        await push(ref(db, `baby_checklist_v6/${catId}/items`), {
-                            name: cat.items[j],
-                            checked: false, order: j, count: 1,
-                            showNaver: true // 일괄 등록 시에는 기본적으로 버튼 표시
-                        });
-                    }
-                }
-            }
-            alert("✅ 등록 완료!");
+        // ==========================================
+        // 🚀 엑셀 다운로드 & 업로드 로직
+        // ==========================================
+        
+        // 1. 엑셀 양식 다운로드
+        window.downloadTemplate = () => {
+            // 헤더 정의
+            const header = ["카테고리", "물품명", "브랜드", "모델명", "수량", "예상가격", "구매링크", "메모"];
+            // 예시 데이터
+            const example = ["위생/케어", "아기 면봉", "마이비", "", 1, 5000, "http://...", "신생아용 얇은거"];
+            
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet([header, example]);
+            XLSX.utils.book_append_sheet(wb, ws, "육아템_양식");
+            XLSX.writeFile(wb, "육아준비물_양식.xlsx");
         };
 
+        // 2. 엑셀 파일 읽어서 DB 등록
+        window.handleExcelUpload = (input) => {
+            const file = input.files[0];
+            if(!file) return;
+
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, {type: 'array'});
+                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1 }); // 배열의 배열로 읽기
+
+                // 헤더 제외하고 데이터만 추출
+                if(rows.length < 2) { alert("데이터가 없습니다."); return; }
+                const dataRows = rows.slice(1); // 첫줄(헤더) 빼고
+
+                // 카테고리별로 그룹화
+                const grouped = {};
+                
+                dataRows.forEach(row => {
+                    // row[0]:카테고리, row[1]:물품명 ...
+                    const catName = row[0];
+                    const itemName = row[1];
+                    if(!catName || !itemName) return; // 필수값 없으면 패스
+
+                    if(!grouped[catName]) grouped[catName] = [];
+                    grouped[catName].push({
+                        name: itemName,
+                        brand: row[2] || "",
+                        model: row[3] || "",
+                        count: row[4] || 1,
+                        price: row[5] || "",
+                        link: row[6] || "",
+                        memo: row[7] || "",
+                        showNaver: true // 기본값
+                    });
+                });
+
+                // Firebase에 등록
+                if(confirm(`${Object.keys(grouped).length}개 카테고리의 물품을 등록하시겠습니까?`)) {
+                    for(const catName of Object.keys(grouped)) {
+                        // 카테고리 생성
+                        const newCatRef = await push(ref(db, 'baby_checklist_v6'), {
+                            name: catName,
+                            icon: "👶", // 기본 아이콘
+                            order: 999
+                        });
+                        const catId = newCatRef.key;
+
+                        // 아이템들 생성
+                        for(const item of grouped[catName]) {
+                            await push(ref(db, `baby_checklist_v6/${catId}/items`), {
+                                ...item,
+                                checked: false,
+                                order: 999
+                            });
+                        }
+                    }
+                    alert("✅ 엑셀 업로드 완료!");
+                    input.value = ""; // 초기화
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        };
+
+        // ... 기존 함수들 ...
         function initCategorySortable() {
             const el = document.getElementById('contentArea');
             catSortable = new Sortable(el, {
@@ -453,7 +495,7 @@
             document.getElementById('itemCount').value = '1';
             document.getElementById('itemPrice').value = '';
             document.getElementById('itemLink').value = '';
-            document.getElementById('itemShowNaver').checked = true; // 추가 시 기본값 true
+            document.getElementById('itemShowNaver').checked = true;
             renderIcons('itemIconGrid');
         };
 
@@ -471,10 +513,7 @@
             document.getElementById('itemCount').value = item.count || 1;
             document.getElementById('itemPrice').value = item.price || '';
             document.getElementById('itemLink').value = item.link || '';
-            
-            // ✅ 기존 값 불러오기 (없으면 true)
             document.getElementById('itemShowNaver').checked = (item.showNaver !== false);
-
             selectedIcon = item.icon || '👶';
             renderIcons('itemIconGrid');
         };
@@ -493,11 +532,9 @@
                 icon: selectedIcon,
                 checked: false,
                 order: 999,
-                // ✅ 체크박스 값 저장
                 showNaver: document.getElementById('itemShowNaver').checked
             };
             if(!newData.name) return alert('이름 입력!');
-
             if(itemId) {
                 const existing = currentData[catId].items[itemId];
                 newData.checked = existing.checked;
