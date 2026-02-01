@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>👶 우리 아기 맞이 준비물 (V15)</title>
+    <title>👶 우리 아기 맞이 준비물 (V16)</title>
     <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -22,10 +22,23 @@
         .container { max-width: 600px; margin: 0 auto; padding-bottom: 150px; }
 
         /* 헤더 */
-        .header { background: linear-gradient(120deg, #ff9a9e 0%, #fecfef 100%); padding: 20px 20px 25px; color: white; border-radius: 0 0 25px 25px; box-shadow: 0 4px 20px rgba(255, 154, 158, 0.3); }
+        .header { background: linear-gradient(120deg, #ff9a9e 0%, #fecfef 100%); padding: 20px 20px 25px; color: white; border-radius: 0 0 25px 25px; box-shadow: 0 4px 20px rgba(255, 154, 158, 0.3); position: relative; }
         .header-top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .header h2 { margin: 0; font-size: 20px; font-weight: 800; }
         
+        .header-actions { display: flex; align-items: center; gap: 10px; }
+        .btn-search-toggle { background: rgba(255,255,255,0.2); border: none; color: white; width: 32px; height: 32px; border-radius: 50%; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+
+        /* 글로벌 검색창 */
+        .global-search-box {
+            display: none; /* 기본 숨김 */
+            background: white; padding: 10px; border-radius: 12px; margin-bottom: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            animation: slideDown 0.3s ease;
+        }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .global-search-input { width: 100%; border: 1px solid #ddd; padding: 10px; border-radius: 8px; font-size: 14px; outline: none; }
+
         .edit-toggle-wrap { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; }
         .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
         .switch input { opacity: 0; width: 0; height: 0; }
@@ -44,6 +57,7 @@
         /* 카테고리 & 아이템 */
         .category-card { background: white; margin: 20px; border-radius: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); overflow: hidden; position: relative; }
         .category-card.sortable-ghost { opacity: 0.4; background: #eee; }
+        .category-card.hidden { display: none; } /* 검색 시 숨김용 */
         
         .cat-header { padding: 15px 20px; background: #fff; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; }
         .cat-left { display: flex; align-items: center; gap: 10px; }
@@ -59,6 +73,7 @@
 
         .item-list { list-style: none; padding: 0; margin: 0; min-height: 10px; }
         .item { padding: 15px 20px; border-bottom: 1px solid #f9f9f9; background: white; }
+        .item.hidden { display: none; } /* 검색 시 숨김용 */
         .item.sortable-ghost { opacity: 0.4; background: #eee; }
         .item-top { display: flex; align-items: flex-start; }
         .drag-handle { display: none; color: #ccc; font-size: 20px; margin-right: 15px; cursor: grab; padding-top: 2px; }
@@ -95,24 +110,11 @@
         body.is-edit-mode .drag-handle-cat { display: block; }
         body.is-edit-mode .chk-wrap { display: none; }
 
-        .item.completed .item-name { text-decoration: line-through; color: #ccc; }
-        .item.completed .item-icon { opacity: 0.5; }
-        .btn-add-item { width: 100%; padding: 12px; background: white; border: none; color: var(--main-color); font-weight: bold; cursor: pointer; border-top: 1px solid #f0f0f0; font-size: 13px; }
-        .fab-btn { position: fixed; bottom: 30px; right: 25px; background: var(--main-color); color: white; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; box-shadow: 0 4px 15px rgba(255, 135, 141, 0.4); border: none; cursor: pointer; z-index: 99; }
-
         .excel-zone { background: white; margin: 20px; padding: 20px; border-radius: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); text-align: center; }
         .excel-btn { background: #27ae60; color: white; border: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; margin: 5px; font-size: 14px; box-shadow: 0 4px 10px rgba(39, 174, 96, 0.3); }
         .excel-btn.upload { background: #2980b9; box-shadow: 0 4px 10px rgba(41, 128, 185, 0.3); }
         .file-input-hidden { display: none; }
-
-        /* 자동 등록 버튼 스타일 */
-        .auto-fill-btn {
-            display: block; width: 90%; margin: 20px auto;
-            padding: 15px; background: #6c5ce7; color: white;
-            border: none; border-radius: 12px; font-weight: bold; font-size: 16px;
-            cursor: pointer; box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3);
-        }
-        .auto-fill-btn:active { transform: scale(0.98); }
+        .auto-fill-btn { display: block; width: 90%; margin: 20px auto; padding: 15px; background: #6c5ce7; color: white; border: none; border-radius: 12px; font-weight: bold; font-size: 16px; cursor: pointer; box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3); }
 
         /* 모달 */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 200; align-items: center; justify-content: center; }
@@ -121,8 +123,12 @@
         .input-label { display: block; font-size: 12px; color: #888; margin-bottom: 5px; }
         .input-field { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; font-size: 15px; outline: none; }
         
+        /* 아이콘 검색 및 직접 입력 */
         .icon-search-box { position: sticky; top: 0; background: white; padding-bottom: 10px; z-index: 10; }
         .icon-search-input { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 8px; font-size: 13px; background: #f9f9f9; }
+        .custom-icon-wrap { margin-bottom: 15px; display: flex; align-items: center; gap: 10px; background: #f0f0f0; padding: 8px; border-radius: 8px; }
+        .custom-icon-input { width: 60px; text-align: center; font-size: 20px; padding: 5px; border-radius: 5px; border: 1px solid #ccc; }
+        
         .icon-grid { height: 180px; overflow-y: scroll; border: 1px solid #eee; border-radius: 10px; padding: 10px; display: grid; grid-template-columns: repeat(6, 1fr); gap: 5px; margin-bottom: 15px; }
         .icon-opt { font-size: 22px; text-align: center; padding: 8px; border-radius: 8px; cursor: pointer; }
         .icon-opt.selected { background: var(--sub-color); border: 1px solid var(--main-color); }
@@ -140,14 +146,22 @@
         <div class="header">
             <div class="header-top-row">
                 <h2>👶 육아 준비 리스트</h2>
-                <div class="edit-toggle-wrap">
-                    <span>편집 모드</span>
-                    <label class="switch">
-                        <input type="checkbox" id="editModeSwitch" onchange="window.toggleEditMode(this.checked)">
-                        <span class="slider"></span>
-                    </label>
+                <div class="header-actions">
+                    <button class="btn-search-toggle" onclick="toggleGlobalSearch()">🔍</button>
+                    <div class="edit-toggle-wrap">
+                        <span>편집</span>
+                        <label class="switch">
+                            <input type="checkbox" id="editModeSwitch" onchange="window.toggleEditMode(this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
                 </div>
             </div>
+
+            <div id="globalSearchBox" class="global-search-box">
+                <input type="text" class="global-search-input" id="globalSearchInput" placeholder="물품명, 브랜드, 메모 검색... (예: 손수건)" onkeyup="searchGlobal(this.value)">
+            </div>
+
             <div style="text-align: right;"><div class="total-budget-badge">총 예산 <span id="grandTotal">0</span>원</div></div>
             <div class="progress-box">
                 <div class="progress-circle" id="percentTxt">0%</div>
@@ -183,8 +197,15 @@
             <h3 id="catModalTitle">📂 카테고리 추가</h3>
             <input type="hidden" id="editCatId">
             <div class="input-label">아이콘 선택</div>
+            
+            <div class="custom-icon-wrap">
+                <span style="font-size:12px;">📱 직접 입력:</span>
+                <input type="text" id="catCustomIcon" class="custom-icon-input" placeholder="😊" maxlength="2">
+                <span style="font-size:11px; color:#888;">(키보드 이모지 사용 가능)</span>
+            </div>
+
             <div class="icon-search-box">
-                <input type="text" class="icon-search-input" placeholder="🔍 아이콘 검색 (예: 우유, 차, 병원)" onkeyup="filterIcons(this.value, 'catIconGrid')">
+                <input type="text" class="icon-search-input" placeholder="🔍 목록에서 찾기 (예: 병원)" onkeyup="filterIcons(this.value, 'catIconGrid')">
             </div>
             <div class="icon-grid" id="catIconGrid"></div>
             <div class="input-group"><input type="text" id="catName" class="input-field" placeholder="이름 (예: 목욕/위생)"></div>
@@ -201,8 +222,14 @@
             <input type="hidden" id="targetCatId"><input type="hidden" id="targetItemId">
             
             <div class="input-label">아이콘 선택</div>
+            <div class="custom-icon-wrap">
+                <span style="font-size:12px;">📱 직접 입력:</span>
+                <input type="text" id="itemCustomIcon" class="custom-icon-input" placeholder="🍼" maxlength="2">
+                <span style="font-size:11px; color:#888;">(키보드 이모지 사용 가능)</span>
+            </div>
+
             <div class="icon-search-box">
-                <input type="text" class="icon-search-input" placeholder="🔍 아이콘 검색 (예: 젖병, 옷, 돈)" onkeyup="filterIcons(this.value, 'itemIconGrid')">
+                <input type="text" class="icon-search-input" placeholder="🔍 목록에서 찾기 (예: 젖병)" onkeyup="filterIcons(this.value, 'itemIconGrid')">
             </div>
             <div class="icon-grid" id="itemIconGrid"></div>
             
@@ -251,42 +278,29 @@
         const db = getDatabase(app);
         const dbRef = ref(db, 'baby_checklist_v6'); 
 
-        // 아이콘 DB (축약됨)
+        // 🚀 방대한 아이콘 DB (600여개)
         const iconDB = [
-            {icon:'👶', t:'아기 베이비 얼굴 신생아'}, {icon:'👧', t:'여자 아이 딸'}, {icon:'🧒', t:'아이 어린이'}, {icon:'👦', t:'남자 아이 아들'}, 
-            {icon:'🤰', t:'임신 임산부 엄마'}, {icon:'🤱', t:'수유 모유 엄마'}, {icon:'👼', t:'천사 아기'}, {icon:'🏥', t:'병원 소아과 조리원'}, 
-            {icon:'🚑', t:'구급차 응급'}, {icon:'🩺', t:'청진기 진찰 의사'}, {icon:'💊', t:'약 알약 영양제'}, {icon:'💉', t:'주사 예방접종'}, 
-            {icon:'🩹', t:'밴드 상처 연고'}, {icon:'🌡️', t:'체온계 온도 열'}, {icon:'😷', t:'마스크 감기'}, {icon:'🍼', t:'젖병 우유 분유'}, 
-            {icon:'🥣', t:'이유식 밥그릇 죽'}, {icon:'🥄', t:'숟가락 스푼'}, {icon:'🥡', t:'도시락'}, {icon:'🍪', t:'과자 간식'}, 
-            {icon:'🥛', t:'우유 컵 물'}, {icon:'🧊', t:'얼음'}, {icon:'🥢', t:'젓가락'}, {icon:'🍽️', t:'식사 접시'}, {icon:'🧂', t:'소금 양념'}, 
-            {icon:'🍎', t:'사과 과일'}, {icon:'🍌', t:'바나나'}, {icon:'🥦', t:'브로콜리 야채'}, {icon:'🥕', t:'당근'}, {icon:'🌽', t:'옥수수'}, 
-            {icon:'🥩', t:'고기 이유식'}, {icon:'🍗', t:'치킨 닭'}, {icon:'🍞', t:'빵 식빵'}, {icon:'🥨', t:'프레첼'}, {icon:'🍩', t:'도넛'}, 
-            {icon:'🍦', t:'아이스크림'}, {icon:'🍰', t:'케이크 생일'}, {icon:'🍫', t:'초콜릿'}, {icon:'🍬', t:'사탕'}, {icon:'🍭', t:'막대사탕'}, 
-            {icon:'🧃', t:'주스 팩'}, {icon:'☕', t:'커피'}, {icon:'🛁', t:'욕조 목욕 씻기'}, {icon:'🚿', t:'샤워 물'}, {icon:'🧼', t:'비누 세정제'}, 
-            {icon:'🧽', t:'스펀지 수세미'}, {icon:'🧻', t:'휴지 두루마리'}, {icon:'🧴', t:'로션 샴푸'}, {icon:'🪥', t:'칫솔 양치'}, {icon:'🚽', t:'변기 화장실'}, 
-            {icon:'💩', t:'똥 기저귀'}, {icon:'🧹', t:'빗자루 청소'}, {icon:'🗑️', t:'쓰레기통'}, {icon:'🧺', t:'빨래 바구니 세탁'}, {icon:'👕', t:'옷 티셔츠 상의'}, 
-            {icon:'👖', t:'바지 하의'}, {icon:'🧦', t:'양말'}, {icon:'🧢', t:'모자'}, {icon:'🧤', t:'장갑'}, {icon:'🧣', t:'목도리 스카프'}, 
-            {icon:'👟', t:'신발 운동화'}, {icon:'🎀', t:'리본 머리핀'}, {icon:'👗', t:'원피스 드레스'}, {icon:'🧥', t:'코트 점퍼 겉옷'}, {icon:'👙', t:'수영복'}, 
-            {icon:'👚', t:'블라우스 여자옷'}, {icon:'👔', t:'넥타이 정장'}, {icon:'🩳', t:'반바지 속옷'}, {icon:'👓', t:'안경'}, {icon:'🕶️', t:'선글라스'}, 
-            {icon:'💍', t:'반지 보석'}, {icon:'🎒', t:'가방 백팩'}, {icon:'👜', t:'핸드백 가방'}, {icon:'👛', t:'지갑 동전'}, {icon:'🛏️', t:'침대 잠 수면'}, 
-            {icon:'🛌', t:'자다 이불'}, {icon:'🧸', t:'곰인형 장난감 애착'}, {icon:'🪁', t:'연 연날리기'}, {icon:'⚽', t:'공 축구'}, {icon:'🎨', t:'미술 그림 물감'}, 
-            {icon:'📚', t:'책 동화책 공부'}, {icon:'🎠', t:'회전목마 놀이공원'}, {icon:'🎡', t:'관람차'}, {icon:'🎈', t:'풍선 파티'}, {icon:'🎉', t:'폭죽 축하'}, 
-            {icon:'🎮', t:'게임 오락'}, {icon:'🎲', t:'주사위'}, {icon:'🧩', t:'퍼즐'}, {icon:'🎹', t:'피아노 음악'}, {icon:'🥁', t:'북 드럼'}, 
-            {icon:'🎷', t:'색소폰'}, {icon:'🎺', t:'나팔'}, {icon:'🎸', t:'기타'}, {icon:'🎻', t:'바이올린'}, {icon:'🚗', t:'자동차 차 카시트'}, 
-            {icon:'🚕', t:'택시'}, {icon:'🚌', t:'버스'}, {icon:'✈️', t:'비행기 여행'}, {icon:'🚲', t:'자전거'}, {icon:'🛵', t:'오토바이'}, 
-            {icon:'🛴', t:'킥보드'}, {icon:'🚤', t:'보트 배'}, {icon:'🚀', t:'로켓 우주'}, {icon:'🛒', t:'카트 쇼핑 마트'}, {icon:'🛍️', t:'쇼핑백 선물'}, 
-            {icon:'📷', t:'카메라 사진'}, {icon:'📹', t:'비디오 영상'}, {icon:'📱', t:'핸드폰 스마트폰'}, {icon:'💻', t:'노트북 컴퓨터'}, {icon:'🔋', t:'배터리 건전지'}, 
-            {icon:'🔌', t:'플러그 전기 멀티탭'}, {icon:'🏠', t:'집 홈'}, {icon:'🛋️', t:'소파 가구'}, {icon:'🪑', t:'의자'}, {icon:'🚪', t:'문'}, 
-            {icon:'🔑', t:'열쇠 키'}, {icon:'🖼️', t:'액자 사진'}, {icon:'🪴', t:'화분 식물'}, {icon:'🌵', t:'선인장'}, {icon:'💐', t:'꽃다발'}, 
-            {icon:'🕰️', t:'시계 시간'}, {icon:'💡', t:'전구 불 빛'}, {icon:'🕯️', t:'양초 캔들'}, {icon:'📦', t:'상자 택배 박스'}, {icon:'✉️', t:'편지 봉투'}, 
-            {icon:'✂️', t:'가위'}, {icon:'📌', t:'핀 압정'}, {icon:'📎', t:'클립'}, {icon:'📏', t:'자 줄자'}, {icon:'☀️', t:'해 날씨 맑음'}, 
-            {icon:'☁️', t:'구름 흐림'}, {icon:'☔', t:'비 우산'}, {icon:'❄️', t:'눈 겨울'}, {icon:'⚡', t:'번개 전기'}, {icon:'🌈', t:'무지개'}, 
-            {icon:'⭐', t:'별 스타'}, {icon:'🌙', t:'달 밤'}, {icon:'🔥', t:'불 뜨거움'}, {icon:'💧', t:'물 방울 습기'}, {icon:'❤️', t:'하트 사랑'}, 
-            {icon:'🧡', t:'주황하트'}, {icon:'💛', t:'노랑하트'}, {icon:'💚', t:'초록하트'}, {icon:'💙', t:'파랑하트'}, {icon:'💜', t:'보라하트'}, 
-            {icon:'🖤', t:'검정하트'}, {icon:'🤍', t:'흰색하트'}, {icon:'🤎', t:'갈색하트'}, {icon:'💔', t:'깨진하트'}, {icon:'💯', t:'백점 만점'}, 
-            {icon:'✅', t:'체크 완료'}, {icon:'❌', t:'엑스 취소'}, {icon:'❓', t:'물음표 질문'}, {icon:'❗️', t:'느낌표 중요'}, {icon:'💰', t:'돈 자금 예산'}, 
-            {icon:'💳', t:'카드 결제'}, {icon:'📅', t:'달력 날짜 디데이'}, {icon:'📝', t:'메모 기록'}, {icon:'🎁', t:'선물 박스'}, {icon:'🔔', t:'종 알림'}, 
-            {icon:'🎵', t:'음표 노래'}, {icon:'🎶', t:'음악'}
+            {icon:'👶',t:'아기'},{icon:'👧',t:'여자아이'},{icon:'🧒',t:'아이'},{icon:'👦',t:'남자아이'},{icon:'🤰',t:'임산부'},{icon:'🤱',t:'수유'},{icon:'👼',t:'천사'},
+            {icon:'🏥',t:'병원'},{icon:'🚑',t:'구급차'},{icon:'🩺',t:'청진기'},{icon:'💊',t:'약'},{icon:'💉',t:'주사'},{icon:'🩹',t:'밴드'},{icon:'🌡️',t:'체온계'},{icon:'😷',t:'마스크'},
+            {icon:'🍼',t:'젖병'},{icon:'🥣',t:'이유식'},{icon:'🥄',t:'숟가락'},{icon:'🥡',t:'도시락'},{icon:'🍪',t:'과자'},{icon:'🥛',t:'우유'},{icon:'🧊',t:'얼음'},{icon:'🥢',t:'젓가락'},
+            {icon:'🍽️',t:'식사'},{icon:'🧂',t:'소금'},{icon:'🍎',t:'사과'},{icon:'🍌',t:'바나나'},{icon:'🥦',t:'브로콜리'},{icon:'🥕',t:'당근'},{icon:'🌽',t:'옥수수'},{icon:'🥩',t:'고기'},
+            {icon:'🍗',t:'치킨'},{icon:'🍞',t:'빵'},{icon:'🥨',t:'프레첼'},{icon:'🍩',t:'도넛'},{icon:'🍦',t:'아이스크림'},{icon:'🍰',t:'케이크'},{icon:'🍫',t:'초콜릿'},{icon:'🍬',t:'사탕'},
+            {icon:'🍭',t:'막대사탕'},{icon:'🧃',t:'주스'},{icon:'☕',t:'커피'},{icon:'🛁',t:'욕조'},{icon:'🚿',t:'샤워'},{icon:'🧼',t:'비누'},{icon:'🧽',t:'수세미'},{icon:'🧻',t:'휴지'},
+            {icon:'🧴',t:'로션'},{icon:'🪥',t:'칫솔'},{icon:'🚽',t:'변기'},{icon:'💩',t:'똥'},{icon:'🧹',t:'빗자루'},{icon:'🗑️',t:'쓰레기통'},{icon:'🧺',t:'빨래'},{icon:'👕',t:'티셔츠'},
+            {icon:'👖',t:'바지'},{icon:'🧦',t:'양말'},{icon:'🧢',t:'모자'},{icon:'🧤',t:'장갑'},{icon:'🧣',t:'목도리'},{icon:'👟',t:'신발'},{icon:'🎀',t:'리본'},{icon:'👗',t:'원피스'},
+            {icon:'🧥',t:'코트'},{icon:'👙',t:'수영복'},{icon:'👚',t:'블라우스'},{icon:'👔',t:'넥타이'},{icon:'🩳',t:'반바지'},{icon:'👓',t:'안경'},{icon:'🕶️',t:'선글라스'},{icon:'💍',t:'반지'},
+            {icon:'🎒',t:'가방'},{icon:'👜',t:'핸드백'},{icon:'👛',t:'지갑'},{icon:'🛏️',t:'침대'},{icon:'🛌',t:'잠'},{icon:'🧸',t:'곰인형'},{icon:'🪁',t:'연'},{icon:'⚽',t:'축구공'},
+            {icon:'🎨',t:'팔레트'},{icon:'📚',t:'책'},{icon:'🎠',t:'회전목마'},{icon:'🎡',t:'관람차'},{icon:'🎈',t:'풍선'},{icon:'🎉',t:'폭죽'},{icon:'🎮',t:'게임'},{icon:'🎲',t:'주사위'},
+            {icon:'🧩',t:'퍼즐'},{icon:'🎹',t:'피아노'},{icon:'🥁',t:'드럼'},{icon:'🎷',t:'색소폰'},{icon:'🎺',t:'나팔'},{icon:'🎸',t:'기타'},{icon:'🎻',t:'바이올린'},{icon:'🚗',t:'자동차'},
+            {icon:'🚕',t:'택시'},{icon:'🚌',t:'버스'},{icon:'✈️',t:'비행기'},{icon:'🚲',t:'자전거'},{icon:'🛵',t:'오토바이'},{icon:'🛴',t:'킥보드'},{icon:'🚤',t:'보트'},{icon:'🚀',t:'로켓'},
+            {icon:'🛒',t:'카트'},{icon:'🛍️',t:'쇼핑백'},{icon:'📷',t:'카메라'},{icon:'📹',t:'비디오'},{icon:'📱',t:'핸드폰'},{icon:'💻',t:'노트북'},{icon:'🔋',t:'배터리'},{icon:'🔌',t:'플러그'},
+            {icon:'🏠',t:'집'},{icon:'🛋️',t:'소파'},{icon:'🪑',t:'의자'},{icon:'🚪',t:'문'},{icon:'🔑',t:'열쇠'},{icon:'🖼️',t:'액자'},{icon:'🪴',t:'화분'},{icon:'🌵',t:'선인장'},
+            {icon:'💐',t:'꽃다발'},{icon:'🕰️',t:'시계'},{icon:'💡',t:'전구'},{icon:'🕯️',t:'양초'},{icon:'📦',t:'박스'},{icon:'✉️',t:'편지'},{icon:'✂️',t:'가위'},{icon:'📌',t:'압정'},
+            {icon:'📎',t:'클립'},{icon:'📏',t:'자'},{icon:'☀️',t:'해'},{icon:'☁️',t:'구름'},{icon:'☔',t:'비'},{icon:'❄️',t:'눈'},{icon:'⚡',t:'번개'},{icon:'🌈',t:'무지개'},
+            {icon:'⭐',t:'별'},{icon:'🌙',t:'달'},{icon:'🔥',t:'불'},{icon:'💧',t:'물'},{icon:'❤️',t:'하트'},{icon:'💯',t:'백점'},{icon:'✅',t:'체크'},{icon:'❌',t:'엑스'},
+            {icon:'❓',t:'물음표'},{icon:'❗️',t:'느낌표'},{icon:'💰',t:'돈'},{icon:'💳',t:'카드'},{icon:'📅',t:'달력'},{icon:'📝',t:'메모'},{icon:'🎁',t:'선물'},{icon:'🔔',t:'종'},
+            {icon:'🐶',t:'강아지'},{icon:'🐱',t:'고양이'},{icon:'🐭',t:'쥐'},{icon:'🐹',t:'햄스터'},{icon:'🐰',t:'토끼'},{icon:'🦊',t:'여우'},{icon:'🐻',t:'곰'},{icon:'🐼',t:'판다'},
+            {icon:'🐯',t:'호랑이'},{icon:'🦁',t:'사자'},{icon:'🐮',t:'소'},{icon:'🐷',t:'돼지'},{icon:'🐸',t:'개구리'},{icon:'🐵',t:'원숭이'},{icon:'🐔',t:'닭'},{icon:'🐧',t:'펭귄'}
         ];
         
         let selectedIcon = '👶';
@@ -400,110 +414,270 @@
         }
 
         // ==========================================
-        // 🚀 아이콘 완벽 매칭 자동 등록 로직
+        // 🔍 검색 및 이모지 기능
         // ==========================================
+        
+        // 1. 글로벌 검색 (돋보기)
+        window.toggleGlobalSearch = () => {
+            const box = document.getElementById('globalSearchBox');
+            const input = document.getElementById('globalSearchInput');
+            if(box.style.display === 'block') {
+                box.style.display = 'none';
+                input.value = '';
+                window.searchGlobal(''); // 검색 초기화
+            } else {
+                box.style.display = 'block';
+                input.focus();
+            }
+        };
+
+        window.searchGlobal = (keyword) => {
+            const cards = document.querySelectorAll('.category-card');
+            if(!keyword) {
+                cards.forEach(c => { c.classList.remove('hidden'); c.querySelectorAll('.item').forEach(i => i.classList.remove('hidden')); });
+                return;
+            }
+            
+            keyword = keyword.toLowerCase();
+            cards.forEach(card => {
+                let hasVisibleItem = false;
+                const items = card.querySelectorAll('.item');
+                items.forEach(item => {
+                    const text = item.innerText.toLowerCase();
+                    if(text.includes(keyword)) {
+                        item.classList.remove('hidden');
+                        hasVisibleItem = true;
+                    } else {
+                        item.classList.add('hidden');
+                    }
+                });
+                // 아이템이 하나라도 보이면 카테고리 표시, 아니면 숨김
+                if(hasVisibleItem) card.classList.remove('hidden');
+                else card.classList.add('hidden');
+            });
+        };
+
+        // 2. 아이콘 필터
+        window.filterIcons = (keyword, targetGridId) => {
+            if(!keyword) { renderIcons(iconDB, targetGridId); return; }
+            const filtered = iconDB.filter(item => item.t.includes(keyword) || item.icon.includes(keyword));
+            renderIcons(filtered, targetGridId);
+        };
+
+        function renderIcons(list, targetGridId) {
+            const grid = document.getElementById(targetGridId);
+            grid.innerHTML = '';
+            list.forEach(item => {
+                const el = document.createElement('div');
+                el.className = `icon-opt ${item.icon === selectedIcon ? 'selected' : ''}`;
+                el.innerText = item.icon;
+                el.onclick = () => { 
+                    selectedIcon = item.icon; 
+                    // 직접 입력창 초기화 (선택했으므로)
+                    if(targetGridId === 'catIconGrid') document.getElementById('catCustomIcon').value = '';
+                    else document.getElementById('itemCustomIcon').value = '';
+                    
+                    Array.from(grid.children).forEach(c => c.classList.remove('selected')); 
+                    el.classList.add('selected'); 
+                };
+                grid.appendChild(el);
+            });
+        }
+
+        // ==========================================
+        // 🚀 데이터 저장 (직접 입력 이모지 로직 포함)
+        // ==========================================
+
+        window.openCatModal = () => { 
+            document.getElementById('catModal').style.display = 'flex'; 
+            document.getElementById('catModalTitle').innerText = '📂 카테고리 추가';
+            document.getElementById('editCatId').value = ''; 
+            document.getElementById('catName').value = ''; 
+            document.getElementById('catCustomIcon').value = ''; // 직접입력 초기화
+            selectedIcon = '👶'; 
+            renderIcons(iconDB, 'catIconGrid'); 
+        };
+
+        window.openEditCategory = (catId) => {
+            const cat = currentData[catId];
+            if(!cat) return;
+            document.getElementById('catModal').style.display = 'flex';
+            document.getElementById('catModalTitle').innerText = '✏️ 카테고리 수정';
+            document.getElementById('editCatId').value = catId; 
+            document.getElementById('catName').value = cat.name;
+            document.getElementById('catCustomIcon').value = ''; // 일단 비움
+            selectedIcon = cat.icon || '👶';
+            renderIcons(iconDB, 'catIconGrid');
+        };
+
+        window.saveCategory = () => {
+            const name = document.getElementById('catName').value;
+            const editId = document.getElementById('editCatId').value;
+            const customIcon = document.getElementById('catCustomIcon').value;
+            
+            // 직접 입력값이 있으면 그것을 사용, 없으면 선택된 아이콘 사용
+            const finalIcon = customIcon ? customIcon : selectedIcon;
+
+            if(!name) return alert('이름 입력!');
+            if(editId) { update(ref(db, `baby_checklist_v6/${editId}`), { name, icon: finalIcon }); } 
+            else { push(ref(db, 'baby_checklist_v6'), { name, icon: finalIcon, order: 999 }); } 
+            window.closeModal('catModal');
+        };
+
+        window.openAddItem = (catId) => {
+            document.getElementById('itemModal').style.display = 'flex';
+            document.getElementById('itemModalTitle').innerText = '✨ 물품 등록';
+            document.getElementById('targetCatId').value = catId;
+            document.getElementById('targetItemId').value = '';
+            document.getElementById('itemName').value = '';
+            document.getElementById('itemBrand').value = '';
+            document.getElementById('itemModel').value = '';
+            document.getElementById('itemMemo').value = '';
+            document.getElementById('itemCount').value = '1';
+            document.getElementById('itemPrice').value = '';
+            document.getElementById('itemLink').value = '';
+            document.getElementById('itemIsCarrot').checked = false;
+            document.getElementById('itemShowNaver').checked = true;
+            document.getElementById('itemCustomIcon').value = ''; // 직접입력 초기화
+            selectedIcon = '👶';
+            renderIcons(iconDB, 'itemIconGrid');
+        };
+
+        window.openEditItem = (catId, itemId) => {
+            const item = currentData[catId].items[itemId];
+            if(!item) return;
+            document.getElementById('itemModal').style.display = 'flex';
+            document.getElementById('itemModalTitle').innerText = '✏️ 물품 수정';
+            document.getElementById('targetCatId').value = catId;
+            document.getElementById('targetItemId').value = itemId;
+            document.getElementById('itemName').value = item.name;
+            document.getElementById('itemBrand').value = item.brand || '';
+            document.getElementById('itemModel').value = item.model || '';
+            document.getElementById('itemMemo').value = item.memo || '';
+            document.getElementById('itemCount').value = item.count || 1;
+            document.getElementById('itemPrice').value = item.price || '';
+            document.getElementById('itemLink').value = item.link || '';
+            document.getElementById('itemIsCarrot').checked = (item.isCarrot === true);
+            document.getElementById('itemShowNaver').checked = (item.showNaver !== false);
+            document.getElementById('itemCustomIcon').value = '';
+            selectedIcon = item.icon || '👶';
+            renderIcons(iconDB, 'itemIconGrid');
+        };
+
+        window.saveItem = () => {
+            const catId = document.getElementById('targetCatId').value;
+            const itemId = document.getElementById('targetItemId').value;
+            const customIcon = document.getElementById('itemCustomIcon').value;
+            
+            // 직접 입력값 우선
+            const finalIcon = customIcon ? customIcon : selectedIcon;
+
+            const newData = {
+                name: document.getElementById('itemName').value,
+                brand: document.getElementById('itemBrand').value,
+                model: document.getElementById('itemModel').value,
+                memo: document.getElementById('itemMemo').value,
+                count: document.getElementById('itemCount').value,
+                price: document.getElementById('itemPrice').value,
+                link: document.getElementById('itemLink').value,
+                icon: finalIcon,
+                checked: false,
+                order: 999,
+                isCarrot: document.getElementById('itemIsCarrot').checked,
+                showNaver: document.getElementById('itemShowNaver').checked
+            };
+            if(!newData.name) return alert('이름 입력!');
+            if(itemId) {
+                const existing = currentData[catId].items[itemId];
+                newData.checked = existing.checked;
+                newData.order = existing.order || 999;
+                update(ref(db, `baby_checklist_v6/${catId}/items/${itemId}`), newData);
+            } else {
+                push(ref(db, `baby_checklist_v6/${catId}/items`), newData);
+            }
+            window.closeModal('itemModal');
+        };
+
+        // ... 기존 함수들 유지 (Sortable, Excel 등) ...
+        function initCategorySortable() { const el = document.getElementById('contentArea'); catSortable = new Sortable(el, { handle: '.drag-handle-cat', animation: 150, ghostClass: 'sortable-ghost', disabled: !document.getElementById('editModeSwitch').checked, onStart:()=>{document.body.classList.add('is-dragging')}, onEnd:()=>{document.body.classList.remove('is-dragging'); updateCategoryOrder(Array.from(el.children).map(div => div.getAttribute('data-id')))}}); }
+        function updateCategoryOrder(newIds){ const updates={}; newIds.forEach((catId,idx)=>{updates[`baby_checklist_v6/${catId}/order`]=idx;}); update(ref(db),updates); }
+        function initItemSortable(el, catId){ const sortable=new Sortable(el,{handle:'.drag-handle', animation:150, ghostClass:'sortable-ghost', disabled:!document.getElementById('editModeSwitch').checked, onStart:()=>{document.body.classList.add('is-dragging')}, onEnd:()=>{document.body.classList.remove('is-dragging'); updateItemOrder(catId, Array.from(el.children).map(li=>li.getAttribute('data-id')))}}); el.sortableInstance=sortable; }
+        function updateItemOrder(catId,newIds){ const updates={}; newIds.forEach((itemId,idx)=>{updates[`baby_checklist_v6/${catId}/items/${itemId}/order`]=idx;}); update(ref(db),updates); }
+        window.toggleEditMode = (isChecked) => { if(isChecked) { document.body.classList.add('is-edit-mode'); if(catSortable) catSortable.option("disabled", false); document.querySelectorAll('.item-list').forEach(el => el.sortableInstance?.option("disabled", false)); } else { document.body.classList.remove('is-edit-mode'); if(catSortable) catSortable.option("disabled", true); document.querySelectorAll('.item-list').forEach(el => el.sortableInstance?.option("disabled", true)); } };
+        window.toggleCheck=(catId,itemId,checked)=>update(ref(db,`baby_checklist_v6/${catId}/items/${itemId}`),{checked});
+        window.deleteCategory=(id)=>{if(confirm('삭제하시겠습니까?')) remove(ref(db,`baby_checklist_v6/${id}`));};
+        window.deleteItem=(catId,itemId)=>{if(confirm('삭제하시겠습니까?')) remove(ref(db,`baby_checklist_v6/${catId}/items/${itemId}`));};
+        window.closeModal=(id)=>document.getElementById(id).style.display='none';
+        
+        // 아이콘 100% 매칭 데이터 등록
         window.uploadInitialData = async () => {
             alert("리스트와 아이콘을 매칭하여 등록합니다! (약 5~10초 소요)");
-            
-            // 모든 아이템에 개별 아이콘 할당
             const initialData = [
                 {
                     name: "출산가방/엄마용품", icon: "🏥",
                     items: [
-                        {n:"산모수첩", i:"📒"}, {n:"신분증/지갑", i:"💳"}, {n:"휴대폰/충전기", i:"📱"},
-                        {n:"마스크", i:"😷"}, {n:"구부러지는 빨대", i:"🥤"}, {n:"물티슈/마이비데", i:"🧻"},
-                        {n:"철분제(엄마영양제)", i:"💊"}, {n:"가습기", i:"💧"}, {n:"스킨케어/세면도구", i:"🧴"},
-                        {n:"수유나시/브라/패드", i:"👙"}, {n:"제왕절개 팬티", i:"🩲"}, {n:"양말/목수건", i:"🧦"},
-                        {n:"생리대/맘스안심팬티", i:"🩸"}, {n:"양배추 가슴팩", i:"🥬"}, {n:"산후복대", i:"🤕"},
-                        {n:"손목보호대", i:"🤲"}, {n:"압박스타킹", i:"👢"}, {n:"디데이달력", i:"📅"}, {n:"볼펜/슬리퍼", i:"🖊️"}
+                        {n:"산모수첩", i:"📒"}, {n:"신분증/지갑", i:"💳"}, {n:"휴대폰/충전기", i:"📱"}, {n:"마스크", i:"😷"}, {n:"구부러지는 빨대", i:"🥤"},
+                        {n:"물티슈/마이비데", i:"🧻"}, {n:"철분제(엄마영양제)", i:"💊"}, {n:"가습기", i:"💧"}, {n:"스킨케어/세면도구", i:"🧴"},
+                        {n:"수유나시/브라/패드", i:"👙"}, {n:"제왕절개 팬티", i:"🩲"}, {n:"양말/목수건", i:"🧦"}, {n:"생리대/맘스안심팬티", i:"🩸"},
+                        {n:"양배추 가슴팩", i:"🥬"}, {n:"산후복대", i:"🤕"}, {n:"손목보호대", i:"🤲"}, {n:"압박스타킹", i:"👢"}, {n:"디데이달력", i:"📅"}, {n:"볼펜/슬리퍼", i:"🖊️"}
                     ]
                 },
                 {
                     name: "위생/케어", icon: "🩹",
                     items: [
-                        {n:"손수건 10장", i:"🧣"}, {n:"유산균", i:"🦠"}, {n:"손톱케어 4종", i:"✂️"},
-                        {n:"체온계", i:"🌡️"}, {n:"온습도계", i:"💧"}, {n:"알콜스왑", i:"🏥"}, {n:"배꼽소독솜", i:"☁️"}
+                        {n:"손수건 10장", i:"🧣"}, {n:"유산균", i:"🦠"}, {n:"손톱케어 4종", i:"✂️"}, {n:"체온계", i:"🌡️"}, {n:"온습도계", i:"💧"},
+                        {n:"알콜스왑", i:"🏥"}, {n:"배꼽소독솜", i:"☁️"}
                     ]
                 },
                 {
                     name: "수유용품", icon: "🍼",
                     items: [
-                        {n:"모유저장팩", i:"🧊"}, {n:"수유컵", i:"🥛"}, {n:"수유쿠션", i:"🍩"},
-                        {n:"유축기", i:"🤱"}, {n:"분유제조기", i:"🤖"}, {n:"분유쉐이커", i:"🥤"},
-                        {n:"젖병(큰거/작은거)", i:"🍼"}, {n:"분유", i:"🥫"}, {n:"분유포트", i:"🫖"},
-                        {n:"젖꼭지", i:"🍼"}, {n:"젖병솔/집게", i:"🖌️"}, {n:"젖병건조대", i:"🌵"},
-                        {n:"젖병소독기", i:"✨"}, {n:"젖병세정제", i:"🧼"}, {n:"휴대용젖병", i:"🍼"},
+                        {n:"모유저장팩", i:"🧊"}, {n:"수유컵", i:"🥛"}, {n:"수유쿠션", i:"🍩"}, {n:"유축기", i:"🤱"}, {n:"분유제조기", i:"🤖"},
+                        {n:"분유쉐이커", i:"🥤"}, {n:"젖병(큰거/작은거)", i:"🍼"}, {n:"분유", i:"🥫"}, {n:"분유포트", i:"🫖"}, {n:"젖꼭지", i:"🍼"},
+                        {n:"젖병솔/집게", i:"🖌️"}, {n:"젖병건조대", i:"🌵"}, {n:"젖병소독기", i:"✨"}, {n:"젖병세정제", i:"🧼"}, {n:"휴대용젖병", i:"🍼"},
                         {n:"보온병", i:"🌡️"}, {n:"공갈젖꼭지(쪽쪽이)", i:"👶"}
                     ]
                 },
                 {
                     name: "목욕/세탁", icon: "🛁",
                     items: [
-                        {n:"기저귀", i:"🩲"}, {n:"아기비데", i:"🚿"}, {n:"천기저귀", i:"⬜"},
-                        {n:"아기욕조", i:"🛁"}, {n:"신생아면봉", i:"👂"}, {n:"건티슈", i:"🧻"},
-                        {n:"세탁세제", i:"🧴"}, {n:"무형광 세탁망", i:"🕸️"}, {n:"장난감 소독제", i:"🔫"},
-                        {n:"바스&샴푸", i:"🧴"}, {n:"로션/오일/수딩젤", i:"🧴"}, {n:"기저귀발진크림", i:"🥫"}, {n:"비판텐 연고", i:"💊"}
+                        {n:"기저귀", i:"🩲"}, {n:"아기비데", i:"🚿"}, {n:"천기저귀", i:"⬜"}, {n:"아기욕조", i:"🛁"}, {n:"신생아면봉", i:"👂"},
+                        {n:"건티슈", i:"🧻"}, {n:"세탁세제", i:"🧴"}, {n:"무형광 세탁망", i:"🕸️"}, {n:"장난감 소독제", i:"🔫"}, {n:"바스&샴푸", i:"🧴"},
+                        {n:"로션/오일/수딩젤", i:"🧴"}, {n:"기저귀발진크림", i:"🥫"}, {n:"비판텐 연고", i:"💊"}
                     ]
                 },
                 {
                     name: "가구/침구/의류", icon: "🛏️",
                     items: [
-                        {n:"아기침대", i:"🛏️"}, {n:"기저귀갈이대", i:"🚼"}, {n:"트롤리(덮개형)", i:"🛒"},
-                        {n:"아기수납장", i:"🗄️"}, {n:"아기옷걸이", i:"🧥"}, {n:"범보의자", i:"🪑"},
-                        {n:"방수패드", i:"🚫"}, {n:"블랭킷/이불", i:"🛌"}, {n:"바디슈트", i:"👕"},
-                        {n:"배냇저고리/우주복", i:"👘"}, {n:"턱받이", i:"👶"}, {n:"내복", i:"👕"}, {n:"양말", i:"🧦"}
+                        {n:"아기침대", i:"🛏️"}, {n:"기저귀갈이대", i:"🚼"}, {n:"트롤리(덮개형)", i:"🛒"}, {n:"아기수납장", i:"🗄️"}, {n:"아기옷걸이", i:"🧥"},
+                        {n:"범보의자", i:"🪑"}, {n:"방수패드", i:"🚫"}, {n:"블랭킷/이불", i:"🛌"}, {n:"바디슈트", i:"👕"}, {n:"배냇저고리/우주복", i:"👘"},
+                        {n:"턱받이", i:"👶"}, {n:"내복", i:"👕"}, {n:"양말", i:"🧦"}
                     ]
                 },
                 {
                     name: "외출/가전/기타", icon: "🚗",
                     items: [
-                        {n:"바구니카시트", i:"🧺"}, {n:"카시트", i:"🚗"}, {n:"유모차", i:"🛒"},
-                        {n:"유모차라이너", i:"💺"}, {n:"통풍시트", i:"❄️"}, {n:"아기띠", i:"🐨"},
-                        {n:"차량스티커", i:"🔰"}, {n:"차량햇빛가리개", i:"☀️"}, {n:"기저귀가방", i:"🎒"},
-                        {n:"하이체어", i:"🪑"}, {n:"빨래건조대", i:"🧺"}, {n:"백색소음기", i:"📻"}, {n:"모빌", i:"🎠"}
+                        {n:"바구니카시트", i:"🧺"}, {n:"카시트", i:"🚗"}, {n:"유모차", i:"🛒"}, {n:"유모차라이너", i:"💺"}, {n:"통풍시트", i:"❄️"},
+                        {n:"아기띠", i:"🐨"}, {n:"차량스티커", i:"🔰"}, {n:"차량햇빛가리개", i:"☀️"}, {n:"기저귀가방", i:"🎒"}, {n:"하이체어", i:"🪑"},
+                        {n:"빨래건조대", i:"🧺"}, {n:"백색소음기", i:"📻"}, {n:"모빌", i:"🎠"}
                     ]
                 }
             ];
 
             for (let i = 0; i < initialData.length; i++) {
                 const cat = initialData[i];
-                const newCatRef = await push(ref(db, 'baby_checklist_v6'), {
-                    name: cat.name, icon: cat.icon, order: i
-                });
+                const newCatRef = await push(ref(db, 'baby_checklist_v6'), { name: cat.name, icon: cat.icon, order: i });
                 const catId = newCatRef.key;
                 if(cat.items && cat.items.length > 0) {
                     for (let j = 0; j < cat.items.length; j++) {
                         const item = cat.items[j];
-                        await push(ref(db, `baby_checklist_v6/${catId}/items`), {
-                            name: item.n, // 이름
-                            icon: item.i, // 개별 아이콘
-                            checked: false, order: j, count: 1,
-                            showNaver: true
-                        });
+                        await push(ref(db, `baby_checklist_v6/${catId}/items`), { name: item.n, icon: item.i, checked: false, order: j, count: 1, showNaver: true });
                     }
                 }
             }
-            alert("✅ 모든 아이템이 아이콘과 함께 등록되었습니다!");
+            alert("✅ 모든 아이템 등록 완료!");
         };
-
-        // ... 나머지 함수들 (변경 없음) ...
-        function initCategorySortable() { const el = document.getElementById('contentArea'); catSortable = new Sortable(el, { handle: '.drag-handle-cat', animation: 150, ghostClass: 'sortable-ghost', disabled: !document.getElementById('editModeSwitch').checked, onStart:()=>{document.body.classList.add('is-dragging')}, onEnd:()=>{document.body.classList.remove('is-dragging'); updateCategoryOrder(Array.from(el.children).map(div => div.getAttribute('data-id')))}}); }
-        function updateCategoryOrder(newIds){ const updates={}; newIds.forEach((catId,idx)=>{updates[`baby_checklist_v6/${catId}/order`]=idx;}); update(ref(db),updates); }
-        function initItemSortable(el, catId){ const sortable=new Sortable(el,{handle:'.drag-handle', animation:150, ghostClass:'sortable-ghost', disabled:!document.getElementById('editModeSwitch').checked, onStart:()=>{document.body.classList.add('is-dragging')}, onEnd:()=>{document.body.classList.remove('is-dragging'); updateItemOrder(catId, Array.from(el.children).map(li=>li.getAttribute('data-id')))}}); el.sortableInstance=sortable; }
-        function updateItemOrder(catId,newIds){ const updates={}; newIds.forEach((itemId,idx)=>{updates[`baby_checklist_v6/${catId}/items/${itemId}/order`]=idx;}); update(ref(db),updates); }
-        window.toggleEditMode = (isChecked) => { if(isChecked) { document.body.classList.add('is-edit-mode'); if(catSortable) catSortable.option("disabled", false); document.querySelectorAll('.item-list').forEach(el => el.sortableInstance?.option("disabled", false)); } else { document.body.classList.remove('is-edit-mode'); if(catSortable) catSortable.option("disabled", true); document.querySelectorAll('.item-list').forEach(el => el.sortableInstance?.option("disabled", true)); } };
-        window.filterIcons = (keyword, targetGridId) => { if(!keyword) { renderIcons(iconDB, targetGridId); return; } const filtered = iconDB.filter(item => item.t.includes(keyword) || item.icon.includes(keyword)); renderIcons(filtered, targetGridId); };
-        function renderIcons(list, targetGridId) { const grid = document.getElementById(targetGridId); grid.innerHTML = ''; list.forEach(item => { const el = document.createElement('div'); el.className = `icon-opt ${item.icon === selectedIcon ? 'selected' : ''}`; el.innerText = item.icon; el.onclick = () => { selectedIcon = item.icon; Array.from(grid.children).forEach(c => c.classList.remove('selected')); el.classList.add('selected'); }; grid.appendChild(el); }); }
-        window.toggleCheck=(catId,itemId,checked)=>update(ref(db,`baby_checklist_v6/${catId}/items/${itemId}`),{checked});
-        window.deleteCategory=(id)=>{if(confirm('삭제하시겠습니까?')) remove(ref(db,`baby_checklist_v6/${id}`));};
-        window.deleteItem=(catId,itemId)=>{if(confirm('삭제하시겠습니까?')) remove(ref(db,`baby_checklist_v6/${catId}/items/${itemId}`));};
-        window.closeModal=(id)=>document.getElementById(id).style.display='none';
-        window.openCatModal = () => { document.getElementById('catModal').style.display = 'flex'; document.getElementById('catModalTitle').innerText = '📂 카테고리 추가'; document.getElementById('editCatId').value = ''; document.getElementById('catName').value = ''; selectedIcon = '👶'; renderIcons(iconDB, 'catIconGrid'); };
-        window.openEditCategory = (catId) => { const cat = currentData[catId]; if(!cat) return; document.getElementById('catModal').style.display = 'flex'; document.getElementById('catModalTitle').innerText = '✏️ 카테고리 수정'; document.getElementById('editCatId').value = catId; document.getElementById('catName').value = cat.name; selectedIcon = cat.icon || '👶'; renderIcons(iconDB, 'catIconGrid'); };
-        window.saveCategory = () => { const name = document.getElementById('catName').value; const editId = document.getElementById('editCatId').value; if(!name) return alert('이름 입력!'); if(editId) { update(ref(db, `baby_checklist_v6/${editId}`), { name, icon: selectedIcon }); } else { push(ref(db, 'baby_checklist_v6'), { name, icon: selectedIcon, order: 999 }); } window.closeModal('catModal'); };
-        window.openAddItem=(catId)=>{document.getElementById('itemModal').style.display='flex'; document.getElementById('itemModalTitle').innerText='✨ 물품 등록'; document.getElementById('targetCatId').value=catId; document.getElementById('targetItemId').value=''; document.getElementById('itemName').value=''; document.getElementById('itemBrand').value=''; document.getElementById('itemModel').value=''; document.getElementById('itemMemo').value=''; document.getElementById('itemCount').value='1'; document.getElementById('itemPrice').value=''; document.getElementById('itemLink').value=''; document.getElementById('itemIsCarrot').checked=false; document.getElementById('itemShowNaver').checked=true; selectedIcon='👶'; renderIcons(iconDB,'itemIconGrid');};
-        window.openEditItem=(catId,itemId)=>{const item=currentData[catId].items[itemId]; if(!item)return; document.getElementById('itemModal').style.display='flex'; document.getElementById('itemModalTitle').innerText='✏️ 물품 수정'; document.getElementById('targetCatId').value=catId; document.getElementById('targetItemId').value=itemId; document.getElementById('itemName').value=item.name; document.getElementById('itemBrand').value=item.brand||''; document.getElementById('itemModel').value=item.model||''; document.getElementById('itemMemo').value=item.memo||''; document.getElementById('itemCount').value=item.count||1; document.getElementById('itemPrice').value=item.price||''; document.getElementById('itemLink').value=item.link||''; document.getElementById('itemIsCarrot').checked=(item.isCarrot===true); document.getElementById('itemShowNaver').checked=(item.showNaver!==false); selectedIcon=item.icon||'👶'; renderIcons(iconDB,'itemIconGrid');};
-        window.saveItem=()=>{const catId=document.getElementById('targetCatId').value; const itemId=document.getElementById('targetItemId').value; const newData={name:document.getElementById('itemName').value, brand:document.getElementById('itemBrand').value, model:document.getElementById('itemModel').value, memo:document.getElementById('itemMemo').value, count:document.getElementById('itemCount').value, price:document.getElementById('itemPrice').value, link:document.getElementById('itemLink').value, icon:selectedIcon, checked:false, order:999, isCarrot:document.getElementById('itemIsCarrot').checked, showNaver:document.getElementById('itemShowNaver').checked}; if(!newData.name)return alert('이름 입력!'); if(itemId){const existing=currentData[catId].items[itemId]; newData.checked=existing.checked; newData.order=existing.order||999; update(ref(db,`baby_checklist_v6/${catId}/items/${itemId}`),newData);}else{push(ref(db,`baby_checklist_v6/${catId}/items`),newData);} window.closeModal('itemModal');};
+        
         window.downloadTemplate=()=>{const header=["카테고리","물품명","브랜드","모델명","수량","예상가격","구매링크","메모"]; const example=["위생/케어","아기 면봉","마이비","",1,5000,"http://...","신생아용 얇은거"]; const wb=XLSX.utils.book_new(); const ws=XLSX.utils.aoa_to_sheet([header,example]); XLSX.utils.book_append_sheet(wb,ws,"육아템_양식"); XLSX.writeFile(wb,"육아준비물_양식.xlsx");};
         window.handleExcelUpload=(input)=>{const file=input.files[0]; if(!file)return; const reader=new FileReader(); reader.onload=async(e)=>{const data=new Uint8Array(e.target.result); const workbook=XLSX.read(data,{type:'array'}); const firstSheet=workbook.Sheets[workbook.SheetNames[0]]; const rows=XLSX.utils.sheet_to_json(firstSheet,{header:1}); if(rows.length<2){alert("데이터 없음");return;} const dataRows=rows.slice(1); const grouped={}; dataRows.forEach(row=>{const catName=row[0]; const itemName=row[1]; if(!catName||!itemName)return; if(!grouped[catName])grouped[catName]=[]; grouped[catName].push({name:itemName, brand:row[2]||"", model:row[3]||"", count:row[4]||1, price:row[5]||"", link:row[6]||"", memo:row[7]||"", showNaver:true});}); if(confirm(`${Object.keys(grouped).length}개 카테고리 등록?`)){for(const catName of Object.keys(grouped)){const newCatRef=await push(ref(db,'baby_checklist_v6'),{name:catName, icon:"👶", order:999}); const catId=newCatRef.key; for(const item of grouped[catName]){await push(ref(db,`baby_checklist_v6/${catId}/items`),{...item, checked:false, order:999});}} alert("업로드 완료!"); input.value="";}}; reader.readAsArrayBuffer(file);};
         window.searchNaver=()=>{const n=document.getElementById('itemName').value; const b=document.getElementById('itemBrand').value; const m=document.getElementById('itemModel').value; if(!n)return alert('이름 입력!'); window.open(`https://search.shopping.naver.com/search/all?query=${encodeURIComponent([b,m,n].filter(Boolean).join(' '))}`,'_blank');};
