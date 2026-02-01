@@ -15,7 +15,7 @@
             --bg-color: #F7F8FA;
             --card-bg: #FFFFFF;
             --text-color: #333333;
-            --text-sub: #888888;
+            --text-sub: #666666;
             --border-color: #EEEEEE;
             --price-color: #FF6B6B;
             --carrot-color: #FF8A3D;
@@ -35,6 +35,7 @@
         body { font-family: 'Pretendard', sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 0; padding-bottom: 120px; transition: background-color 0.3s; }
         .container { max-width: 600px; margin: 0 auto; }
 
+        /* 헤더 */
         .header { background: linear-gradient(135deg, var(--main-color), #ff9a9e); padding: 20px 20px 25px; color: white; border-radius: 0 0 25px 25px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); position: sticky; top: 0; z-index: 100; }
         .header-top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .header h2 { margin: 0; font-size: 20px; font-weight: 800; }
@@ -58,6 +59,7 @@
         .category-card { background: var(--card-bg); margin: 20px; border-radius: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); overflow: hidden; transition: transform 0.1s; }
         .category-card:active { transform: scale(0.995); }
         .category-card.collapsed .item-list, .category-card.collapsed .btn-add-item { display: none; }
+        
         .cat-header { padding: 15px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
         .cat-left { display: flex; align-items: center; gap: 10px; }
         .cat-icon { font-size: 18px; background: var(--sub-color); width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
@@ -111,6 +113,7 @@
         .fab-btn { position: fixed; bottom: 30px; right: 25px; background: var(--main-color); color: white; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); border: none; cursor: pointer; z-index: 99; transition: transform 0.2s; }
         .fab-btn:active { transform: scale(0.9); }
 
+        /* 실행 취소 바 */
         #undoBar { position: fixed; bottom: -80px; left: 50%; transform: translateX(-50%); background: #222; color: white; padding: 14px 24px; border-radius: 30px; box-shadow: 0 10px 20px rgba(0,0,0,0.2); z-index: 200; display: flex; align-items: center; gap: 20px; font-size: 14px; transition: bottom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); width: 90%; max-width: 400px; justify-content: space-between; }
         #undoBar.show { bottom: 30px; }
         .undo-btn { color: var(--main-color); font-weight: 800; cursor: pointer; text-transform: uppercase; }
@@ -321,8 +324,8 @@
         const db = getDatabase(app);
         const dbRef = ref(db, 'baby_checklist_v6'); 
 
-        // ✅ 방대한 아이콘 DB 복구
-        const ICON_DB = [
+        // ✅ 방대한 아이콘 DB (복구됨)
+        const iconDB = [
             {i:'👶',t:'아기 베이비 얼굴 신생아'}, {i:'👧',t:'여자 아이 딸'}, {i:'🧒',t:'아이 어린이'}, {i:'👦',t:'남자 아이 아들'}, 
             {i:'🤰',t:'임신 임산부 엄마'}, {i:'🤱',t:'수유 모유 엄마'}, {i:'👼',t:'천사 아기'}, {i:'🏥',t:'병원 소아과 조리원'}, 
             {i:'🚑',t:'구급차 응급'}, {i:'🩺',t:'청진기 진찰 의사'}, {i:'💊',t:'약 알약 영양제'}, {i:'💉',t:'주사 예방접종'}, 
@@ -364,20 +367,16 @@
         
         let currentData = {};
         let isEditMode = false;
-        // ✅ 실행취소 변수 (수정 및 삭제 모두 저장)
+        // ✅ 수정 시에도 실행 취소 가능하도록 저장
         let lastAction = null; 
         let undoTimer = null;
 
-        const savedTheme = localStorage.getItem('appTheme') || '#FF878D';
-        document.documentElement.style.setProperty('--main-color', savedTheme);
-        if(localStorage.getItem('darkMode') === 'true') document.body.setAttribute('data-theme', 'dark');
-
-        onValue(dbRef, (snapshot) => {
-            currentData = snapshot.val() || {};
+        onValue(dbRef, (snap) => {
+            currentData = snap.val() || {};
             renderApp();
         });
 
-        window.renderApp = () => {
+        function renderApp() {
             const data = currentData;
             const contentArea = document.getElementById('contentArea');
             contentArea.innerHTML = '';
@@ -433,7 +432,6 @@
                     if(item.isCarrot) tags += `<span class="tag carrot">🥕 당근</span> `;
                     if(item.link) tags += `<a href="${item.link}" target="_blank" class="link-btn">🔗 구매</a>`;
                     if(item.link2) tags += `<a href="${item.link2}" target="_blank" class="link-btn review">🔗 후기</a>`;
-                    
                     if(item.showNaver !== false) {
                         const query = [item.brand, item.model, item.name].filter(Boolean).join(' ');
                         tags += `<a href="https://search.shopping.naver.com/search/all?query=${encodeURIComponent(query)}" target="_blank" class="naver-btn">N 검색</a>`;
@@ -677,11 +675,32 @@
         window.searchGlobal=(k)=>{k=k.toLowerCase();document.querySelectorAll('.category-card').forEach(c=>{let v=false;c.querySelectorAll('.item').forEach(i=>{if(i.innerText.toLowerCase().includes(k)){i.classList.remove('hidden');v=true;}else i.classList.add('hidden');});c.style.display=v?'block':'none';});};
         
         window.uploadInitialData = async () => {
-            if(!confirm('리스트를 등록하시겠습니까?')) return;
-            const d=[{name:"출산가방",icon:"🏥",items:[{name:"산모수첩",icon:"📒",memo:"병원 갈 때 필수"},{name:"신분증",icon:"💳"},{name:"충전기",icon:"⚡"}]},{name:"수유용품",icon:"🍼",items:[{name:"젖병",icon:"🍼"},{name:"분유",icon:"🥫"},{name:"젖병솔",icon:"🖌️"}]},{name:"위생용품",icon:"🩹",items:[{name:"체온계",icon:"🌡️",memo:"브라운 추천"},{name:"손수건",icon:"🧣",count:30},{name:"기저귀",icon:"🩲"}]}];
-            for(const c of d){ const r=await push(ref(db,'baby_checklist_v6'),{name:c.name,icon:c.icon,order:999}); for(const i of c.items) await push(ref(db,`baby_checklist_v6/${r.key}/items`),{...i,checked:false}); }
-            alert("완료!");
+            alert("리스트와 아이콘을 매칭하여 등록합니다! (약 5~10초 소요)");
+            const initialData = [
+                {name: "출산가방/엄마용품", icon: "🏥", items: [{n:"산모수첩", i:"📒"}, {n:"신분증/지갑", i:"💳"}, {n:"휴대폰/충전기", i:"📱"}, {n:"마스크", i:"😷"}, {n:"구부러지는 빨대", i:"🥤"}, {n:"물티슈/마이비데", i:"🧻"}, {n:"철분제(엄마영양제)", i:"💊"}, {n:"가습기", i:"💧"}, {n:"스킨케어/세면도구", i:"🧴"}, {n:"수유나시/브라/패드", i:"👙"}, {n:"제왕절개 팬티", i:"🩲"}, {n:"양말/목수건", i:"🧦"}, {n:"생리대/맘스안심팬티", i:"🩸"}, {n:"양배추 가슴팩", i:"🥬"}, {n:"산후복대", i:"🤕"}, {n:"손목보호대", i:"🤲"}, {n:"압박스타킹", i:"👢"}, {n:"디데이달력", i:"📅"}, {n:"볼펜/슬리퍼", i:"🖊️"}]},
+                {name: "위생/케어", icon: "🩹", items: [{n:"손수건 10장", i:"🧣"}, {n:"유산균", i:"🦠"}, {n:"손톱케어 4종", i:"✂️"}, {n:"체온계", i:"🌡️"}, {n:"온습도계", i:"💧"}, {n:"알콜스왑", i:"🏥"}, {n:"배꼽소독솜", i:"☁️"}]},
+                {name: "수유용품", icon: "🍼", items: [{n:"모유저장팩", i:"🧊"}, {n:"수유컵", i:"🥛"}, {n:"수유쿠션", i:"🍩"}, {n:"유축기", i:"🤱"}, {n:"분유제조기", i:"🤖"}, {n:"분유쉐이커", i:"🥤"}, {n:"젖병(큰거/작은거)", i:"🍼"}, {n:"분유", i:"🥫"}, {n:"분유포트", i:"🫖"}, {n:"젖꼭지", i:"🍼"}, {n:"젖병솔/집게", i:"🖌️"}, {n:"젖병건조대", i:"🌵"}, {n:"젖병소독기", i:"✨"}, {n:"젖병세정제", i:"🧼"}, {n:"휴대용젖병", i:"🍼"}, {n:"보온병", i:"🌡️"}, {n:"공갈젖꼭지(쪽쪽이)", i:"👶"}]},
+                {name: "목욕/세탁", icon: "🛁", items: [{n:"기저귀", i:"🩲"}, {n:"아기비데", i:"🚿"}, {n:"천기저귀", i:"⬜"}, {n:"아기욕조", i:"🛁"}, {n:"신생아면봉", i:"👂"}, {n:"건티슈", i:"🧻"}, {n:"세탁세제", i:"🧴"}, {n:"무형광 세탁망", i:"🕸️"}, {n:"장난감 소독제", i:"🔫"}, {n:"바스&샴푸", i:"🧴"}, {n:"로션/오일/수딩젤", i:"🧴"}, {n:"기저귀발진크림", i:"🥫"}, {n:"비판텐 연고", i:"💊"}]},
+                {name: "가구/침구/의류", icon: "🛏️", items: [{n:"아기침대", i:"🛏️"}, {n:"기저귀갈이대", i:"🚼"}, {n:"트롤리(덮개형)", i:"🛒"}, {n:"아기수납장", i:"🗄️"}, {n:"아기옷걸이", i:"🧥"}, {n:"범보의자", i:"🪑"}, {n:"방수패드", i:"🚫"}, {n:"블랭킷/이불", i:"🛌"}, {n:"바디슈트", i:"👕"}, {n:"배냇저고리/우주복", i:"👘"}, {n:"턱받이", i:"👶"}, {n:"내복", i:"👕"}, {n:"양말", i:"🧦"}]},
+                {name: "외출/가전/기타", icon: "🚗", items: [{n:"바구니카시트", i:"🧺"}, {n:"카시트", i:"🚗"}, {n:"유모차", i:"🛒"}, {n:"유모차라이너", i:"💺"}, {n:"통풍시트", i:"❄️"}, {n:"아기띠", i:"🐨"}, {n:"차량스티커", i:"🔰"}, {n:"차량햇빛가리개", i:"☀️"}, {n:"기저귀가방", i:"🎒"}, {n:"하이체어", i:"🪑"}, {n:"빨래건조대", i:"🧺"}, {n:"백색소음기", i:"📻"}, {n:"모빌", i:"🎠"}]}
+            ];
+            for (let i = 0; i < initialData.length; i++) {
+                const cat = initialData[i];
+                const newCatRef = await push(ref(db, 'baby_checklist_v6'), { name: cat.name, icon: cat.icon, order: i });
+                const catId = newCatRef.key;
+                if(cat.items && cat.items.length > 0) {
+                    for (let j = 0; j < cat.items.length; j++) {
+                        const item = cat.items[j];
+                        await push(ref(db, `baby_checklist_v6/${catId}/items`), { name: item.n, icon: item.i, checked: false, order: j, count: 1, showNaver: true });
+                    }
+                }
+            }
+            alert("✅ 모든 아이템 등록 완료!");
         };
+        
+        window.downloadTemplate=()=>{const header=["카테고리","물품명","브랜드","모델명","수량","예상가격","구매링크","메모"]; const example=["위생/케어","아기 면봉","마이비","",1,5000,"http://...","신생아용 얇은거"]; const wb=XLSX.utils.book_new(); const ws=XLSX.utils.aoa_to_sheet([header,example]); XLSX.utils.book_append_sheet(wb,ws,"육아템_양식"); XLSX.writeFile(wb,"육아준비물_양식.xlsx");};
+        window.handleExcelUpload=(input)=>{const file=input.files[0]; if(!file)return; const reader=new FileReader(); reader.onload=async(e)=>{const data=new Uint8Array(e.target.result); const workbook=XLSX.read(data,{type:'array'}); const firstSheet=workbook.Sheets[workbook.SheetNames[0]]; const rows=XLSX.utils.sheet_to_json(firstSheet,{header:1}); if(rows.length<2){alert("데이터 없음");return;} const dataRows=rows.slice(1); const grouped={}; dataRows.forEach(row=>{const catName=row[0]; const itemName=row[1]; if(!catName||!itemName)return; if(!grouped[catName])grouped[catName]=[]; grouped[catName].push({name:itemName, brand:row[2]||"", model:row[3]||"", count:row[4]||1, price:row[5]||"", link:row[6]||"", memo:row[7]||"", showNaver:true});}); if(confirm(`${Object.keys(grouped).length}개 카테고리 등록?`)){for(const catName of Object.keys(grouped)){const newCatRef=await push(ref(db,'baby_checklist_v6'),{name:catName, icon:"👶", order:999}); const catId=newCatRef.key; for(const item of grouped[catName]){await push(ref(db,`baby_checklist_v6/${catId}/items`),{...item, checked:false, order:999});}} alert("업로드 완료!"); input.value="";}}; reader.readAsArrayBuffer(file);};
+        window.searchNaver=()=>{const n=document.getElementById('itemName').value; const b=document.getElementById('itemBrand').value; const m=document.getElementById('itemModel').value; if(!n)return alert('이름 입력!'); window.open(`https://search.shopping.naver.com/search/all?query=${encodeURIComponent([b,m,n].filter(Boolean).join(' '))}`,'_blank');};
     </script>
 </body>
 </html>
