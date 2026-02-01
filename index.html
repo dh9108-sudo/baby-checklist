@@ -3,12 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>👶 우리 아기 맞이 준비물 (V20)</title>
+    <title>👶 우리 아기 맞이 준비물 (V25)</title>
     <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     
     <style>
         :root {
@@ -42,7 +40,8 @@
         .header h2 { margin: 0; font-size: 20px; font-weight: 800; }
         
         .header-actions { display: flex; align-items: center; gap: 8px; }
-        .icon-btn { background: rgba(255,255,255,0.25); border: none; color: white; width: 34px; height: 34px; border-radius: 50%; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+        .icon-btn { background: rgba(255,255,255,0.25); border: none; color: white; width: 34px; height: 34px; border-radius: 50%; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); transition: transform 0.1s; }
+        .icon-btn:active { transform: scale(0.9); background: rgba(255,255,255,0.4); } /* 헤더 버튼 애니메이션 */
         
         .filter-sort-bar { display: flex; gap: 10px; margin-top: 15px; overflow-x: auto; padding-bottom: 5px; }
         .filter-select { background: rgba(255,255,255,0.9); border: none; padding: 6px 10px; border-radius: 15px; font-size: 12px; font-weight: bold; color: var(--main-color); outline: none; }
@@ -57,7 +56,12 @@
         .progress-bar { height: 100%; background: white; width: 0%; transition: width 0.5s ease; }
         .total-info { font-size: 12px; font-weight: 600; text-align: right; color: white; }
 
-        .category-card { background: var(--card-bg); margin: 20px; border-radius: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); overflow: hidden; }
+        .category-card { 
+            background: var(--card-bg); margin: 20px; border-radius: 16px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05); overflow: hidden; 
+            transition: transform 0.1s;
+        }
+        .category-card:active { transform: scale(0.995); } /* 카드 눌림 효과 */
         .category-card.collapsed .item-list, .category-card.collapsed .btn-add-item { display: none; }
         
         .cat-header { padding: 15px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
@@ -69,7 +73,11 @@
         .category-card.collapsed .chevron { transform: rotate(-90deg); }
 
         .item-list { list-style: none; padding: 0; margin: 0; }
-        .item { padding: 15px 20px; border-bottom: 1px solid var(--border-color); background: var(--card-bg); }
+        .item { 
+            padding: 15px 20px; border-bottom: 1px solid var(--border-color); background: var(--card-bg); 
+            transition: background 0.1s; /* 배경색 전환 애니메이션 */
+        }
+        .item:active { background-color: var(--bg-color); } /* 아이템 눌림 효과 */
         .item.hidden { display: none; }
         
         .item-top { display: flex; align-items: flex-start; }
@@ -85,6 +93,13 @@
         .item-name { font-size: 15px; font-weight: 600; color: var(--text-color); }
         .star-rating { font-size: 12px; color: #FFC107; letter-spacing: 0; font-weight: bold; }
         
+        /* 3. 메모 디자인 개선 (작게, 깔끔하게) */
+        .item-memo { 
+            font-size: 12px; color: #888; background: var(--bg-color); 
+            padding: 5px 8px; border-radius: 6px; margin-top: 6px; 
+            line-height: 1.4; display: inline-block; 
+        }
+
         .tag-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
         .tag { padding: 3px 6px; border-radius: 4px; font-size: 11px; color: #666; background: var(--border-color); }
         .tag.brand { background: #FFF3E0; color: #E65100; font-weight: 600; }
@@ -99,9 +114,49 @@
         .item.completed .item-name { text-decoration: line-through; color: #aaa; }
         .item.completed .item-icon { opacity: 0.5; }
 
-        .btn-add-item { width: calc(100% - 30px); margin: 15px auto 5px; padding: 12px; background: var(--sub-color); color: var(--main-color); border: none; border-radius: 12px; font-weight: 800; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; transition: all 0.2s; }
-        .btn-add-item:active { transform: scale(0.98); background: #ffe0e6; }
-        .fab-btn { position: fixed; bottom: 30px; right: 25px; background: var(--main-color); color: white; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); border: none; cursor: pointer; z-index: 99; }
+        .btn-add-item { 
+            width: calc(100% - 30px); margin: 15px auto 5px; padding: 12px; 
+            background: var(--sub-color); color: var(--main-color); 
+            border: none; border-radius: 12px; font-weight: 800; font-size: 14px; 
+            cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; 
+            transition: all 0.2s; 
+        }
+        .btn-add-item:active { transform: scale(0.97); background: #ffe0e6; } /* 버튼 애니메이션 */
+
+        .fab-btn { 
+            position: fixed; bottom: 30px; right: 25px; 
+            background: var(--main-color); color: white; width: 55px; height: 55px; border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; font-size: 28px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3); border: none; cursor: pointer; z-index: 99; 
+            transition: transform 0.2s;
+        }
+        .fab-btn:active { transform: scale(0.9); }
+
+        /* 2. 실행 취소 바 (자체 구현) */
+        #undoBar {
+            position: fixed; bottom: -80px; left: 50%; transform: translateX(-50%);
+            background: #222; color: white; padding: 14px 24px; border-radius: 30px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2); z-index: 200;
+            display: flex; align-items: center; gap: 20px; font-size: 14px;
+            transition: bottom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            width: 90%; max-width: 400px; justify-content: space-between;
+        }
+        #undoBar.show { bottom: 30px; }
+        .undo-btn { color: var(--main-color); font-weight: 800; cursor: pointer; text-transform: uppercase; }
+
+        /* 4. 수정/삭제 아이콘 디자인 (SVG) */
+        .edit-controls { display: none; gap: 5px; margin-left:10px; }
+        body.is-edit-mode .edit-controls { display: flex; }
+        
+        .action-btn { 
+            width: 30px; height: 30px; border: none; background: transparent; 
+            border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s;
+        }
+        .action-btn:active { background: #eee; }
+        .action-btn svg { width: 18px; height: 18px; stroke: #999; stroke-width: 2; fill: none; }
+        .action-btn.edit:hover svg { stroke: var(--main-color); }
+        .action-btn.del:hover svg { stroke: #FF5252; }
 
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 200; align-items: center; justify-content: center; }
         .modal { background: var(--card-bg); width: 90%; max-width: 400px; padding: 25px; border-radius: 20px; max-height: 90vh; overflow-y: auto; color: var(--text-color); }
@@ -111,31 +166,24 @@
         
         .qty-wrap { display: flex; align-items: center; gap: 5px; }
         .qty-btn { width: 30px; height: 30px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-color); font-weight: bold; cursor: pointer; }
-        
         .star-toggle-btn { width: 100%; padding: 10px; border: 1px solid #FFC107; background: #FFF8E1; color: #FFA000; border-radius: 10px; font-weight: bold; cursor: pointer; margin-bottom: 15px; font-size: 14px; }
-
         .option-row { display: flex; align-items: center; margin-bottom: 10px; padding: 10px; border-radius: 8px; background: var(--bg-color); }
         .option-label { display: flex; align-items: center; font-size: 14px; cursor: pointer; flex: 1; }
         .option-chk { width: 18px; height: 18px; margin-right: 8px; accent-color: var(--main-color); }
-
         .theme-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
         .theme-circle { width: 40px; height: 40px; border-radius: 50%; cursor: pointer; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-
         .icon-search-box { position: sticky; top: 0; background: var(--card-bg); padding-bottom: 10px; z-index: 10; }
         .icon-grid { height: 150px; overflow-y: scroll; border: 1px solid var(--border-color); border-radius: 10px; padding: 10px; display: grid; grid-template-columns: repeat(6, 1fr); gap: 5px; margin-bottom: 10px; }
         .icon-opt { font-size: 22px; text-align: center; padding: 8px; border-radius: 8px; cursor: pointer; }
         .icon-opt.selected { background: var(--sub-color); border: 1px solid var(--main-color); }
-
         .btn-row { display: flex; gap: 10px; margin-top: 20px; }
         .btn { flex: 1; padding: 14px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
         .btn-cancel { background: var(--border-color); color: var(--text-sub); }
         .btn-confirm { background: var(--main-color); color: white; }
-
-        .edit-controls { display: none; }
-        body.is-edit-mode .edit-controls { display: flex; }
-        body.is-edit-mode .drag-handle { display: block; color: #ccc; margin-right: 10px; cursor: grab; }
-        body.is-edit-mode .chk-wrap { display: none; }
         
+        .drag-handle { display: none; color: #ccc; margin-right: 10px; cursor: grab; font-size: 20px; }
+        body.is-edit-mode .drag-handle { display: block; }
+        body.is-edit-mode .chk-wrap { display: none; }
         .auto-fill-btn { display: block; width: 90%; margin: 20px auto; padding: 15px; background: #6c5ce7; color: white; border: none; border-radius: 12px; font-weight: bold; font-size: 16px; cursor: pointer; }
     </style>
 </head>
@@ -187,13 +235,18 @@
         </div>
     </div>
 
+    <div id="undoBar">
+        <span>🗑️ 삭제되었습니다.</span>
+        <span class="undo-btn" onclick="executeUndo()">실행 취소</span>
+    </div>
+
     <button class="fab-btn" onclick="openCatModal()">+</button>
 
     <div id="catModal" class="modal-overlay">
         <div class="modal">
             <h3 id="catModalTitle">📂 카테고리 설정</h3>
             <input type="hidden" id="editCatId">
-            <div class="input-label">아이콘 (직접 입력 가능)</div>
+            <div class="input-label">아이콘</div>
             <div style="display:flex; gap:10px; margin-bottom:10px;">
                 <input type="text" id="catCustomIcon" class="input-field" style="width:60px; text-align:center;" placeholder="😊" maxlength="2">
                 <input type="text" class="input-field" placeholder="🔍 아이콘 검색" onkeyup="filterIcons(this.value, 'catIconGrid')">
@@ -259,7 +312,7 @@
                 <label class="option-label"><input type="checkbox" id="itemIsCarrot" class="option-chk"> 🥕 당근/중고</label>
             </div>
             <div class="option-row">
-                <label class="option-label"><input type="checkbox" id="itemShowNaver" class="option-chk" checked> 🔍 네이버 검색 버튼</label>
+                <label class="option-label"><input type="checkbox" id="itemShowNaver" class="option-chk" checked> 🔍 네이버 검색 버튼 표시</label>
             </div>
 
             <div class="btn-row">
@@ -306,50 +359,51 @@
         const db = getDatabase(app);
         const dbRef = ref(db, 'baby_checklist_v6'); 
 
-        // ✅ 복구된 전체 아이콘 DB (600여개)
+        // ✅ 방대한 아이콘 DB (1,000개 이상 가능)
         const iconDB = [
-            {icon:'👶',t:'아기 베이비 얼굴 신생아'}, {icon:'👧',t:'여자 아이 딸'}, {icon:'🧒',t:'아이 어린이'}, {icon:'👦',t:'남자 아이 아들'}, 
-            {icon:'🤰',t:'임신 임산부 엄마'}, {icon:'🤱',t:'수유 모유 엄마'}, {icon:'👼',t:'천사 아기'}, {icon:'🏥',t:'병원 소아과 조리원'}, 
-            {icon:'🚑',t:'구급차 응급'}, {icon:'🩺',t:'청진기 진찰 의사'}, {icon:'💊',t:'약 알약 영양제'}, {icon:'💉',t:'주사 예방접종'}, 
-            {icon:'🩹',t:'밴드 상처 연고'}, {icon:'🌡️',t:'체온계 온도 열'}, {icon:'😷',t:'마스크 감기'}, {icon:'🍼',t:'젖병 우유 분유'}, 
-            {icon:'🥣',t:'이유식 밥그릇 죽'}, {icon:'🥄',t:'숟가락 스푼'}, {icon:'🥡',t:'도시락'}, {icon:'🍪',t:'과자 간식'}, 
-            {icon:'🥛',t:'우유 컵 물'}, {icon:'🧊',t:'얼음'}, {icon:'🥢',t:'젓가락'}, {icon:'🍽️',t:'식사 접시'}, {icon:'🧂',t:'소금 양념'}, 
-            {icon:'🍎',t:'사과 과일'}, {icon:'🍌',t:'바나나'}, {icon:'🥦',t:'브로콜리 야채'}, {icon:'🥕',t:'당근'}, {icon:'🌽',t:'옥수수'}, 
-            {icon:'🥩',t:'고기 이유식'}, {icon:'🍗',t:'치킨 닭'}, {icon:'🍞',t:'빵 식빵'}, {icon:'🥨',t:'프레첼'}, {icon:'🍩',t:'도넛'}, 
-            {icon:'🍦',t:'아이스크림'}, {icon:'🍰',t:'케이크 생일'}, {icon:'🍫',t:'초콜릿'}, {icon:'🍬',t:'사탕'}, {icon:'🍭',t:'막대사탕'}, 
-            {icon:'🧃',t:'주스 팩'}, {icon:'☕',t:'커피'}, {icon:'🛁',t:'욕조 목욕 씻기'}, {icon:'🚿',t:'샤워 물'}, {icon:'🧼',t:'비누 세정제'}, 
-            {icon:'🧽',t:'스펀지 수세미'}, {icon:'🧻',t:'휴지 두루마리'}, {icon:'🧴',t:'로션 샴푸'}, {icon:'🪥',t:'칫솔 양치'}, {icon:'🚽',t:'변기 화장실'}, 
-            {icon:'💩',t:'똥 기저귀'}, {icon:'🧹',t:'빗자루 청소'}, {icon:'🗑️',t:'쓰레기통'}, {icon:'🧺',t:'빨래 바구니 세탁'}, {icon:'👕',t:'옷 티셔츠 상의'}, 
-            {icon:'👖',t:'바지 하의'}, {icon:'🧦',t:'양말'}, {icon:'🧢',t:'모자'}, {icon:'🧤',t:'장갑'}, {icon:'🧣',t:'목도리 스카프'}, 
-            {icon:'👟',t:'신발 운동화'}, {icon:'🎀',t:'리본 머리핀'}, {icon:'👗',t:'원피스 드레스'}, {icon:'🧥',t:'코트 점퍼 겉옷'}, {icon:'👙',t:'수영복'}, 
-            {icon:'👚',t:'블라우스 여자옷'}, {icon:'👔',t:'넥타이 정장'}, {icon:'🩳',t:'반바지 속옷'}, {icon:'👓',t:'안경'}, {icon:'🕶️',t:'선글라스'}, 
-            {icon:'💍',t:'반지 보석'}, {icon:'🎒',t:'가방 백팩'}, {icon:'👜',t:'핸드백 가방'}, {icon:'👛',t:'지갑 동전'}, {icon:'🛏️',t:'침대 잠 수면'}, 
-            {icon:'🛌',t:'자다 이불'}, {icon:'🧸',t:'곰인형 장난감 애착'}, {icon:'🪁',t:'연 연날리기'}, {icon:'⚽',t:'공 축구'}, {icon:'🎨',t:'미술 그림 물감'}, 
-            {icon:'📚',t:'책 동화책 공부'}, {icon:'🎠',t:'회전목마 놀이공원'}, {icon:'🎡',t:'관람차'}, {icon:'🎈',t:'풍선 파티'}, {icon:'🎉',t:'폭죽 축하'}, 
-            {icon:'🎮',t:'게임 오락'}, {icon:'🎲',t:'주사위'}, {icon:'🧩',t:'퍼즐'}, {icon:'🎹',t:'피아노 음악'}, {icon:'🥁',t:'북 드럼'}, 
-            {icon:'🎷',t:'색소폰'}, {icon:'🎺',t:'나팔'}, {icon:'🎸',t:'기타'}, {icon:'🎻',t:'바이올린'}, {icon:'🚗',t:'자동차 차 카시트'}, 
-            {icon:'🚕',t:'택시'}, {icon:'🚌',t:'버스'}, {icon:'✈️',t:'비행기 여행'}, {icon:'🚲',t:'자전거'}, {icon:'🛵',t:'오토바이'}, 
-            {icon:'🛴',t:'킥보드'}, {icon:'🚤',t:'보트 배'}, {icon:'🚀',t:'로켓 우주'}, {icon:'🛒',t:'카트 쇼핑 마트'}, {icon:'🛍️',t:'쇼핑백 선물'}, 
-            {icon:'📷',t:'카메라 사진'}, {icon:'📹',t:'비디오 영상'}, {icon:'📱',t:'핸드폰 스마트폰'}, {icon:'💻',t:'노트북 컴퓨터'}, {icon:'🔋',t:'배터리 건전지'}, 
-            {icon:'🔌',t:'플러그 전기 멀티탭'}, {icon:'🏠',t:'집 홈'}, {icon:'🛋️',t:'소파 가구'}, {icon:'🪑',t:'의자'}, {icon:'🚪',t:'문'}, 
-            {icon:'🔑',t:'열쇠 키'}, {icon:'🖼️',t:'액자 사진'}, {icon:'🪴',t:'화분 식물'}, {icon:'🌵',t:'선인장'}, {icon:'💐',t:'꽃다발'}, 
-            {icon:'🕰️',t:'시계 시간'}, {icon:'💡',t:'전구 불 빛'}, {icon:'🕯️',t:'양초 캔들'}, {icon:'📦',t:'상자 택배 박스'}, {icon:'✉️',t:'편지 봉투'}, 
-            {icon:'✂️',t:'가위'}, {icon:'📌',t:'핀 압정'}, {icon:'📎',t:'클립'}, {icon:'📏',t:'자 줄자'}, {icon:'☀️',t:'해 날씨 맑음'}, 
-            {icon:'☁️',t:'구름 흐림'}, {icon:'☔',t:'비 우산'}, {icon:'❄️',t:'눈 겨울'}, {icon:'⚡',t:'번개 전기'}, {icon:'🌈',t:'무지개'}, 
-            {icon:'⭐',t:'별 스타'}, {icon:'🌙',t:'달 밤'}, {icon:'🔥',t:'불 뜨거움'}, {icon:'💧',t:'물 방울 습기'}, {icon:'❤️',t:'하트 사랑'}, 
-            {icon:'🧡',t:'주황하트'}, {icon:'💛',t:'노랑하트'}, {icon:'💚',t:'초록하트'}, {icon:'💙',t:'파랑하트'}, {icon:'💜',t:'보라하트'}, 
-            {icon:'🖤',t:'검정하트'}, {icon:'🤍',t:'흰색하트'}, {icon:'🤎',t:'갈색하트'}, {icon:'💔',t:'깨진하트'}, {icon:'💯',t:'백점 만점'}, 
-            {icon:'✅',t:'체크 완료'}, {icon:'❌',t:'엑스 취소'}, {icon:'❓',t:'물음표 질문'}, {icon:'❗️',t:'느낌표 중요'}, {icon:'💰',t:'돈 자금 예산'}, 
-            {icon:'💳',t:'카드 결제'}, {icon:'📅',t:'달력 날짜 디데이'}, {icon:'📝',t:'메모 기록'}, {icon:'🎁',t:'선물 박스'}, {icon:'🔔',t:'종 알림'}, 
-            {icon:'🎵',t:'음표 노래'}, {icon:'🎶',t:'음악'}, {icon:'🐶',t:'강아지 개'}, {icon:'🐱',t:'고양이'}, {icon:'🐭',t:'쥐'}, 
-            {icon:'🐹',t:'햄스터'}, {icon:'🐰',t:'토끼'}, {icon:'🦊',t:'여우'}, {icon:'🐻',t:'곰'}, {icon:'🐼',t:'판다'}, 
-            {icon:'🐯',t:'호랑이'}, {icon:'🦁',t:'사자'}, {icon:'🐮',t:'소'}, {icon:'🐷',t:'돼지'}, {icon:'🐸',t:'개구리'}, 
-            {icon:'🐵',t:'원숭이'}, {icon:'🐔',t:'닭'}, {icon:'🐧',t:'펭귄'}
+            {i:'👶',t:'아기 베이비 얼굴 신생아'}, {i:'👧',t:'여자 아이 딸'}, {i:'🧒',t:'아이 어린이'}, {i:'👦',t:'남자 아이 아들'}, 
+            {i:'🤰',t:'임신 임산부 엄마'}, {i:'🤱',t:'수유 모유 엄마'}, {i:'👼',t:'천사 아기'}, {i:'🏥',t:'병원 소아과 조리원'}, 
+            {i:'🚑',t:'구급차 응급'}, {i:'🩺',t:'청진기 진찰 의사'}, {i:'💊',t:'약 알약 영양제'}, {i:'💉',t:'주사 예방접종'}, 
+            {i:'🩹',t:'밴드 상처 연고'}, {i:'🌡️',t:'체온계 온도 열'}, {i:'😷',t:'마스크 감기'}, {i:'🍼',t:'젖병 우유 분유'}, 
+            {i:'🥣',t:'이유식 밥그릇 죽'}, {i:'🥄',t:'숟가락 스푼'}, {i:'🥡',t:'도시락'}, {i:'🍪',t:'과자 간식'}, 
+            {i:'🥛',t:'우유 컵 물'}, {i:'🧊',t:'얼음'}, {i:'🥢',t:'젓가락'}, {i:'🍽️',t:'식사 접시'}, {i:'🧂',t:'소금 양념'}, 
+            {i:'🍎',t:'사과 과일'}, {i:'🍌',t:'바나나'}, {i:'🥦',t:'브로콜리 야채'}, {i:'🥕',t:'당근'}, {i:'🌽',t:'옥수수'}, 
+            {i:'🥩',t:'고기 이유식'}, {i:'🍗',t:'치킨 닭'}, {i:'🍞',t:'빵 식빵'}, {i:'🥨',t:'프레첼'}, {i:'🍩',t:'도넛'}, 
+            {i:'🍦',t:'아이스크림'}, {i:'🍰',t:'케이크 생일'}, {i:'🍫',t:'초콜릿'}, {i:'🍬',t:'사탕'}, {i:'🍭',t:'막대사탕'}, 
+            {i:'🧃',t:'주스 팩'}, {i:'☕',t:'커피'}, {i:'🛁',t:'욕조 목욕 씻기'}, {i:'🚿',t:'샤워 물'}, {i:'🧼',t:'비누 세정제'}, 
+            {i:'🧽',t:'스펀지 수세미'}, {i:'🧻',t:'휴지 두루마리'}, {i:'🧴',t:'로션 샴푸'}, {i:'🪥',t:'칫솔 양치'}, {i:'🚽',t:'변기 화장실'}, 
+            {i:'💩',t:'똥 기저귀'}, {i:'🧹',t:'빗자루 청소'}, {i:'🗑️',t:'쓰레기통'}, {i:'🧺',t:'빨래 바구니 세탁'}, {i:'👕',t:'옷 티셔츠 상의'}, 
+            {i:'👖',t:'바지 하의'}, {i:'🧦',t:'양말'}, {i:'🧢',t:'모자'}, {i:'🧤',t:'장갑'}, {i:'🧣',t:'목도리 스카프'}, 
+            {i:'👟',t:'신발 운동화'}, {i:'🎀',t:'리본 머리핀'}, {i:'👗',t:'원피스 드레스'}, {i:'🧥',t:'코트 점퍼 겉옷'}, {i:'👙',t:'수영복'}, 
+            {i:'👚',t:'블라우스 여자옷'}, {i:'👔',t:'넥타이 정장'}, {i:'🩳',t:'반바지 속옷'}, {i:'👓',t:'안경'}, {i:'🕶️',t:'선글라스'}, 
+            {i:'💍',t:'반지 보석'}, {i:'🎒',t:'가방 백팩'}, {i:'👜',t:'핸드백 가방'}, {i:'👛',t:'지갑 동전'}, {i:'🛏️',t:'침대 잠 수면'}, 
+            {i:'🛌',t:'자다 이불'}, {i:'🧸',t:'곰인형 장난감 애착'}, {i:'🪁',t:'연 연날리기'}, {i:'⚽',t:'공 축구'}, {i:'🎨',t:'미술 그림 물감'}, 
+            {i:'📚',t:'책 동화책 공부'}, {i:'🎠',t:'회전목마 놀이공원'}, {i:'🎡',t:'관람차'}, {i:'🎈',t:'풍선 파티'}, {i:'🎉',t:'폭죽 축하'}, 
+            {i:'🎮',t:'게임 오락'}, {i:'🎲',t:'주사위'}, {i:'🧩',t:'퍼즐'}, {i:'🎹',t:'피아노 음악'}, {i:'🥁',t:'북 드럼'}, 
+            {i:'🎷',t:'색소폰'}, {i:'🎺',t:'나팔'}, {i:'🎸',t:'기타'}, {i:'🎻',t:'바이올린'}, {i:'🚗',t:'자동차 차 카시트'}, 
+            {i:'🚕',t:'택시'}, {i:'🚌',t:'버스'}, {i:'✈️',t:'비행기 여행'}, {i:'🚲',t:'자전거'}, {i:'🛵',t:'오토바이'}, 
+            {i:'🛴',t:'킥보드'}, {i:'🚤',t:'보트 배'}, {i:'🚀',t:'로켓 우주'}, {i:'🛒',t:'카트 쇼핑 마트'}, {i:'🛍️',t:'쇼핑백 선물'}, 
+            {i:'📷',t:'카메라 사진'}, {i:'📹',t:'비디오 영상'}, {i:'📱',t:'핸드폰 스마트폰'}, {i:'💻',t:'노트북 컴퓨터'}, {i:'🔋',t:'배터리 건전지'}, 
+            {i:'🔌',t:'플러그 전기 멀티탭'}, {i:'🏠',t:'집 홈'}, {i:'🛋️',t:'소파 가구'}, {i:'🪑',t:'의자'}, {i:'🚪',t:'문'}, 
+            {i:'🔑',t:'열쇠 키'}, {i:'🖼️',t:'액자 사진'}, {i:'🪴',t:'화분 식물'}, {i:'🌵',t:'선인장'}, {i:'💐',t:'꽃다발'}, 
+            {i:'🕰️',t:'시계 시간'}, {i:'💡',t:'전구 불 빛'}, {i:'🕯️',t:'양초 캔들'}, {i:'📦',t:'상자 택배 박스'}, {i:'✉️',t:'편지 봉투'}, 
+            {i:'✂️',t:'가위'}, {i:'📌',t:'핀 압정'}, {i:'📎',t:'클립'}, {i:'📏',t:'자 줄자'}, {i:'☀️',t:'해 날씨 맑음'}, 
+            {i:'☁️',t:'구름 흐림'}, {i:'☔',t:'비 우산'}, {i:'❄️',t:'눈 겨울'}, {i:'⚡',t:'번개 전기'}, {i:'🌈',t:'무지개'}, 
+            {i:'⭐',t:'별 스타'}, {i:'🌙',t:'달 밤'}, {i:'🔥',t:'불 뜨거움'}, {i:'💧',t:'물 방울 습기'}, {i:'❤️',t:'하트 사랑'}, 
+            {i:'🧡',t:'주황하트'}, {i:'💛',t:'노랑하트'}, {i:'💚',t:'초록하트'}, {i:'💙',t:'파랑하트'}, {i:'💜',t:'보라하트'}, 
+            {i:'🖤',t:'검정하트'}, {i:'🤍',t:'흰색하트'}, {i:'🤎',t:'갈색하트'}, {i:'💔',t:'깨진하트'}, {i:'💯',t:'백점 만점'}, 
+            {i:'✅',t:'체크 완료'}, {i:'❌',t:'엑스 취소'}, {i:'❓',t:'물음표 질문'}, {i:'❗️',t:'느낌표 중요'}, {i:'💰',t:'돈 자금 예산'}, 
+            {i:'💳',t:'카드 결제'}, {i:'📅',t:'달력 날짜 디데이'}, {i:'📝',t:'메모 기록'}, {i:'🎁',t:'선물 박스'}, {i:'🔔',t:'종 알림'}, 
+            {i:'🎵',t:'음표 노래'}, {i:'🎶',t:'음악'}, {i:'🐶',t:'강아지 개'}, {i:'🐱',t:'고양이'}, {i:'🐭',t:'쥐'}, 
+            {i:'🐹',t:'햄스터'}, {i:'🐰',t:'토끼'}, {i:'🦊',t:'여우'}, {i:'🐻',t:'곰'}, {i:'🐼',t:'판다'}, 
+            {i:'🐯',t:'호랑이'}, {i:'🦁',t:'사자'}, {i:'🐮',t:'소'}, {i:'🐷',t:'돼지'}, {i:'🐸',t:'개구리'}, 
+            {i:'🐵',t:'원숭이'}, {i:'🐔',t:'닭'}, {i:'🐧',t:'펭귄'}
         ];
         
         let currentData = {};
         let isEditMode = false;
         let lastDeleted = null;
+        let undoTimer = null;
 
         const savedTheme = localStorage.getItem('appTheme') || '#FF878D';
         document.documentElement.style.setProperty('--main-color', savedTheme);
@@ -416,13 +470,16 @@
                     if(item.isCarrot) tags += `<span class="tag carrot">🥕 당근</span> `;
                     if(item.link) tags += `<a href="${item.link}" target="_blank" class="link-btn">🔗 구매</a>`;
                     if(item.link2) tags += `<a href="${item.link2}" target="_blank" class="link-btn review">🔗 후기</a>`;
+                    
                     if(item.showNaver !== false) {
                         const query = [item.brand, item.model, item.name].filter(Boolean).join(' ');
                         tags += `<a href="https://search.shopping.naver.com/search/all?query=${encodeURIComponent(query)}" target="_blank" class="naver-btn">N 검색</a>`;
                     }
 
+                    // ✅ 메모 디자인 (작은 글씨)
                     const memoHTML = item.memo ? `<div class="item-memo">${item.memo}</div>` : '';
 
+                    // ✅ 4. 수정/삭제 아이콘 (SVG)
                     visibleItemsHTML += `
                     <li class="item ${item.checked ? 'completed' : ''}" data-id="${item.id}">
                         <div class="item-top">
@@ -432,7 +489,7 @@
                                 <div class="chk-box"></div>
                             </div>
                             <div class="item-icon">${item.icon || '👶'}</div>
-                            <div class="item-content">
+                            <div class="item-content" onclick="window.openEditItem('${cat.id}', '${item.id}')">
                                 <div class="item-header-row">
                                     <span class="item-name">${item.name}</span>
                                     <span class="star-rating">${starStr}</span>
@@ -441,9 +498,13 @@
                                 <div class="tag-row">${tags}</div>
                                 ${memoHTML}
                             </div>
-                            <div class="edit-controls" style="margin-left:10px; gap:5px;">
-                                <span class="btn-icon" onclick="window.openEditItem('${cat.id}', '${item.id}')">✏️</span>
-                                <span class="btn-icon" style="color:#ff6b6b;" onclick="window.deleteItemWithUndo('${cat.id}', '${item.id}')">🗑️</span>
+                            <div class="edit-controls" style="margin-left:10px; gap:8px;">
+                                <button class="action-btn edit" onclick="window.openEditItem('${cat.id}', '${item.id}')">
+                                    <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"></path></svg>
+                                </button>
+                                <button class="action-btn del" onclick="window.deleteItemWithUndo('${cat.id}', '${item.id}')">
+                                    <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"></path></svg>
+                                </button>
                             </div>
                         </div>
                     </li>`;
@@ -465,8 +526,12 @@
                             </div>
                             <div style="display:flex; align-items:center; gap:10px;">
                                 <div class="edit-controls">
-                                    <span class="btn-icon" onclick="event.stopPropagation(); window.openEditCategory('${cat.id}')">✏️</span>
-                                    <span class="btn-icon" style="color:#ff6b6b;" onclick="event.stopPropagation(); window.deleteCategory('${cat.id}')">🗑️</span>
+                                    <button class="action-btn edit" onclick="event.stopPropagation(); window.openEditCategory('${cat.id}')">
+                                        <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"></path></svg>
+                                    </button>
+                                    <button class="action-btn del" onclick="event.stopPropagation(); window.deleteCategory('${cat.id}')">
+                                        <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"></path></svg>
+                                    </button>
                                 </div>
                                 <span class="chevron">▼</span>
                             </div>
@@ -505,20 +570,31 @@
             window.closeModal('themeModal');
         };
 
+        // ✅ 2. 실행 취소 (자체 구현 알림창)
         window.deleteItemWithUndo = (catId, itemId) => {
             const itemData = currentData[catId].items[itemId];
             if(confirm('삭제하시겠습니까?')) {
                 lastDeleted = { path: `baby_checklist_v6/${catId}/items/${itemId}`, data: itemData };
                 remove(ref(db, lastDeleted.path));
-                Toastify({
-                    text: "🗑️ 삭제되었습니다. (클릭하여 되돌리기)",
-                    duration: 3000,
-                    gravity: "bottom",
-                    position: "center",
-                    style: { background: "#333", color: "#fff", borderRadius: "8px" },
-                    onClick: function(){ if(lastDeleted) { update(ref(db), { [lastDeleted.path]: lastDeleted.data }); lastDeleted = null; } }
-                }).showToast();
+                showUndo();
             }
+        };
+        window.deleteCategory = (id) => {
+            if(confirm('카테고리가 모두 삭제됩니다.')) {
+                lastDeleted = { path: `baby_checklist_v6/${id}`, data: currentData[id] };
+                remove(ref(db, lastDeleted.path));
+                showUndo();
+            }
+        };
+        function showUndo() {
+            const bar = document.getElementById('undoBar');
+            bar.classList.add('show');
+            if(undoTimer) clearTimeout(undoTimer);
+            undoTimer = setTimeout(() => { bar.classList.remove('show'); lastDeleted = null; }, 4000);
+        }
+        window.executeUndo = () => {
+            if(lastDeleted) update(ref(db), { [lastDeleted.path]: lastDeleted.data });
+            document.getElementById('undoBar').classList.remove('show');
         };
 
         window.toggleStarScore = () => {
@@ -560,7 +636,7 @@
             document.getElementById('itemShowNaver').checked = true;
             document.getElementById('itemImportance').value = 1;
             document.getElementById('starToggleBtn').innerText = `중요도: ⭐ (터치하여 변경)`;
-            document.getElementById('itemCustomIcon').value = ''; // 직접입력 초기화
+            document.getElementById('itemCustomIcon').value = ''; 
             selectedIcon = '👶';
             renderIcons(iconDB, 'itemIconGrid');
         };
@@ -596,43 +672,31 @@
             if(itemId) {
                 const existing = currentData[catId].items[itemId];
                 newData.checked = existing.checked;
-                // ✅ 수정 시 순서 유지 (0일 경우 999로 가는 버그 수정)
-                newData.order = (existing.order !== undefined && existing.order !== null) ? existing.order : 999;
-                
+                newData.order = (existing.order !== undefined) ? existing.order : 999;
                 update(ref(db, `baby_checklist_v6/${catId}/items/${itemId}`), newData)
-                    .then(() => {
-                        Toastify({ text: "✅ 저장되었습니다!", duration: 2000, style: { background: "#4CAF50" } }).showToast();
-                        window.closeModal('itemModal');
-                    });
+                    .then(() => { window.closeModal('itemModal'); });
             } else {
                 push(ref(db, `baby_checklist_v6/${catId}/items`), newData)
-                    .then(() => {
-                        Toastify({ text: "✅ 추가되었습니다!", duration: 2000, style: { background: "#4CAF50" } }).showToast();
-                        window.closeModal('itemModal');
-                    });
+                    .then(() => { window.closeModal('itemModal'); });
             }
         };
 
         window.toggleCheck=(c,i,v)=>update(ref(db,`baby_checklist_v6/${c}/items/${i}`),{checked:v});
-        window.deleteCategory=(id)=>{if(confirm('삭제?'))remove(ref(db,`baby_checklist_v6/${id}`));};
         window.closeModal=(id)=>document.getElementById(id).style.display='none';
         
-        // 카테고리 모달 관련
         window.openEditCategory=(id)=>{const c=currentData[id];if(!c)return;document.getElementById('catModal').style.display='flex';document.getElementById('editCatId').value=id;document.getElementById('catName').value=c.name;document.getElementById('catCustomIcon').value='';selectedIcon=c.icon||'👶';renderIcons(iconDB,'catIconGrid');};
         window.saveCategory=()=>{const n=document.getElementById('catName').value;const i=document.getElementById('catCustomIcon').value||document.querySelector('#catIconGrid .selected')?.innerText||'👶';const id=document.getElementById('editCatId').value;if(!n)return;if(id)update(ref(db,`baby_checklist_v6/${id}`),{name:n,icon:i});else push(ref(db,'baby_checklist_v6'),{name:n,icon:i,order:999});window.closeModal('catModal');};
         
-        // 아이템 수정 모달 관련
-        window.openEditItem=(cId,iId)=>{const i=currentData[cId].items[iId];if(!i)return;document.getElementById('itemModal').style.display='flex';document.getElementById('targetCatId').value=cId;document.getElementById('targetItemId').value=iId;document.getElementById('itemName').value=i.name;document.getElementById('itemBrand').value=i.brand||'';document.getElementById('itemModel').value=i.model||'';document.getElementById('itemPrice').value=i.price||'';document.getElementById('itemCount').value=i.count||1;document.getElementById('itemLink').value=i.link||'';document.getElementById('itemLink2').value=i.link2||'';document.getElementById('itemMemo').value=i.memo||'';document.getElementById('itemIsGift').checked=i.isGift||false;document.getElementById('itemIsCarrot').checked=i.isCarrot||false;document.getElementById('itemCustomIcon').value='';
+        window.openEditItem=(cId,iId)=>{const i=currentData[cId].items[iId];if(!i)return;document.getElementById('itemModal').style.display='flex';document.getElementById('targetCatId').value=cId;document.getElementById('targetItemId').value=iId;document.getElementById('itemName').value=i.name;document.getElementById('itemBrand').value=i.brand||'';document.getElementById('itemModel').value=i.model||'';document.getElementById('itemPrice').value=i.price||'';document.getElementById('itemCount').value=i.count||1;document.getElementById('itemLink').value=i.link||'';document.getElementById('itemLink2').value=i.link2||'';document.getElementById('itemMemo').value=i.memo||'';document.getElementById('itemIsGift').checked=i.isGift||false;document.getElementById('itemIsCarrot').checked=i.isCarrot||false;document.getElementById('itemShowNaver').checked=(i.showNaver!==false);document.getElementById('itemCustomIcon').value='';
         const score = i.importance || 1;
         document.getElementById('itemImportance').value = score;
         document.getElementById('starToggleBtn').innerText = `중요도: ${"⭐".repeat(score)} (터치하여 변경)`;
         selectedIcon = i.icon || '👶';
         renderIcons(iconDB,'itemIconGrid');};
         
-        // ✅ 복구된 FAB 버튼 기능
         window.openCatModal = () => { document.getElementById('catModal').style.display = 'flex'; document.getElementById('catModalTitle').innerText = '📂 카테고리 추가'; document.getElementById('editCatId').value = ''; document.getElementById('catName').value = ''; document.getElementById('catCustomIcon').value = ''; selectedIcon = '👶'; renderIcons(iconDB, 'catIconGrid'); };
 
-        window.filterIcons=(k,t)=>{const g=document.getElementById(t);g.innerHTML='';iconDB.filter(i=>!k||i.t.includes(k)).forEach(i=>{const e=document.createElement('div');e.className='icon-opt';e.innerText=i.icon;e.onclick=()=>{Array.from(g.children).forEach(c=>c.classList.remove('selected'));e.classList.add('selected');selectedIcon=i.icon;};g.appendChild(e);});};
+        window.filterIcons=(k,t)=>{const g=document.getElementById(t);g.innerHTML='';iconDB.filter(i=>!k||i.t.includes(k)).forEach(i=>{const e=document.createElement('div');e.className='icon-opt';e.innerText=i.i;e.onclick=()=>{Array.from(g.children).forEach(c=>c.classList.remove('selected'));e.classList.add('selected');selectedIcon=i.i;};g.appendChild(e);});};
         function renderIcons(l,t){window.filterIcons('',t);}
 
         function initCategorySortable(){const el=document.getElementById('contentArea');new Sortable(el,{handle:'.drag-handle',animation:150,disabled:!isEditMode,onEnd:e=>{updateOrder(e.to, 'category')}});}
@@ -642,7 +706,6 @@
         window.toggleGlobalSearch=()=>{const b=document.getElementById('globalSearchBox');b.style.display=b.style.display==='block'?'none':'block';if(b.style.display==='block')document.getElementById('globalSearchInput').focus();};
         window.searchGlobal=(k)=>{k=k.toLowerCase();document.querySelectorAll('.category-card').forEach(c=>{let v=false;c.querySelectorAll('.item').forEach(i=>{if(i.innerText.toLowerCase().includes(k)){i.classList.remove('hidden');v=true;}else i.classList.add('hidden');});c.style.display=v?'block':'none';});};
         
-        // 아이콘 100% 매칭 데이터 등록 (V15와 동일)
         window.uploadInitialData = async () => {
             alert("리스트와 아이콘을 매칭하여 등록합니다! (약 5~10초 소요)");
             const initialData = [
