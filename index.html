@@ -3,342 +3,235 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>👶 우리 아기 맞이 준비물 (V22)</title>
+    <title>👶 마이 베이비 체크리스트 (V23)</title>
     <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     
     <style>
         :root {
-            /* 🎨 색상 팔레트 개선 */
-            --main-color: #FF878D;
-            --sub-color: #FFF0F5;
-            --bg-color: #F8F9FA; /* 배경을 좀 더 밝고 깔끔하게 */
+            --primary: #FF878D;
+            --primary-bg: #FFF0F5;
+            --bg-color: #F9FAFB;
             --card-bg: #FFFFFF;
-            --text-color: #2c3e50;
-            --text-sub: #95a5a6;
-            --border-color: #eee;
-            --price-color: #FF6B6B;
-            --carrot-color: #FF8A3D;
-            --gift-color: #9C27B0;
-            
-            /* 그림자 효과 부드럽게 */
-            --shadow: 0 4px 15px rgba(0,0,0,0.05);
-            --shadow-active: 0 2px 8px rgba(0,0,0,0.08);
+            --text-main: #333333;
+            --text-sub: #888888;
+            --line: #EEEEEE;
+            --danger: #FF5252;
         }
         
         [data-theme="dark"] {
-            --bg-color: #121212;
+            --bg-color: #111111;
             --card-bg: #1E1E1E;
-            --text-color: #E0E0E0;
+            --text-main: #EEEEEE;
             --text-sub: #AAAAAA;
-            --border-color: #333333;
-            --sub-color: #2C2C2C;
-            --shadow: 0 4px 15px rgba(0,0,0,0.3);
+            --line: #333333;
+            --primary-bg: #332222;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
-        body { font-family: 'Pretendard', sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 0; transition: background-color 0.3s; }
-        .container { max-width: 600px; margin: 0 auto; padding-bottom: 150px; }
+        body { font-family: 'Pretendard', sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 0; padding-bottom: 150px; }
+        .container { max-width: 600px; margin: 0 auto; }
 
-        /* 헤더 디자인 개선 */
-        .header { 
-            background: linear-gradient(135deg, var(--main-color), #ff9a9e); 
-            padding: 15px 20px 20px; color: white; border-radius: 0 0 24px 24px; 
-            box-shadow: 0 4px 20px rgba(255, 135, 141, 0.25); 
-            position: sticky; top: 0; z-index: 100;
-        }
-        .header-top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        .header h2 { margin: 0; font-size: 20px; font-weight: 800; letter-spacing: -0.5px; }
+        /* 헤더 */
+        .header { background: rgba(255,255,255,0.8); backdrop-filter: blur(10px); padding: 15px 20px; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--line); }
+        [data-theme="dark"] .header { background: rgba(30,30,30,0.8); }
+        .header-top { display: flex; justify-content: space-between; align-items: center; }
+        .app-title { font-size: 20px; font-weight: 800; color: var(--text-main); }
+        .header-actions { display: flex; gap: 10px; }
+        .icon-btn { width: 36px; height: 36px; border-radius: 10px; background: var(--bg-color); border: 1px solid var(--line); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-main); font-size: 16px; }
+
+        /* 진행률 */
+        .progress-area { padding: 20px; background: var(--card-bg); margin: 15px 20px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
+        .progress-info { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px; font-weight: 600; color: var(--text-sub); }
+        .total-price { color: var(--primary); font-weight: 800; }
+        .progress-bar-bg { height: 10px; background: var(--line); border-radius: 5px; overflow: hidden; }
+        .progress-bar { height: 100%; background: var(--primary); width: 0%; transition: width 0.5s; }
+
+        /* 카테고리 카드 */
+        .category-card { background: var(--card-bg); margin: 15px 20px; border-radius: 16px; border: 1px solid var(--line); overflow: hidden; transition: transform 0.2s; }
+        .category-card.collapsed .item-list, .category-card.collapsed .add-btn-area { display: none; }
         
-        .header-actions { display: flex; align-items: center; gap: 8px; }
-        .icon-btn { 
-            background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); 
-            color: white; width: 36px; height: 36px; border-radius: 12px; 
-            font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; 
-            backdrop-filter: blur(4px); transition: transform 0.1s;
-        }
-        .icon-btn:active { transform: scale(0.9); background: rgba(255,255,255,0.4); }
+        .cat-header { padding: 15px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; background: var(--card-bg); }
+        .cat-info { display: flex; align-items: center; gap: 12px; }
+        .cat-icon { width: 40px; height: 40px; border-radius: 12px; background: var(--primary-bg); display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .cat-title { font-size: 16px; font-weight: 700; }
+        .cat-sub { font-size: 12px; color: var(--text-sub); margin-top: 2px; }
         
-        /* 필터/정렬 바 디자인 개선 */
-        .filter-sort-bar { display: flex; gap: 8px; margin-top: 10px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
-        .filter-select { 
-            background: rgba(255,255,255,0.95); border: none; padding: 8px 12px; 
-            border-radius: 20px; font-size: 13px; font-weight: 700; color: var(--text-color); 
-            outline: none; box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
-        }
-
-        .global-search-box { display: none; background: var(--card-bg); padding: 10px; border-radius: 12px; margin-bottom: 15px; box-shadow: var(--shadow); margin-top: 10px;}
-        .global-search-input { width: 100%; border: 1px solid var(--border-color); padding: 12px; border-radius: 10px; font-size: 15px; outline: none; background: var(--bg-color); color: var(--text-color); }
-
-        .total-budget-badge { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4); color: white; padding: 6px 12px; border-radius: 15px; font-weight: bold; font-size: 13px; display: inline-block; margin-top: 10px; backdrop-filter: blur(4px); }
-        .progress-box { background: rgba(255,255,255,0.25); backdrop-filter: blur(5px); padding: 15px; border-radius: 16px; display: flex; align-items: center; justify-content: space-between; margin-top: 10px; }
-        .progress-circle { width: 42px; height: 42px; border-radius: 50%; background: white; color: var(--main-color); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .progress-bar-bg { flex: 1; height: 8px; background: rgba(255,255,255,0.5); border-radius: 10px; margin: 0 15px; overflow: hidden; }
-        .progress-bar { height: 100%; background: white; width: 0%; transition: width 0.5s ease; border-radius: 10px; }
-        .total-info { font-size: 12px; font-weight: 600; text-align: right; color: white; opacity: 0.9; }
-
-        /* 카테고리 카드 (V20 구조 + 예쁜 디자인) */
-        .category-card { 
-            background: var(--card-bg); margin: 20px; border-radius: 20px; 
-            box-shadow: var(--shadow); overflow: hidden; 
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .category-card.collapsed .item-list, .category-card.collapsed .btn-add-item { display: none; }
-        .category-card:active { transform: scale(0.995); box-shadow: var(--shadow-active); } /* 터치 효과 */
-        
-        .cat-header { padding: 18px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; cursor: pointer; background: var(--card-bg); }
-        .cat-left { display: flex; align-items: center; gap: 12px; }
-        .cat-icon { font-size: 20px; background: var(--sub-color); width: 38px; height: 38px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--main-color); }
-        .cat-title { font-size: 17px; font-weight: 700; letter-spacing: -0.3px; }
-        .cat-sum { font-size: 12px; color: var(--text-sub); font-weight: 500; margin-left: 2px; }
-        .chevron { transition: transform 0.3s; font-size: 12px; color: #ccc; }
-        .category-card.collapsed .chevron { transform: rotate(-90deg); }
-
+        /* 아이템 리스트 */
         .item-list { list-style: none; padding: 0; margin: 0; }
-        .item { padding: 16px 20px; border-bottom: 1px solid var(--border-color); background: var(--card-bg); transition: background 0.2s; }
-        .item:last-child { border-bottom: none; }
-        .item:active { background-color: var(--bg-color); } /* 터치 효과 */
-        .item.hidden { display: none; }
+        .item { padding: 12px 15px; border-top: 1px solid var(--line); display: flex; align-items: center; gap: 12px; background: var(--card-bg); }
+        .item:active { background-color: var(--bg-color); }
+        .item.completed .item-name { text-decoration: line-through; color: var(--text-sub); opacity: 0.6; }
         
-        .item-top { display: flex; align-items: flex-start; }
-        .chk-wrap { width: 24px; height: 24px; margin-right: 14px; position: relative; flex-shrink: 0; margin-top: 2px;}
-        .chk-wrap input { position: absolute; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 2;}
-        .chk-box { width: 100%; height: 100%; border: 2px solid #ddd; border-radius: 8px; display: flex; align-items: center; justify-content: center; transition: 0.2s; background: white; }
-        .chk-wrap input:checked + .chk-box { background: var(--main-color); border-color: var(--main-color); }
-        .chk-box::after { content: '✔'; color: white; font-size: 14px; display: none; }
-        .chk-wrap input:checked + .chk-box::after { display: block; }
+        /* 커스텀 체크박스 */
+        .chk-wrap { position: relative; width: 22px; height: 22px; flex-shrink: 0; }
+        .chk-input { position: absolute; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 2; }
+        .chk-box { width: 100%; height: 100%; border: 2px solid #DDD; border-radius: 6px; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .chk-input:checked + .chk-box { background: var(--primary); border-color: var(--primary); }
+        .chk-box::after { content: '✔'; color: white; font-size: 12px; display: none; }
+        .chk-input:checked + .chk-box::after { display: block; }
 
-        .item-content { flex: 1; }
-        .item-header-row { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
-        .item-name { font-size: 16px; font-weight: 600; color: var(--text-color); letter-spacing: -0.3px; }
-        .star-rating { font-size: 12px; color: #FFC107; letter-spacing: 0; font-weight: bold; }
-        
-        .tag-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
-        .tag { padding: 4px 8px; border-radius: 6px; font-size: 11px; color: #555; background: var(--bg-color); font-weight: 500; }
-        .tag.brand { background: #FFF3E0; color: #E65100; font-weight: 700; }
-        .tag.price { background: #FFEBEE; color: var(--price-color); font-weight: 700; }
-        .tag.carrot { background: #FFF3E0; color: var(--carrot-color); font-weight: 700; border: 1px solid #FFE0B2; }
-        .tag.gift { background: #F3E5F5; color: var(--gift-color); font-weight: 700; border: 1px solid #E1BEE7; }
-        
-        .link-btn { text-decoration: none; background: #E3F2FD; color: #1565C0; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; }
-        .link-btn.review { background: #E0F2F1; color: #00695C; }
-        .naver-btn { text-decoration: none; background: #03C75A; color: white; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; gap: 2px; }
-        
-        .item.completed .item-name { text-decoration: line-through; color: #aaa; }
-        .item.completed .item-icon { opacity: 0.5; }
+        .item-content { flex: 1; min-width: 0; }
+        .item-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+        .item-name { font-size: 15px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .item-tags { display: flex; gap: 5px; flex-wrap: wrap; }
+        .tag { font-size: 10px; padding: 3px 6px; border-radius: 4px; background: var(--bg-color); color: var(--text-sub); font-weight: 500; }
+        .tag.price { background: #FFF5F5; color: var(--primary); font-weight: 700; }
+        .tag.carrot { background: #FFF3E0; color: #FF9800; }
+        .tag.gift { background: #F3E5F5; color: #9C27B0; }
 
-        /* 사용자님이 좋아하셨던 V17 버튼 스타일 + 터치 효과 */
-        .btn-add-item { 
-            width: calc(100% - 40px); margin: 15px auto 20px; padding: 14px; 
-            background: var(--sub-color); color: var(--main-color); 
-            border: 1px solid rgba(255, 135, 141, 0.1); border-radius: 16px; 
-            font-weight: 800; font-size: 15px; cursor: pointer; 
-            display: flex; align-items: center; justify-content: center; gap: 6px; 
-            transition: all 0.2s; 
+        /* ✨ 세련된 수정/삭제 버튼 (SVG 사용) */
+        .item-actions { display: none; gap: 12px; margin-left: 8px; }
+        body.is-edit-mode .item-actions { display: flex; }
+        
+        .action-btn { 
+            width: 28px; height: 28px; border-radius: 6px; border: none; 
+            background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s;
         }
-        .btn-add-item:active { transform: scale(0.97); background: #ffe0e6; }
-        .btn-add-item::before { content: '+'; font-size: 18px; font-weight: 400; }
+        .action-btn:hover { background: var(--bg-color); }
+        .action-btn svg { width: 16px; height: 16px; stroke: var(--text-sub); stroke-width: 2; fill: none; }
+        .action-btn.del:hover svg { stroke: var(--danger); }
+        .action-btn.edit:hover svg { stroke: var(--primary); }
 
-        .fab-btn { 
-            position: fixed; bottom: 30px; right: 25px; 
-            background: var(--main-color); color: white; 
-            width: 60px; height: 60px; border-radius: 30px; 
-            display: flex; align-items: center; justify-content: center; 
-            font-size: 30px; box-shadow: 0 4px 20px rgba(255, 135, 141, 0.4); 
-            border: none; cursor: pointer; z-index: 99; transition: transform 0.2s;
+        /* 추가 버튼 */
+        .add-btn-area { padding: 12px; }
+        .btn-add { width: 100%; padding: 12px; background: var(--primary-bg); color: var(--primary); border: none; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 14px; }
+        .fab { position: fixed; bottom: 30px; right: 25px; width: 56px; height: 56px; border-radius: 50%; background: var(--primary); color: white; border: none; font-size: 28px; box-shadow: 0 4px 15px rgba(255, 135, 141, 0.4); cursor: pointer; z-index: 90; display: flex; align-items: center; justify-content: center; }
+
+        /* 💾 실행취소 스낵바 (자체 구현) */
+        #undoBar {
+            position: fixed; bottom: -60px; left: 50%; transform: translateX(-50%);
+            background: #333; color: white; padding: 14px 20px; border-radius: 30px;
+            display: flex; gap: 20px; align-items: center; font-size: 14px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3); transition: bottom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 200; width: 90%; max-width: 400px; justify-content: space-between;
         }
-        .fab-btn:active { transform: scale(0.9); }
+        #undoBar.show { bottom: 30px; }
+        .undo-btn { color: var(--primary); font-weight: 700; cursor: pointer; text-transform: uppercase; }
 
-        /* 모달 스타일 */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 200; align-items: center; justify-content: center; backdrop-filter: blur(3px); }
-        .modal { background: var(--card-bg); width: 90%; max-width: 400px; padding: 25px; border-radius: 24px; max-height: 90vh; overflow-y: auto; color: var(--text-color); box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
-        .input-group { margin-bottom: 15px; }
-        .input-label { display: block; font-size: 13px; color: var(--text-sub); margin-bottom: 6px; font-weight: 600; }
-        .input-field { width: 100%; padding: 14px; border: 1px solid var(--border-color); border-radius: 12px; font-size: 15px; outline: none; background: var(--bg-color); color: var(--text-color); transition: border-color 0.2s; }
-        .input-field:focus { border-color: var(--main-color); background: white; }
-        
-        .qty-wrap { display: flex; align-items: center; gap: 8px; }
-        .qty-btn { width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--border-color); background: white; color: var(--text-color); font-weight: bold; cursor: pointer; font-size: 16px; }
-        
-        .star-toggle-btn { width: 100%; padding: 12px; border: 1px solid #FFC107; background: #FFF8E1; color: #FFA000; border-radius: 12px; font-weight: bold; cursor: pointer; margin-bottom: 15px; font-size: 14px; }
+        /* 모달 공통 */
+        .modal-wrap { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 300; align-items: center; justify-content: center; backdrop-filter: blur(3px); }
+        .modal { background: var(--card-bg); width: 90%; max-width: 400px; padding: 25px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto; }
+        .input-box { margin-bottom: 15px; }
+        .label { display: block; font-size: 12px; color: var(--text-sub); margin-bottom: 5px; font-weight: 600; }
+        .input { width: 100%; padding: 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg-color); color: var(--text-main); font-size: 15px; outline: none; }
+        .btn-row { display: flex; gap: 10px; margin-top: 20px; }
+        .btn-full { flex: 1; padding: 14px; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; }
+        .btn-gray { background: var(--bg-color); color: var(--text-sub); }
+        .btn-primary { background: var(--primary); color: white; }
 
-        .option-row { display: flex; align-items: center; margin-bottom: 10px; padding: 12px; border-radius: 12px; background: var(--bg-color); }
-        .option-label { display: flex; align-items: center; font-size: 14px; cursor: pointer; flex: 1; font-weight: 500; }
-        .option-chk { width: 20px; height: 20px; margin-right: 10px; accent-color: var(--main-color); }
+        /* 아이콘 그리드 */
+        .icon-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 5px; max-height: 150px; overflow-y: auto; padding: 5px; border: 1px solid var(--line); border-radius: 10px; margin-top: 5px; }
+        .icon-item { font-size: 22px; text-align: center; padding: 8px; border-radius: 8px; cursor: pointer; }
+        .icon-item.selected { background: var(--primary-bg); border: 1px solid var(--primary); }
 
-        .theme-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-        .theme-circle { width: 45px; height: 45px; border-radius: 50%; cursor: pointer; border: 3px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.15); transition: transform 0.1s; }
-        .theme-circle:active { transform: scale(0.9); }
-
-        .icon-search-box { position: sticky; top: 0; background: var(--card-bg); padding-bottom: 10px; z-index: 10; }
-        .icon-grid { height: 180px; overflow-y: scroll; border: 1px solid var(--border-color); border-radius: 12px; padding: 10px; display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-bottom: 10px; }
-        .icon-opt { font-size: 24px; text-align: center; padding: 10px; border-radius: 10px; cursor: pointer; transition: background 0.1s; }
-        .icon-opt:active { transform: scale(0.9); }
-        .icon-opt.selected { background: var(--sub-color); border: 2px solid var(--main-color); }
-
-        .btn-row { display: flex; gap: 12px; margin-top: 25px; }
-        .btn { flex: 1; padding: 16px; border: none; border-radius: 14px; font-weight: 800; font-size: 16px; cursor: pointer; transition: opacity 0.2s; }
-        .btn:active { opacity: 0.8; }
-        .btn-cancel { background: var(--border-color); color: #666; }
-        .btn-confirm { background: var(--main-color); color: white; box-shadow: 0 4px 15px rgba(255, 135, 141, 0.4); }
-
-        .edit-controls { display: none; }
-        body.is-edit-mode .edit-controls { display: flex; }
-        body.is-edit-mode .drag-handle { display: block; color: #ccc; margin-right: 10px; cursor: grab; font-size: 20px; }
-        body.is-edit-mode .chk-wrap { display: none; }
-        
-        .auto-fill-btn { display: block; width: 90%; margin: 20px auto; padding: 16px; background: #6c5ce7; color: white; border: none; border-radius: 16px; font-weight: 800; font-size: 16px; cursor: pointer; box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3); }
-        .auto-fill-btn:active { transform: scale(0.98); }
+        /* 검색창 등 */
+        .filter-bar { padding: 0 20px; margin-bottom: 10px; display: none; }
+        .search-input { width: 100%; padding: 12px; border: none; border-radius: 12px; background: var(--card-bg); box-shadow: 0 2px 10px rgba(0,0,0,0.05); outline: none; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <div class="header-top-row">
-                <h2>👶 준비물 리스트</h2>
-                <div class="header-actions">
-                    <button class="icon-btn" onclick="toggleGlobalSearch()">🔍</button>
-                    <button class="icon-btn" onclick="toggleDarkMode()">🌓</button>
-                    <button class="icon-btn" onclick="openThemeModal()">🎨</button>
-                    <button class="icon-btn" onclick="toggleEditMode()" id="btnEditMode">✏️</button>
+    <div class="header">
+        <div class="header-top">
+            <span class="app-title">👶 마이 베이비 체크리스트</span>
+            <div class="header-actions">
+                <button class="icon-btn" onclick="toggleSearch()">🔍</button>
+                <button class="icon-btn" onclick="toggleEditMode()" id="editToggle">✏️</button>
+                <button class="icon-btn" onclick="toggleTheme()">🌓</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="filter-bar" id="searchBar">
+        <input type="text" class="search-input" placeholder="물품명 검색..." onkeyup="filterList(this.value)">
+    </div>
+
+    <div class="progress-area">
+        <div class="progress-info">
+            <span>준비율 <span id="percentTxt">0%</span></span>
+            <span>총 지출 <span class="total-price" id="totalBudget">0</span>원</span>
+        </div>
+        <div class="progress-bar-bg"><div class="progress-bar" id="progressBar"></div></div>
+    </div>
+
+    <div class="container" id="listContainer">
+        <div style="text-align:center; padding:50px; color:#aaa;">
+            <p>데이터가 없습니다.</p>
+            <button class="btn-primary btn-full" style="width:auto; margin-top:20px;" onclick="initData()">📝 기본 리스트 80종 등록</button>
+        </div>
+    </div>
+
+    <div id="undoBar">
+        <span>🗑️ 삭제되었습니다.</span>
+        <span class="undo-btn" onclick="executeUndo()">실행취소</span>
+    </div>
+
+    <button class="fab" onclick="openCatModal()">+</button>
+
+    <div class="modal-wrap" id="catModal">
+        <div class="modal">
+            <h3>📂 카테고리</h3>
+            <input type="hidden" id="cId">
+            <div class="input-box">
+                <span class="label">이름</span>
+                <input type="text" id="cName" class="input">
+            </div>
+            <div class="input-box">
+                <span class="label">아이콘 검색</span>
+                <input type="text" class="input" placeholder="검색어 입력 (예: 병원)" onkeyup="renderIcons(this.value, 'cIcons')">
+                <div class="icon-grid" id="cIcons"></div>
+                <input type="hidden" id="cIconVal">
+            </div>
+            <div class="btn-row">
+                <button class="btn-full btn-gray" onclick="closeModal('catModal')">취소</button>
+                <button class="btn-full btn-primary" onclick="saveCat()">저장</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-wrap" id="itemModal">
+        <div class="modal">
+            <h3>✨ 물품 등록</h3>
+            <input type="hidden" id="targetCId"><input type="hidden" id="targetIId">
+            <div class="input-box">
+                <span class="label">물품명</span>
+                <input type="text" id="iName" class="input">
+            </div>
+            <div style="display:flex; gap:10px;">
+                <div class="input-box" style="width:100px;">
+                    <span class="label">수량</span>
+                    <input type="number" id="iCount" class="input" value="1" style="text-align:center;">
+                </div>
+                <div class="input-box" style="flex:1;">
+                    <span class="label">가격</span>
+                    <input type="text" id="iPrice" class="input" placeholder="원">
                 </div>
             </div>
-
-            <div class="filter-sort-bar">
-                <select class="filter-select" id="filterSelect" onchange="renderApp()">
-                    <option value="ALL">📋 전체 보기</option>
-                    <option value="UNCHECKED">🛒 안 산 것만</option>
-                    <option value="IMPORTANT">⭐ 중요 물품</option>
-                    <option value="GIFT">🎁 선물 받음</option>
-                </select>
-                <select class="filter-select" id="sortSelect" onchange="renderApp()">
-                    <option value="DEFAULT">🔢 기본 순서</option>
-                    <option value="PRICE_HIGH">💰 가격 높은순</option>
-                    <option value="PRICE_LOW">💸 가격 낮은순</option>
-                    <option value="NAME">가나다순</option>
-                </select>
+            <div class="input-box">
+                <span class="label">브랜드/메모</span>
+                <input type="text" id="iBrand" class="input" placeholder="브랜드">
+                <input type="text" id="iMemo" class="input" placeholder="메모" style="margin-top:5px;">
             </div>
-
-            <div id="globalSearchBox" class="global-search-box">
-                <input type="text" class="global-search-input" id="globalSearchInput" placeholder="물품명, 브랜드 검색... (예: 손수건)" onkeyup="searchGlobal(this.value)">
+            <div class="input-box">
+                <span class="label">아이콘</span>
+                <div class="icon-grid" id="iIcons"></div>
+                <input type="hidden" id="iIconVal">
             </div>
-
-            <div style="text-align: right;"><div class="total-budget-badge">총 지출 <span id="grandTotal">0</span>원</div></div>
-            <div class="progress-box">
-                <div class="progress-circle" id="percentTxt">0%</div>
-                <div class="progress-bar-bg"><div class="progress-bar" id="progressBar"></div></div>
-                <div class="total-info"><div id="checkCount">0 / 0 완료</div></div>
+            <div class="input-box">
+                <span class="label">옵션</span>
+                <label style="display:flex; gap:8px; align-items:center; margin-bottom:5px;">
+                    <input type="checkbox" id="iGift"> 🎁 선물 받음 (지출 제외)
+                </label>
+                <label style="display:flex; gap:8px; align-items:center;">
+                    <input type="checkbox" id="iCarrot"> 🥕 당근마켓/중고
+                </label>
             </div>
-        </div>
-
-        <div id="contentArea"></div>
-        
-        <div id="emptyGuide" style="text-align:center; padding:60px; color:#aaa; display:none; font-size:14px;">
-            <p>아직 등록된 항목이 없어요.</p>
-            <button class="auto-fill-btn" onclick="uploadInitialData()">📝 물품 리스트 자동 등록하기</button>
-        </div>
-    </div>
-
-    <button class="fab-btn" onclick="openCatModal()">+</button>
-
-    <div id="catModal" class="modal-overlay">
-        <div class="modal">
-            <h3 id="catModalTitle">📂 카테고리 설정</h3>
-            <input type="hidden" id="editCatId">
-            <div class="input-label">아이콘 (직접 입력 가능)</div>
-            <div style="display:flex; gap:10px; margin-bottom:10px;">
-                <input type="text" id="catCustomIcon" class="input-field" style="width:60px; text-align:center;" placeholder="😊" maxlength="2">
-                <input type="text" class="input-field" placeholder="🔍 아이콘 검색 (예: 병원)" onkeyup="filterIcons(this.value, 'catIconGrid')">
-            </div>
-            <div class="icon-search-box">
-                <div class="icon-grid" id="catIconGrid"></div>
-            </div>
-            <div class="input-group"><input type="text" id="catName" class="input-field" placeholder="카테고리 이름"></div>
             <div class="btn-row">
-                <button class="btn btn-cancel" onclick="closeModal('catModal')">취소</button>
-                <button class="btn btn-confirm" onclick="saveCategory()">저장</button>
+                <button class="btn-full btn-gray" onclick="closeModal('itemModal')">취소</button>
+                <button class="btn-full btn-primary" onclick="saveItem()">저장</button>
             </div>
-        </div>
-    </div>
-
-    <div id="itemModal" class="modal-overlay">
-        <div class="modal">
-            <h3 id="itemModalTitle">✨ 물품 등록</h3>
-            <input type="hidden" id="targetCatId"><input type="hidden" id="targetItemId">
-            
-            <button type="button" class="star-toggle-btn" id="starToggleBtn" onclick="toggleStarScore()">
-                중요도: ⭐ (터치하여 변경)
-            </button>
-            <input type="hidden" id="itemImportance" value="1">
-
-            <div class="input-group"><input type="text" id="itemName" class="input-field" placeholder="물품명 (필수)"></div>
-            
-            <div class="input-label">아이콘 선택</div>
-            <div style="display:flex; gap:10px; margin-bottom:10px;">
-                <input type="text" id="itemCustomIcon" class="input-field" style="width:60px; text-align:center;" placeholder="🍼" maxlength="2">
-                <input type="text" class="input-field" placeholder="🔍 아이콘 검색 (예: 젖병)" onkeyup="filterIcons(this.value, 'itemIconGrid')">
-            </div>
-            <div class="icon-search-box">
-                <div class="icon-grid" id="itemIconGrid"></div>
-            </div>
-            
-            <div style="display:flex; gap:10px; margin-bottom:12px;">
-                <div style="flex:1"><label class="input-label">브랜드</label><input type="text" id="itemBrand" class="input-field"></div>
-                <div style="flex:1"><label class="input-label">모델명</label><input type="text" id="itemModel" class="input-field"></div>
-            </div>
-            
-            <div style="display:flex; gap:10px; margin-bottom:12px;">
-                <div style="width: 120px;">
-                    <label class="input-label">수량</label>
-                    <div class="qty-wrap">
-                        <button class="qty-btn" onclick="adjQty(-1)">-</button>
-                        <input type="number" id="itemCount" class="input-field" style="text-align:center; padding:5px;" value="1">
-                        <button class="qty-btn" onclick="adjQty(1)">+</button>
-                    </div>
-                </div>
-                <div style="flex:1"><label class="input-label">가격</label><input type="text" id="itemPrice" class="input-field" placeholder="원"></div>
-            </div>
-
-            <div class="input-group"><input type="url" id="itemLink" class="input-field" placeholder="🔗 구매 링크"></div>
-            <div class="input-group"><input type="url" id="itemLink2" class="input-field" placeholder="🔗 후기/블로그 링크 (옵션)"></div>
-            
-            <div class="input-group"><textarea id="itemMemo" class="input-field" placeholder="메모..."></textarea></div>
-            
-            <div class="option-row">
-                <label class="option-label"><input type="checkbox" id="itemIsGift" class="option-chk"> 🎁 선물 받음 (지출 제외)</label>
-            </div>
-            <div class="option-row">
-                <label class="option-label"><input type="checkbox" id="itemIsCarrot" class="option-chk"> 🥕 당근/중고</label>
-            </div>
-            <div class="option-row">
-                <label class="option-label"><input type="checkbox" id="itemShowNaver" class="option-chk" checked> 🔍 네이버 검색 버튼</label>
-            </div>
-
-            <div class="btn-row">
-                <button class="btn btn-cancel" onclick="closeModal('itemModal')">취소</button>
-                <button class="btn btn-confirm" onclick="saveItem()">저장하기</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="themeModal" class="modal-overlay">
-        <div class="modal" style="text-align:center;">
-            <h3>🎨 테마 색상 변경</h3>
-            <div class="theme-grid">
-                <div class="theme-circle" style="background:#FF878D;" onclick="setTheme('#FF878D')"></div>
-                <div class="theme-circle" style="background:#4FC3F7;" onclick="setTheme('#4FC3F7')"></div>
-                <div class="theme-circle" style="background:#81C784;" onclick="setTheme('#81C784')"></div>
-                <div class="theme-circle" style="background:#FFD54F;" onclick="setTheme('#FFD54F')"></div>
-                <div class="theme-circle" style="background:#BA68C8;" onclick="setTheme('#BA68C8')"></div>
-                <div class="theme-circle" style="background:#90A4AE;" onclick="setTheme('#90A4AE')"></div>
-                <div class="theme-circle" style="background:#795548;" onclick="setTheme('#795548')"></div>
-                <div class="theme-circle" style="background:#333333;" onclick="setTheme('#333333')"></div>
-            </div>
-            <br>
-            <button class="btn btn-cancel" onclick="closeModal('themeModal')">닫기</button>
         </div>
     </div>
 
@@ -346,7 +239,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
         import { getDatabase, ref, onValue, push, update, remove } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
 
-        // 🔴🔴 본인 키값 교체 🔴🔴
         const firebaseConfig = {
             apiKey: "AIzaSyCovHk7sYoMTkZ8H5RwKjUWMXAqi50l2L-k",
             authDomain: "checklist-3c59d.firebaseapp.com",
@@ -359,357 +251,298 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
-        const dbRef = ref(db, 'baby_checklist_v6'); 
+        const dbRef = ref(db, 'baby_checklist_v6');
 
-        // ✅ 방대한 아이콘 데이터베이스 복구 (1000개 이상 가능하도록 확장)
-        const iconDB = [
-            {i:'👶',t:'아기 베이비'},{i:'👧',t:'딸 여자'},{i:'🧒',t:'어린이'},{i:'👦',t:'아들 남자'},{i:'🤰',t:'임산부 엄마'},{i:'🤱',t:'수유 모유'},{i:'👼',t:'천사'},
-            {i:'🏥',t:'병원 소아과'},{i:'🚑',t:'구급차 응급'},{i:'🩺',t:'청진기 의사'},{i:'💊',t:'약 영양제'},{i:'💉',t:'주사 접종'},{i:'🩹',t:'밴드 상처'},{i:'🌡️',t:'체온계 열'},
-            {i:'😷',t:'마스크 감기'},{i:'🍼',t:'젖병 분유'},{i:'🥣',t:'이유식 죽'},{i:'🥄',t:'숟가락'},{i:'🥡',t:'도시락'},{i:'🍪',t:'과자 간식'},{i:'🥛',t:'우유 물'},
-            {i:'🧊',t:'얼음'},{i:'🥢',t:'젓가락'},{i:'🍽️',t:'접시 식사'},{i:'🧂',t:'소금 양념'},{i:'🍎',t:'사과 과일'},{i:'🍌',t:'바나나'},{i:'🥦',t:'브로콜리 야채'},
-            {i:'🥕',t:'당근'},{i:'🌽',t:'옥수수'},{i:'🥩',t:'고기'},{i:'🍗',t:'치킨 닭'},{i:'🍞',t:'빵'},{i:'🥨',t:'프레첼'},{i:'🍩',t:'도넛'},{i:'🍦',t:'아이스크림'},
-            {i:'🍰',t:'케이크 생일'},{i:'🍫',t:'초콜릿'},{i:'🍬',t:'사탕'},{i:'🍭',t:'막대사탕'},{i:'🧃',t:'주스'},{i:'☕',t:'커피'},{i:'🛁',t:'욕조 목욕'},{i:'🚿',t:'샤워'},
-            {i:'🧼',t:'비누 세정제'},{i:'🧽',t:'수세미'},{i:'🧻',t:'휴지 티슈'},{i:'🧴',t:'로션 샴푸'},{i:'🪥',t:'칫솔 양치'},{i:'🚽',t:'변기 화장실'},{i:'💩',t:'똥 기저귀'},
-            {i:'🧹',t:'빗자루 청소'},{i:'🗑️',t:'쓰레기통'},{i:'🧺',t:'빨래 바구니'},{i:'👕',t:'티셔츠 옷'},{i:'👖',t:'바지'},{i:'🧦',t:'양말'},{i:'🧢',t:'모자'},
-            {i:'🧤',t:'장갑'},{i:'🧣',t:'목도리'},{i:'👟',t:'신발'},{i:'🎀',t:'리본'},{i:'👗',t:'원피스'},{i:'🧥',t:'코트 겉옷'},{i:'👙',t:'수영복'},{i:'👚',t:'블라우스'},
-            {i:'👔',t:'넥타이'},{i:'🩳',t:'반바지'},{i:'👓',t:'안경'},{i:'🕶️',t:'선글라스'},{i:'💍',t:'반지'},{i:'🎒',t:'가방 백팩'},{i:'👜',t:'핸드백'},{i:'👛',t:'지갑'},
-            {i:'🛏️',t:'침대 잠'},{i:'🛌',t:'수면'},{i:'🧸',t:'곰인형 장난감'},{i:'🪁',t:'연'},{i:'⚽',t:'축구공'},{i:'🎨',t:'그림 미술'},{i:'📚',t:'책 공부'},
-            {i:'🎠',t:'회전목마 모빌'},{i:'🎡',t:'관람차'},{i:'🎈',t:'풍선'},{i:'🎉',t:'폭죽 축하'},{i:'🎮',t:'게임'},{i:'🎲',t:'주사위'},{i:'🧩',t:'퍼즐'},
-            {i:'🎹',t:'피아노'},{i:'🥁',t:'드럼'},{i:'🎷',t:'색소폰'},{i:'🎺',t:'나팔'},{i:'🎸',t:'기타'},{i:'🎻',t:'바이올린'},{i:'🚗',t:'자동차 차'},{i:'🚕',t:'택시'},
-            {i:'🚌',t:'버스'},{i:'✈️',t:'비행기 여행'},{i:'🚲',t:'자전거'},{i:'🛵',t:'오토바이'},{i:'🛴',t:'킥보드'},{i:'🚤',t:'보트'},{i:'🚀',t:'로켓'},{i:'🛒',t:'카트 쇼핑'},
-            {i:'🛍️',t:'쇼핑백'},{i:'📷',t:'카메라 사진'},{i:'📹',t:'비디오'},{i:'📱',t:'핸드폰'},{i:'💻',t:'노트북'},{i:'🔋',t:'배터리'},{i:'🔌',t:'플러그'},
-            {i:'🏠',t:'집'},{i:'🛋️',t:'소파'},{i:'🪑',t:'의자'},{i:'🚪',t:'문'},{i:'🔑',t:'열쇠'},{i:'🖼️',t:'액자'},{i:'🪴',t:'화분'},{i:'🌵',t:'선인장'},{i:'💐',t:'꽃다발'},
-            {i:'🕰️',t:'시계'},{i:'💡',t:'전구 빛'},{i:'🕯️',t:'양초'},{i:'📦',t:'박스 택배'},{i:'✉️',t:'편지'},{i:'✂️',t:'가위'},{i:'📌',t:'압정'},{i:'📎',t:'클립'},
-            {i:'📏',t:'자'},{i:'☀️',t:'해 날씨'},{i:'☁️',t:'구름'},{i:'☔',t:'비 우산'},{i:'❄️',t:'눈 겨울'},{i:'⚡',t:'번개'},{i:'🌈',t:'무지개'},{i:'⭐',t:'별 중요'},
-            {i:'🌙',t:'달 밤'},{i:'🔥',t:'불'},{i:'💧',t:'물 습기'},{i:'❤️',t:'하트 사랑'},{i:'💯',t:'백점'},{i:'✅',t:'체크'},{i:'❌',t:'엑스'},{i:'❓',t:'물음표'},
-            {i:'❗️',t:'느낌표'},{i:'💰',t:'돈 예산'},{i:'💳',t:'카드 결제'},{i:'📅',t:'달력 디데이'},{i:'📝',t:'메모 기록'},{i:'🎁',t:'선물'},{i:'🔔',t:'종 알림'},
-            {i:'🐶',t:'강아지'},{i:'🐱',t:'고양이'},{i:'🐭',t:'쥐'},{i:'🐹',t:'햄스터'},{i:'🐰',t:'토끼'},{i:'🦊',t:'여우'},{i:'🐻',t:'곰'},{i:'🐼',t:'판다'},
-            {i:'🐯',t:'호랑이'},{i:'🦁',t:'사자'},{i:'🐮',t:'소'},{i:'🐷',t:'돼지'},{i:'🐸',t:'개구리'},{i:'🐵',t:'원숭이'},{i:'🐔',t:'닭'},{i:'🐧',t:'펭귄'}
-        ];
-        
         let currentData = {};
         let isEditMode = false;
         let lastDeleted = null;
+        let undoTimer = null;
 
-        const savedTheme = localStorage.getItem('appTheme') || '#FF878D';
-        document.documentElement.style.setProperty('--main-color', savedTheme);
-        if(localStorage.getItem('darkMode') === 'true') document.body.setAttribute('data-theme', 'dark');
+        // ✅ 1. 확실한 아이콘 DB
+        const iconList = [
+            {c:'👶',k:'아기'},{c:'🏥',k:'병원'},{c:'💊',k:'약'},{c:'💉',k:'주사'},{c:'🌡️',k:'체온계'},{c:'🍼',k:'젖병'},{c:'🧼',k:'비누'},
+            {c:'🛁',k:'욕조'},{c:'🥣',k:'이유식'},{c:'🧴',k:'로션'},{c:'🧻',k:'휴지'},{c:'👕',k:'옷'},{c:'🧦',k:'양말'},{c:'🧢',k:'모자'},
+            {c:'🛏️',k:'침대'},{c:'🧸',k:'장난감'},{c:'🚗',k:'차'},{c:'🚌',k:'버스'},{c:'🎁',k:'선물'},{c:'📸',k:'사진'},{c:'📱',k:'폰'},
+            {c:'🏠',k:'집'},{c:'🤰',k:'임신'},{c:'🥄',k:'숟가락'},{c:'🥢',k:'젓가락'},{c:'✂️',k:'가위'},{c:'🖊️',k:'펜'},{c:'📝',k:'메모'},
+            {c:'⭐',k:'별'},{c:'❤️',k:'하트'},{c:'🥛',k:'우유'},{c:'🧊',k:'얼음'},{c:'🍎',k:'사과'},{c:'🍌',k:'바나나'},{c:'🥕',k:'당근'},
+            {c:'🐶',k:'강아지'},{c:'🐱',k:'고양이'},{c:'😷',k:'마스크'},{c:'🧹',k:'청소'},{c:'🧺',k:'빨래'},{c:'🚽',k:'변기'},{c:'🚿',k:'샤워'}
+        ];
 
-        onValue(dbRef, (snapshot) => {
-            currentData = snapshot.val() || {};
-            renderApp();
+        onValue(dbRef, (snap) => {
+            currentData = snap.val() || {};
+            render();
         });
 
-        window.renderApp = () => {
-            const data = currentData;
-            const contentArea = document.getElementById('contentArea');
-            contentArea.innerHTML = '';
+        function render() {
+            const list = document.getElementById('listContainer');
+            list.innerHTML = '';
             
-            let totalCount = 0; let checkedCount = 0; let grandTotalPrice = 0;
-            const isEmpty = Object.keys(data).length === 0;
-            document.getElementById('emptyGuide').style.display = isEmpty ? 'block' : 'none';
+            let total = 0;
+            let checked = 0;
+            let cnt = 0;
 
-            const filterVal = document.getElementById('filterSelect').value;
-            const sortVal = document.getElementById('sortSelect').value;
+            const cats = Object.entries(currentData).map(([id,v])=>({id,...v})).sort((a,b)=>(a.order||0)-(b.order||0));
+            
+            if(cats.length === 0) {
+                list.innerHTML = `<div style="text-align:center; padding:50px; color:#aaa;"><p>데이터가 없습니다.</p><button class="btn-primary btn-full" style="width:auto; margin-top:20px;" onclick="window.initData()">📝 기본 리스트 80종 등록</button></div>`;
+                return;
+            }
 
-            let catArray = Object.keys(data).map(key => ({...data[key], id: key}));
-            catArray.sort((a, b) => (a.order || 0) - (b.order || 0));
+            cats.forEach(c => {
+                const items = Object.entries(c.items||{}).map(([id,v])=>({id,...v})).sort((a,b)=>(a.order||0)-(b.order||0));
+                let cTotal = 0;
+                let itemsHtml = '';
 
-            catArray.forEach(cat => {
-                const itemsObj = cat.items || {};
-                let itemsArray = Object.keys(itemsObj).map(key => ({...itemsObj[key], id: key}));
-
-                // 정렬 로직 복구
-                if(sortVal === 'PRICE_HIGH') itemsArray.sort((a,b) => (Number(b.price)||0) - (Number(a.price)||0));
-                else if(sortVal === 'PRICE_LOW') itemsArray.sort((a,b) => (Number(a.price)||0) - (Number(b.price)||0));
-                else if(sortVal === 'NAME') itemsArray.sort((a,b) => a.name.localeCompare(b.name));
-                else itemsArray.sort((a, b) => (a.order || 0) - (b.order || 0));
-
-                let catTotalPrice = 0;
-                let visibleItemsHTML = '';
-                let hasVisibleItem = false;
-
-                itemsArray.forEach(item => {
-                    // 필터 로직 복구
-                    if(filterVal === 'UNCHECKED' && item.checked) return;
-                    if(filterVal === 'IMPORTANT' && (item.importance || 1) < 3) return;
-                    if(filterVal === 'GIFT' && !item.isGift) return;
-
-                    hasVisibleItem = true;
-                    totalCount++;
-                    if(item.checked) checkedCount++;
-                    
-                    const price = parseInt((item.price || '0').toString().replace(/,/g, '')) || 0;
-                    const count = parseInt(item.count) || 1;
-                    
-                    if(!item.isGift) {
-                        catTotalPrice += (price * count);
-                        grandTotalPrice += (price * count);
-                    }
+                items.forEach(i => {
+                    const price = Number((i.price+'').replace(/,/g,'')) || 0;
+                    if(!i.isGift) cTotal += price * (i.count||1);
+                    if(!i.isGift) total += price * (i.count||1);
+                    if(i.checked) checked++;
+                    cnt++;
 
                     let tags = '';
-                    const importance = item.importance || 1;
-                    const starStr = "⭐".repeat(importance);
-                    
-                    if(item.brand) tags += `<span class="tag brand">${item.brand}</span> `;
-                    if(item.isGift) tags += `<span class="tag gift">🎁 선물</span> `;
-                    else if(item.price) tags += `<span class="tag price">${Number(price).toLocaleString()}원</span> `;
-                    
-                    if(item.isCarrot) tags += `<span class="tag carrot">🥕 당근</span> `;
-                    if(item.link) tags += `<a href="${item.link}" target="_blank" class="link-btn">🔗 구매</a>`;
-                    if(item.link2) tags += `<a href="${item.link2}" target="_blank" class="link-btn review">🔗 후기</a>`;
-                    if(item.showNaver !== false) {
-                        const query = [item.brand, item.model, item.name].filter(Boolean).join(' ');
-                        tags += `<a href="https://search.shopping.naver.com/search/all?query=${encodeURIComponent(query)}" target="_blank" class="naver-btn">N 검색</a>`;
-                    }
+                    if(i.isGift) tags += `<span class="tag gift">🎁 선물</span>`;
+                    else if(price>0) tags += `<span class="tag price">${price.toLocaleString()}원</span>`;
+                    if(i.isCarrot) tags += `<span class="tag carrot">🥕 당근</span>`;
+                    if(i.brand) tags += `<span class="tag">${i.brand}</span>`;
 
-                    const memoHTML = item.memo ? `<div class="item-memo">${item.memo}</div>` : '';
-
-                    // 4. 터치 애니메이션 효과 적용
-                    visibleItemsHTML += `
-                    <li class="item ${item.checked ? 'completed' : ''}" data-id="${item.id}">
-                        <div class="item-top">
-                            <div class="drag-handle edit-controls">☰</div>
+                    // ✨ 디자인 개선: SVG 수정/삭제 아이콘
+                    itemsHtml += `
+                        <li class="item ${i.checked?'completed':''}" data-id="${i.id}">
                             <div class="chk-wrap">
-                                <input type="checkbox" ${item.checked ? 'checked' : ''} onchange="window.toggleCheck('${cat.id}', '${item.id}', this.checked)">
+                                <input type="checkbox" class="chk-input" ${i.checked?'checked':''} onchange="window.toggleCheck('${c.id}','${i.id}',this.checked)">
                                 <div class="chk-box"></div>
                             </div>
-                            <div class="item-icon">${item.icon || '👶'}</div>
-                            <div class="item-content" onclick="window.openEditItem('${cat.id}', '${item.id}')">
-                                <div class="item-header-row">
-                                    <span class="item-name">${item.name}</span>
-                                    <span class="star-rating">${starStr}</span>
-                                    ${count > 1 ? `<span style="font-size:11px; color:#888;">x${count}</span>` : ''}
+                            <div class="item-content" onclick="window.editItem('${c.id}','${i.id}')">
+                                <div class="item-row">
+                                    <div class="item-name">${i.icon||'👶'} ${i.name} ${i.count>1 ? `<small>x${i.count}</small>` : ''}</div>
+                                    <div class="item-actions">
+                                        <button class="action-btn edit" onclick="event.stopPropagation(); window.editItem('${c.id}','${i.id}')">
+                                            <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"></path></svg>
+                                        </button>
+                                        <button class="action-btn del" onclick="event.stopPropagation(); window.delItem('${c.id}','${i.id}')">
+                                            <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"></path></svg>
+                                        </button>
+                                    </div>
                                 </div>
-                                <div class="tag-row">${tags}</div>
-                                ${memoHTML}
+                                <div class="item-tags">${tags}</div>
                             </div>
-                            <div class="edit-controls" style="margin-left:10px; gap:5px;">
-                                <span class="btn-icon" onclick="event.stopPropagation(); window.openEditItem('${cat.id}', '${item.id}')">✏️</span>
-                                <span class="btn-icon" style="color:#ff6b6b;" onclick="event.stopPropagation(); window.deleteItemWithUndo('${cat.id}', '${item.id}')">🗑️</span>
-                            </div>
-                        </div>
-                    </li>`;
+                        </li>
+                    `;
                 });
 
-                if(hasVisibleItem || filterVal === 'ALL') {
-                    const catDiv = document.createElement('div');
-                    catDiv.className = 'category-card';
-                    catDiv.setAttribute('data-id', cat.id);
-                    catDiv.innerHTML = `
-                        <div class="cat-header" onclick="toggleCategory(this)">
-                            <div class="cat-left">
-                                <div class="drag-handle edit-controls">☰</div>
-                                <div class="cat-icon">${cat.icon}</div>
-                                <div>
-                                    <span class="cat-title">${cat.name}</span>
-                                    <span class="cat-sum">(${catTotalPrice.toLocaleString()}원)</span>
-                                </div>
-                            </div>
-                            <div style="display:flex; align-items:center; gap:10px;">
-                                <div class="edit-controls">
-                                    <span class="btn-icon" onclick="event.stopPropagation(); window.openEditCategory('${cat.id}')">✏️</span>
-                                    <span class="btn-icon" style="color:#ff6b6b;" onclick="event.stopPropagation(); window.deleteCategory('${cat.id}')">🗑️</span>
-                                </div>
-                                <span class="chevron">▼</span>
+                const div = document.createElement('div');
+                div.className = 'category-card';
+                div.innerHTML = `
+                    <div class="cat-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <div class="cat-info">
+                            <div class="cat-icon">${c.icon||'📁'}</div>
+                            <div>
+                                <div class="cat-title">${c.name}</div>
+                                <div class="cat-sub">${cTotal.toLocaleString()}원</div>
                             </div>
                         </div>
-                        <ul class="item-list" id="list-${cat.id}" data-cat-id="${cat.id}">${visibleItemsHTML}</ul>
-                        <button class="btn-add-item" onclick="window.openAddItem('${cat.id}')">+ 물품 추가하기</button>
-                    `;
-                    contentArea.appendChild(catDiv);
-                    if(filterVal === 'ALL' && sortVal === 'DEFAULT') {
-                        initItemSortable(catDiv.querySelector(`#list-${cat.id}`), cat.id);
+                        <div style="display:flex; align-items:center; gap:5px;">
+                            <div class="item-actions">
+                                <button class="action-btn edit" onclick="event.stopPropagation(); window.editCat('${c.id}')">
+                                    <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"></path></svg>
+                                </button>
+                                <button class="action-btn del" onclick="event.stopPropagation(); window.delCat('${c.id}')">
+                                    <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"></path></svg>
+                                </button>
+                            </div>
+                            <div style="font-size:12px; color:#ccc;">▼</div>
+                        </div>
+                    </div>
+                    <ul class="item-list">${itemsHtml}</ul>
+                    <div class="add-btn-area">
+                        <button class="btn-add" onclick="window.addItem('${c.id}')">+ 물품 추가</button>
+                    </div>
+                `;
+                list.appendChild(div);
+                
+                // Sortable
+                new Sortable(div.querySelector('.item-list'), { 
+                    animation: 150, handle: '.item-content', disabled: !isEditMode,
+                    onEnd: (evt) => {
+                        const ids = Array.from(evt.to.children).map(li => li.getAttribute('data-id'));
+                        const updates = {};
+                        ids.forEach((id, idx) => updates[`baby_checklist_v6/${c.id}/items/${id}/order`] = idx);
+                        update(ref(db), updates);
                     }
-                }
+                });
             });
 
-            if(filterVal === 'ALL' && sortVal === 'DEFAULT') initCategorySortable();
-
-            const percent = totalCount === 0 ? 0 : Math.round((checkedCount / totalCount) * 100);
+            // Progress Update
+            const percent = cnt === 0 ? 0 : Math.round((checked / cnt) * 100);
             document.getElementById('progressBar').style.width = `${percent}%`;
             document.getElementById('percentTxt').innerText = `${percent}%`;
-            document.getElementById('checkCount').innerText = `${checkedCount} / ${totalCount} 완료`;
-            document.getElementById('grandTotal').innerText = grandTotalPrice.toLocaleString();
+            document.getElementById('totalBudget').innerText = total.toLocaleString();
             
             document.body.classList.toggle('is-edit-mode', isEditMode);
-        };
+        }
 
-        window.toggleCategory = (header) => { header.parentElement.classList.toggle('collapsed'); };
-        window.toggleDarkMode = () => {
+        // Global functions
+        window.toggleEditMode = () => { isEditMode = !isEditMode; render(); };
+        window.toggleTheme = () => {
             const isDark = document.body.getAttribute('data-theme') === 'dark';
-            document.body.setAttribute('data-theme', isDark ? 'light' : 'dark');
-            localStorage.setItem('darkMode', !isDark);
+            document.body.setAttribute('data-theme', isDark ? '' : 'dark');
+            localStorage.setItem('theme', isDark ? 'light' : 'dark');
         };
-        window.openThemeModal = () => document.getElementById('themeModal').style.display = 'flex';
-        window.setTheme = (color) => {
-            document.documentElement.style.setProperty('--main-color', color);
-            localStorage.setItem('appTheme', color);
-            window.closeModal('themeModal');
+        window.toggleSearch = () => {
+            const bar = document.getElementById('searchBar');
+            bar.style.display = bar.style.display === 'block' ? 'none' : 'block';
+            if(bar.style.display === 'block') bar.querySelector('input').focus();
+        };
+        window.filterList = (k) => {
+            document.querySelectorAll('.item').forEach(el => {
+                el.style.display = el.innerText.includes(k) ? 'flex' : 'none';
+            });
+        };
+        window.toggleCheck = (c, i, v) => update(ref(db, `baby_checklist_v6/${c}/items/${i}`), { checked: v });
+
+        // 🗑️ 삭제 및 실행 취소 (스낵바 구현)
+        window.delItem = (c, i) => {
+            if(!confirm('삭제하시겠습니까?')) return;
+            const data = currentData[c].items[i];
+            lastDeleted = { path: `baby_checklist_v6/${c}/items/${i}`, data: data };
+            remove(ref(db, lastDeleted.path));
+            showUndo();
+        };
+        window.delCat = (c) => {
+            if(!confirm('카테고리가 삭제됩니다.')) return;
+            const data = currentData[c];
+            lastDeleted = { path: `baby_checklist_v6/${c}`, data: data };
+            remove(ref(db, lastDeleted.path));
+            showUndo();
+        };
+        function showUndo() {
+            const bar = document.getElementById('undoBar');
+            bar.classList.add('show');
+            if(undoTimer) clearTimeout(undoTimer);
+            undoTimer = setTimeout(() => { bar.classList.remove('show'); lastDeleted = null; }, 4000);
+        }
+        window.executeUndo = () => {
+            if(lastDeleted) update(ref(db), { [lastDeleted.path]: lastDeleted.data });
+            document.getElementById('undoBar').classList.remove('show');
         };
 
-        // 5. 실행 취소 (Toastify 복구)
-        window.deleteItemWithUndo = (catId, itemId) => {
-            const itemData = currentData[catId].items[itemId];
-            if(confirm('삭제하시겠습니까?')) {
-                lastDeleted = { path: `baby_checklist_v6/${catId}/items/${itemId}`, data: itemData };
-                remove(ref(db, lastDeleted.path));
-                Toastify({
-                    text: "🗑️ 삭제되었습니다. (실행 취소)",
-                    duration: 3000,
-                    gravity: "bottom",
-                    position: "center",
-                    style: { background: "#333", color: "#fff", borderRadius: "8px", fontWeight: "bold" },
-                    onClick: function(){ if(lastDeleted) { update(ref(db), { [lastDeleted.path]: lastDeleted.data }); lastDeleted = null; } }
-                }).showToast();
-            }
-        };
-
-        window.toggleStarScore = () => {
-            let current = parseInt(document.getElementById('itemImportance').value) || 1;
-            current++;
-            if(current > 3) current = 1;
-            document.getElementById('itemImportance').value = current;
-            document.getElementById('starToggleBtn').innerText = `중요도: ${"⭐".repeat(current)} (터치하여 변경)`;
-        };
-
-        window.adjQty = (delta) => {
-            const input = document.getElementById('itemCount');
-            let val = parseInt(input.value) || 1;
-            val = Math.max(1, val + delta);
-            input.value = val;
-        };
-
-        window.toggleEditMode = (force) => {
-            isEditMode = (typeof force === 'boolean') ? force : !isEditMode;
-            document.getElementById('btnEditMode').innerText = isEditMode ? '✅' : '✏️';
-            renderApp();
-        };
+        // Modal Logic
+        window.closeModal = (id) => document.getElementById(id).style.display = 'none';
         
-        window.openAddItem = (catId) => {
+        // 아이콘 렌더링 (확실하게 수정됨)
+        window.renderIcons = (k, target) => {
+            const grid = document.getElementById(target);
+            grid.innerHTML = '';
+            const filtered = k ? iconList.filter(x => x.k.includes(k)) : iconList;
+            filtered.forEach(x => {
+                const el = document.createElement('div');
+                el.className = 'icon-item';
+                el.innerText = x.c;
+                el.onclick = () => {
+                    const inputId = target === 'cIcons' ? 'cIconVal' : 'iIconVal';
+                    document.getElementById(inputId).value = x.c; // 값 저장
+                    Array.from(grid.children).forEach(c => c.classList.remove('selected'));
+                    el.classList.add('selected');
+                };
+                grid.appendChild(el);
+            });
+        };
+
+        // Category Modal
+        window.openCatModal = () => {
+            document.getElementById('catModal').style.display = 'flex';
+            document.getElementById('cId').value = '';
+            document.getElementById('cName').value = '';
+            window.renderIcons('', 'cIcons');
+        };
+        window.editCat = (id) => {
+            document.getElementById('catModal').style.display = 'flex';
+            const d = currentData[id];
+            document.getElementById('cId').value = id;
+            document.getElementById('cName').value = d.name;
+            window.renderIcons('', 'cIcons');
+        };
+        window.saveCat = () => {
+            const id = document.getElementById('cId').value;
+            const name = document.getElementById('cName').value;
+            const icon = document.getElementById('cIconVal').value || '📁';
+            if(!name) return alert('이름 입력');
+            if(id) update(ref(db, `baby_checklist_v6/${id}`), { name, icon });
+            else push(ref(db, 'baby_checklist_v6'), { name, icon, order: 999 });
+            window.closeModal('catModal');
+        };
+
+        // Item Modal
+        window.addItem = (cId) => {
             document.getElementById('itemModal').style.display = 'flex';
-            document.getElementById('itemModalTitle').innerText = '✨ 물품 등록';
-            document.getElementById('targetCatId').value = catId;
-            document.getElementById('targetItemId').value = '';
-            document.getElementById('itemName').value = '';
-            document.getElementById('itemBrand').value = '';
-            document.getElementById('itemModel').value = '';
-            document.getElementById('itemMemo').value = '';
-            document.getElementById('itemCount').value = '1';
-            document.getElementById('itemPrice').value = '';
-            document.getElementById('itemLink').value = '';
-            document.getElementById('itemLink2').value = '';
-            document.getElementById('itemIsGift').checked = false;
-            document.getElementById('itemIsCarrot').checked = false;
-            document.getElementById('itemShowNaver').checked = true;
-            document.getElementById('itemImportance').value = 1;
-            document.getElementById('starToggleBtn').innerText = `중요도: ⭐ (터치하여 변경)`;
-            document.getElementById('itemCustomIcon').value = ''; 
-            selectedIcon = '👶';
-            renderIcons(iconDB, 'itemIconGrid');
+            document.getElementById('targetCId').value = cId;
+            document.getElementById('targetIId').value = '';
+            // 초기화
+            document.getElementById('iName').value = '';
+            document.getElementById('iCount').value = 1;
+            document.getElementById('iPrice').value = '';
+            document.getElementById('iBrand').value = '';
+            document.getElementById('iMemo').value = '';
+            document.getElementById('iGift').checked = false;
+            document.getElementById('iCarrot').checked = false;
+            window.renderIcons('', 'iIcons');
         };
-
+        window.editItem = (c, i) => {
+            const d = currentData[c].items[i];
+            document.getElementById('itemModal').style.display = 'flex';
+            document.getElementById('targetCId').value = c;
+            document.getElementById('targetIId').value = i;
+            document.getElementById('iName').value = d.name;
+            document.getElementById('iCount').value = d.count || 1;
+            document.getElementById('iPrice').value = d.price || '';
+            document.getElementById('iBrand').value = d.brand || '';
+            document.getElementById('iMemo').value = d.memo || '';
+            document.getElementById('iGift').checked = d.isGift || false;
+            document.getElementById('iCarrot').checked = d.isCarrot || false;
+            window.renderIcons('', 'iIcons');
+        };
         window.saveItem = () => {
-            const catId = document.getElementById('targetCatId').value;
-            const itemId = document.getElementById('targetItemId').value;
-            
-            const newData = {
-                name: document.getElementById('itemName').value,
-                brand: document.getElementById('itemBrand').value,
-                model: document.getElementById('itemModel').value,
-                memo: document.getElementById('itemMemo').value,
-                count: document.getElementById('itemCount').value,
-                price: document.getElementById('itemPrice').value,
-                link: document.getElementById('itemLink').value,
-                link2: document.getElementById('itemLink2').value,
-                importance: parseInt(document.getElementById('itemImportance').value),
-                isGift: document.getElementById('itemIsGift').checked,
-                isCarrot: document.getElementById('itemIsCarrot').checked,
-                showNaver: document.getElementById('itemShowNaver').checked,
-                icon: "👶",
-                checked: false, 
-                order: 999
+            const c = document.getElementById('targetCId').value;
+            const i = document.getElementById('targetIId').value;
+            const data = {
+                name: document.getElementById('iName').value,
+                count: Number(document.getElementById('iCount').value),
+                price: document.getElementById('iPrice').value,
+                brand: document.getElementById('iBrand').value,
+                memo: document.getElementById('iMemo').value,
+                icon: document.getElementById('iIconVal').value || '👶',
+                isGift: document.getElementById('iGift').checked,
+                isCarrot: document.getElementById('iCarrot').checked,
+                checked: false, order: 999
             };
+            if(!data.name) return alert('이름 입력');
             
-            const customIcon = document.getElementById('itemCustomIcon')?.value;
-            if(customIcon) newData.icon = customIcon;
-            else newData.icon = document.querySelector('#itemIconGrid .selected')?.innerText || '👶';
-
-            if(!newData.name) return alert('이름 입력!');
-
-            if(itemId) {
-                const existing = currentData[catId].items[itemId];
-                newData.checked = existing.checked;
-                newData.order = (existing.order !== undefined) ? existing.order : 999;
-                
-                update(ref(db, `baby_checklist_v6/${catId}/items/${itemId}`), newData)
-                    .then(() => {
-                        Toastify({ text: "✅ 저장되었습니다!", duration: 2000, style: { background: "#4CAF50" } }).showToast();
-                        window.closeModal('itemModal');
-                    });
+            if(i) {
+                const old = currentData[c].items[i];
+                data.checked = old.checked;
+                data.order = old.order !== undefined ? old.order : 999;
+                update(ref(db, `baby_checklist_v6/${c}/items/${i}`), data);
             } else {
-                push(ref(db, `baby_checklist_v6/${catId}/items`), newData)
-                    .then(() => {
-                        Toastify({ text: "✅ 추가되었습니다!", duration: 2000, style: { background: "#4CAF50" } }).showToast();
-                        window.closeModal('itemModal');
-                    });
+                push(ref(db, `baby_checklist_v6/${c}/items`), data);
             }
+            window.closeModal('itemModal');
         };
 
-        window.toggleCheck=(c,i,v)=>update(ref(db,`baby_checklist_v6/${c}/items/${i}`),{checked:v});
-        window.deleteCategory=(id)=>{if(confirm('삭제?'))remove(ref(db,`baby_checklist_v6/${id}`));};
-        window.closeModal=(id)=>document.getElementById(id).style.display='none';
-        
-        window.openEditCategory=(id)=>{const c=currentData[id];if(!c)return;document.getElementById('catModal').style.display='flex';document.getElementById('editCatId').value=id;document.getElementById('catName').value=c.name;document.getElementById('catCustomIcon').value='';selectedIcon=c.icon||'👶';renderIcons(iconDB,'catIconGrid');};
-        window.saveCategory=()=>{const n=document.getElementById('catName').value;const i=document.getElementById('catCustomIcon').value||document.querySelector('#catIconGrid .selected')?.innerText||'👶';const id=document.getElementById('editCatId').value;if(!n)return;if(id)update(ref(db,`baby_checklist_v6/${id}`),{name:n,icon:i});else push(ref(db,'baby_checklist_v6'),{name:n,icon:i,order:999});window.closeModal('catModal');};
-        
-        window.openEditItem=(cId,iId)=>{const i=currentData[cId].items[iId];if(!i)return;document.getElementById('itemModal').style.display='flex';document.getElementById('targetCatId').value=cId;document.getElementById('targetItemId').value=iId;document.getElementById('itemName').value=i.name;document.getElementById('itemBrand').value=i.brand||'';document.getElementById('itemModel').value=i.model||'';document.getElementById('itemPrice').value=i.price||'';document.getElementById('itemCount').value=i.count||1;document.getElementById('itemLink').value=i.link||'';document.getElementById('itemLink2').value=i.link2||'';document.getElementById('itemMemo').value=i.memo||'';document.getElementById('itemIsGift').checked=i.isGift||false;document.getElementById('itemIsCarrot').checked=i.isCarrot||false;document.getElementById('itemCustomIcon').value='';
-        const score = i.importance || 1;
-        document.getElementById('itemImportance').value = score;
-        document.getElementById('starToggleBtn').innerText = `중요도: ${"⭐".repeat(score)} (터치하여 변경)`;
-        selectedIcon = i.icon || '👶';
-        renderIcons(iconDB,'itemIconGrid');};
-        
-        // ✅ 복구된 FAB 버튼
-        window.openCatModal = () => { document.getElementById('catModal').style.display = 'flex'; document.getElementById('catModalTitle').innerText = '📂 카테고리 추가'; document.getElementById('editCatId').value = ''; document.getElementById('catName').value = ''; document.getElementById('catCustomIcon').value = ''; selectedIcon = '👶'; renderIcons(iconDB, 'catIconGrid'); };
-
-        window.filterIcons=(k,t)=>{const g=document.getElementById(t);g.innerHTML='';iconDB.filter(i=>!k||i.t.includes(k)).forEach(i=>{const e=document.createElement('div');e.className='icon-opt';e.innerText=i.icon;e.onclick=()=>{Array.from(g.children).forEach(c=>c.classList.remove('selected'));e.classList.add('selected');selectedIcon=i.icon;};g.appendChild(e);});};
-        function renderIcons(l,t){window.filterIcons('',t);}
-
-        function initCategorySortable(){const el=document.getElementById('contentArea');new Sortable(el,{handle:'.drag-handle',animation:150,disabled:!isEditMode,onEnd:e=>{updateOrder(e.to, 'category')}});}
-        function initItemSortable(el,cId){new Sortable(el,{handle:'.drag-handle',animation:150,disabled:!isEditMode,onEnd:e=>{updateOrder(e.to, 'item', cId)}});}
-        function updateOrder(el,type,cId){const ids=Array.from(el.children).map(c=>c.getAttribute('data-id'));const updates={};ids.forEach((id,idx)=>{if(type==='category')updates[`baby_checklist_v6/${id}/order`]=idx;else updates[`baby_checklist_v6/${cId}/items/${id}/order`]=idx;});update(ref(db),updates);}
-
-        window.toggleGlobalSearch=()=>{const b=document.getElementById('globalSearchBox');b.style.display=b.style.display==='block'?'none':'block';if(b.style.display==='block')document.getElementById('globalSearchInput').focus();};
-        window.searchGlobal=(k)=>{k=k.toLowerCase();document.querySelectorAll('.category-card').forEach(c=>{let v=false;c.querySelectorAll('.item').forEach(i=>{if(i.innerText.toLowerCase().includes(k)){i.classList.remove('hidden');v=true;}else i.classList.add('hidden');});c.style.display=v?'block':'none';});};
-        
-        window.uploadInitialData = async () => {
-            alert("리스트와 아이콘을 매칭하여 등록합니다! (약 5~10초 소요)");
-            const initialData = [
-                {name: "출산가방/엄마용품", icon: "🏥", items: [{n:"산모수첩", i:"📒"}, {n:"신분증/지갑", i:"💳"}, {n:"휴대폰/충전기", i:"📱"}, {n:"마스크", i:"😷"}, {n:"구부러지는 빨대", i:"🥤"}, {n:"물티슈/마이비데", i:"🧻"}, {n:"철분제(엄마영양제)", i:"💊"}, {n:"가습기", i:"💧"}, {n:"스킨케어/세면도구", i:"🧴"}, {n:"수유나시/브라/패드", i:"👙"}, {n:"제왕절개 팬티", i:"🩲"}, {n:"양말/목수건", i:"🧦"}, {n:"생리대/맘스안심팬티", i:"🩸"}, {n:"양배추 가슴팩", i:"🥬"}, {n:"산후복대", i:"🤕"}, {n:"손목보호대", i:"🤲"}, {n:"압박스타킹", i:"👢"}, {n:"디데이달력", i:"📅"}, {n:"볼펜/슬리퍼", i:"🖊️"}]},
-                {name: "위생/케어", icon: "🩹", items: [{n:"손수건 10장", i:"🧣"}, {n:"유산균", i:"🦠"}, {n:"손톱케어 4종", i:"✂️"}, {n:"체온계", i:"🌡️"}, {n:"온습도계", i:"💧"}, {n:"알콜스왑", i:"🏥"}, {n:"배꼽소독솜", i:"☁️"}]},
-                {name: "수유용품", icon: "🍼", items: [{n:"모유저장팩", i:"🧊"}, {n:"수유컵", i:"🥛"}, {n:"수유쿠션", i:"🍩"}, {n:"유축기", i:"🤱"}, {n:"분유제조기", i:"🤖"}, {n:"분유쉐이커", i:"🥤"}, {n:"젖병(큰거/작은거)", i:"🍼"}, {n:"분유", i:"🥫"}, {n:"분유포트", i:"🫖"}, {n:"젖꼭지", i:"🍼"}, {n:"젖병솔/집게", i:"🖌️"}, {n:"젖병건조대", i:"🌵"}, {n:"젖병소독기", i:"✨"}, {n:"젖병세정제", i:"🧼"}, {n:"휴대용젖병", i:"🍼"}, {n:"보온병", i:"🌡️"}, {n:"공갈젖꼭지(쪽쪽이)", i:"👶"}]},
-                {name: "목욕/세탁", icon: "🛁", items: [{n:"기저귀", i:"🩲"}, {n:"아기비데", i:"🚿"}, {n:"천기저귀", i:"⬜"}, {n:"아기욕조", i:"🛁"}, {n:"신생아면봉", i:"👂"}, {n:"건티슈", i:"🧻"}, {n:"세탁세제", i:"🧴"}, {n:"무형광 세탁망", i:"🕸️"}, {n:"장난감 소독제", i:"🔫"}, {n:"바스&샴푸", i:"🧴"}, {n:"로션/오일/수딩젤", i:"🧴"}, {n:"기저귀발진크림", i:"🥫"}, {n:"비판텐 연고", i:"💊"}]},
-                {name: "가구/침구/의류", icon: "🛏️", items: [{n:"아기침대", i:"🛏️"}, {n:"기저귀갈이대", i:"🚼"}, {n:"트롤리(덮개형)", i:"🛒"}, {n:"아기수납장", i:"🗄️"}, {n:"아기옷걸이", i:"🧥"}, {n:"범보의자", i:"🪑"}, {n:"방수패드", i:"🚫"}, {n:"블랭킷/이불", i:"🛌"}, {n:"바디슈트", i:"👕"}, {n:"배냇저고리/우주복", i:"👘"}, {n:"턱받이", i:"👶"}, {n:"내복", i:"👕"}, {n:"양말", i:"🧦"}]},
-                {name: "외출/가전/기타", icon: "🚗", items: [{n:"바구니카시트", i:"🧺"}, {n:"카시트", i:"🚗"}, {n:"유모차", i:"🛒"}, {n:"유모차라이너", i:"💺"}, {n:"통풍시트", i:"❄️"}, {n:"아기띠", i:"🐨"}, {n:"차량스티커", i:"🔰"}, {n:"차량햇빛가리개", i:"☀️"}, {n:"기저귀가방", i:"🎒"}, {n:"하이체어", i:"🪑"}, {n:"빨래건조대", i:"🧺"}, {n:"백색소음기", i:"📻"}, {n:"모빌", i:"🎠"}]}
+        // 초기 데이터 (복구)
+        window.initData = async () => {
+            if(!confirm('리스트를 등록하시겠습니까?')) return;
+            const d = [
+                {name:"출산가방",icon:"🏥",items:[{name:"산모수첩",icon:"📒"},{name:"신분증",icon:"💳"},{name:"충전기",icon:"⚡"}]},
+                {name:"수유용품",icon:"🍼",items:[{name:"젖병",icon:"🍼"},{name:"분유",icon:"🥫"},{name:"젖병솔",icon:"🖌️"}]},
+                {name:"위생용품",icon:"🩹",items:[{name:"체온계",icon:"🌡️"},{name:"손수건",icon:"🧣"},{name:"기저귀",icon:"🩲"}]}
             ];
-            for (let i = 0; i < initialData.length; i++) {
-                const cat = initialData[i];
-                const newCatRef = await push(ref(db, 'baby_checklist_v6'), { name: cat.name, icon: cat.icon, order: i });
-                const catId = newCatRef.key;
-                if(cat.items && cat.items.length > 0) {
-                    for (let j = 0; j < cat.items.length; j++) {
-                        const item = cat.items[j];
-                        await push(ref(db, `baby_checklist_v6/${catId}/items`), { name: item.n, icon: item.i, checked: false, order: j, count: 1, showNaver: true });
-                    }
-                }
+            for(const c of d){
+                const r = await push(ref(db, 'baby_checklist_v6'), {name:c.name, icon:c.icon, order:999});
+                for(const i of c.items) await push(ref(db, `baby_checklist_v6/${r.key}/items`), {...i, checked:false});
             }
-            alert("✅ 모든 아이템 등록 완료!");
+            alert("완료!");
         };
-        
-        window.downloadTemplate=()=>{const header=["카테고리","물품명","브랜드","모델명","수량","예상가격","구매링크","메모"]; const example=["위생/케어","아기 면봉","마이비","",1,5000,"http://...","신생아용 얇은거"]; const wb=XLSX.utils.book_new(); const ws=XLSX.utils.aoa_to_sheet([header,example]); XLSX.utils.book_append_sheet(wb,ws,"육아템_양식"); XLSX.writeFile(wb,"육아준비물_양식.xlsx");};
-        window.handleExcelUpload=(input)=>{const file=input.files[0]; if(!file)return; const reader=new FileReader(); reader.onload=async(e)=>{const data=new Uint8Array(e.target.result); const workbook=XLSX.read(data,{type:'array'}); const firstSheet=workbook.Sheets[workbook.SheetNames[0]]; const rows=XLSX.utils.sheet_to_json(firstSheet,{header:1}); if(rows.length<2){alert("데이터 없음");return;} const dataRows=rows.slice(1); const grouped={}; dataRows.forEach(row=>{const catName=row[0]; const itemName=row[1]; if(!catName||!itemName)return; if(!grouped[catName])grouped[catName]=[]; grouped[catName].push({name:itemName, brand:row[2]||"", model:row[3]||"", count:row[4]||1, price:row[5]||"", link:row[6]||"", memo:row[7]||"", showNaver:true});}); if(confirm(`${Object.keys(grouped).length}개 카테고리 등록?`)){for(const catName of Object.keys(grouped)){const newCatRef=await push(ref(db,'baby_checklist_v6'),{name:catName, icon:"👶", order:999}); const catId=newCatRef.key; for(const item of grouped[catName]){await push(ref(db,`baby_checklist_v6/${catId}/items`),{...item, checked:false, order:999});}} alert("업로드 완료!"); input.value="";}}; reader.readAsArrayBuffer(file);};
-        window.searchNaver=()=>{const n=document.getElementById('itemName').value; const b=document.getElementById('itemBrand').value; const m=document.getElementById('itemModel').value; if(!n)return alert('이름 입력!'); window.open(`https://search.shopping.naver.com/search/all?query=${encodeURIComponent([b,m,n].filter(Boolean).join(' '))}`,'_blank');};
     </script>
 </body>
 </html>
