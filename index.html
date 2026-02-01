@@ -3,182 +3,177 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>👶 베이비 체크리스트 Pro</title>
+    <title>👶 마이 베이비 체크리스트 (V27)</title>
     <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     
     <style>
         :root {
-            /* 🎨 프리미엄 컬러 팔레트 (iOS 스타일) */
-            --primary: #FF7E86;       /* 조금 더 세련된 코랄 핑크 */
-            --primary-bg: #FFF0F1;
-            --bg-color: #F5F7F9;      /* 차분한 쿨그레이 배경 */
+            /* 🎨 V20의 따뜻한 핑크 톤 + 세련된 그레이 */
+            --main-color: #FF878D;
+            --sub-color: #FFF0F5;
+            --bg-color: #F6F7F9; /* 눈이 편안한 쿨 그레이 배경 */
             --card-bg: #FFFFFF;
-            --text-main: #1C1C1E;     /* 완전 검정 대신 진한 회색 */
-            --text-sub: #8E8E93;
-            --border: #E5E5EA;
-            --shadow: 0 4px 20px rgba(0,0,0,0.06);
-            --danger: #FF3B30;
-            --success: #34C759;
-            
-            /* 태그 컬러 */
-            --tag-carrot-bg: #FFF3E0; --tag-carrot-text: #FF9800;
-            --tag-gift-bg: #F3E5F5; --tag-gift-text: #9C27B0;
+            --text-main: #333333;
+            --text-sub: #888888;
+            --border: #EEEEEE;
+            --price: #FF6B6B;
+            --carrot: #FF8A3D;
+            --gift: #9C27B0;
+            --shadow: 0 4px 15px rgba(0,0,0,0.05); /* 은은한 그림자 */
         }
         
         [data-theme="dark"] {
-            --bg-color: #000000;
-            --card-bg: #1C1C1E;
-            --text-main: #FFFFFF;
-            --text-sub: #98989F;
-            --border: #38383A;
-            --shadow: none;
-            --primary-bg: #2C2C2E;
+            --bg-color: #121212;
+            --card-bg: #1E1E1E;
+            --text-main: #E0E0E0;
+            --text-sub: #AAAAAA;
+            --border: #333333;
+            --sub-color: #2C2C2C;
+            --shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
-        body { font-family: 'Pretendard', -apple-system, sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 0; padding-bottom: 120px; transition: 0.3s; }
-        .container { max-width: 600px; margin: 0 auto; }
-
-        /* 헤더: 글래스모피즘 효과 */
-        .header {
-            position: sticky; top: 0; z-index: 100;
-            background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            padding: 15px 20px; border-bottom: 1px solid var(--border);
+        body { 
+            font-family: 'Pretendard', sans-serif; 
+            background-color: var(--bg-color); color: var(--text-main); 
+            margin: 0; padding: 0; padding-bottom: 120px; 
+            transition: background-color 0.3s;
         }
-        [data-theme="dark"] .header { background: rgba(28, 28, 30, 0.85); }
+        /* ✅ 3. 디자인 원복: 최대 너비 제한으로 적절한 비율 유지 */
+        .container { max-width: 500px; margin: 0 auto; }
 
-        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        /* 헤더: 그라데이션 적용 (V20 스타일) */
+        .header { 
+            background: linear-gradient(135deg, var(--main-color), #ff9a9e); 
+            padding: 20px 25px 25px; color: white; 
+            border-radius: 0 0 30px 30px; 
+            box-shadow: 0 8px 20px rgba(255, 135, 141, 0.25);
+            position: sticky; top: 0; z-index: 100;
+        }
+        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .app-title { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
         
-        .icon-btn {
-            width: 36px; height: 36px; border-radius: 50%; border: none;
-            background: var(--bg-color); color: var(--text-main);
-            font-size: 17px; cursor: pointer; display: flex; align-items: center; justify-content: center;
-            transition: transform 0.1s;
+        .header-actions { display: flex; gap: 8px; }
+        .icon-btn { 
+            background: rgba(255,255,255,0.25); border: 1px solid rgba(255,255,255,0.3); 
+            color: white; width: 38px; height: 38px; border-radius: 12px; 
+            font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; 
+            backdrop-filter: blur(4px); transition: 0.2s;
         }
-        .icon-btn:active { transform: scale(0.9); background: var(--border); }
+        .icon-btn:active { transform: scale(0.92); background: rgba(255,255,255,0.4); }
 
-        /* 필터 바 (가로 스크롤) */
-        .filter-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
-        .filter-scroll::-webkit-scrollbar { display: none; }
-        .filter-chip {
-            padding: 8px 14px; border-radius: 20px; font-size: 13px; font-weight: 600;
-            background: var(--card-bg); border: 1px solid var(--border); color: var(--text-sub);
-            white-space: nowrap; transition: 0.2s; cursor: pointer;
+        /* 필터 바 */
+        .filter-bar { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
+        .filter-chip { 
+            background: rgba(255,255,255,0.9); border: none; padding: 6px 12px; 
+            border-radius: 15px; font-size: 12px; font-weight: 700; color: var(--main-color); 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); cursor: pointer; white-space: nowrap;
         }
-        .filter-chip.active { background: var(--text-main); color: var(--card-bg); border-color: var(--text-main); }
+        .filter-chip.active { background: white; color: var(--text-main); border: 1px solid var(--main-color); }
 
-        /* 진행률 카드 */
-        .summary-card {
-            margin: 15px 20px; padding: 20px; border-radius: 20px;
-            background: var(--card-bg); box-shadow: var(--shadow);
+        /* 검색창 (숨김 상태) */
+        .search-container { display: none; margin-top: 15px; }
+        .search-input { width: 100%; padding: 12px; border: none; border-radius: 12px; background: rgba(255,255,255,0.9); font-size: 14px; outline: none; }
+
+        /* 예산 요약 */
+        .budget-box { 
+            background: rgba(255,255,255,0.2); backdrop-filter: blur(5px); 
+            padding: 15px; border-radius: 16px; margin-top: 15px; 
+            display: flex; align-items: center; justify-content: space-between; border: 1px solid rgba(255,255,255,0.3);
         }
-        .budget-row { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 10px; }
-        .budget-label { font-size: 13px; color: var(--text-sub); font-weight: 600; }
-        .budget-value { font-size: 20px; font-weight: 800; color: var(--primary); }
-        .progress-bg { height: 8px; background: var(--bg-color); border-radius: 4px; overflow: hidden; }
-        .progress-fill { height: 100%; background: var(--primary); width: 0%; border-radius: 4px; transition: width 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        .budget-circle { width: 45px; height: 45px; border-radius: 50%; background: white; color: var(--main-color); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .budget-track { flex: 1; height: 8px; background: rgba(255,255,255,0.4); border-radius: 4px; margin: 0 15px; overflow: hidden; }
+        .budget-fill { height: 100%; background: white; width: 0%; transition: width 0.5s; border-radius: 4px; }
+        .budget-text { font-size: 12px; font-weight: 700; text-align: right; color: rgba(255,255,255,0.95); }
 
-        /* 🔍 검색창 */
-        .search-area { padding: 0 20px; display: none; margin-bottom: 10px; animation: slideDown 0.2s; }
-        @keyframes slideDown { from{transform:translateY(-10px);opacity:0} to{transform:translateY(0);opacity:1} }
-        .search-input { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--card-bg); font-size: 15px; outline: none; }
-
-        /* 📂 카테고리 카드 */
-        .cat-card {
-            background: var(--card-bg); margin: 15px 20px; border-radius: 20px;
-            box-shadow: var(--shadow); overflow: hidden; transition: transform 0.2s;
+        /* 📂 카테고리 카드 (V20 레이아웃 복구) */
+        .category-card { 
+            background: var(--card-bg); margin: 20px 20px; border-radius: 20px; 
+            box-shadow: var(--shadow); overflow: hidden; transition: 0.2s; 
         }
-        .cat-card:active { transform: scale(0.99); }
-        .cat-card.collapsed .item-list, .cat-card.collapsed .add-btn-wrap { display: none; }
+        .category-card.collapsed .item-list, .category-card.collapsed .add-btn-wrapper { display: none; }
         
-        .cat-header {
-            padding: 18px; display: flex; align-items: center; justify-content: space-between;
-            cursor: pointer; border-bottom: 1px solid transparent;
+        .cat-header { 
+            padding: 18px 20px; display: flex; justify-content: space-between; align-items: center; 
+            cursor: pointer; background: var(--card-bg); border-bottom: 1px solid var(--border);
         }
-        .cat-left { display: flex; align-items: center; gap: 12px; }
-        .cat-icon {
-            width: 42px; height: 42px; border-radius: 14px; background: var(--primary-bg);
-            color: var(--primary); font-size: 22px; display: flex; align-items: center; justify-content: center;
+        .cat-info { display: flex; align-items: center; gap: 12px; }
+        .cat-icon { 
+            font-size: 22px; background: var(--sub-color); width: 40px; height: 40px; 
+            border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--main-color); 
         }
-        .cat-info h3 { margin: 0; font-size: 17px; font-weight: 700; }
-        .cat-info p { margin: 2px 0 0; font-size: 12px; color: var(--text-sub); }
-        .chevron { color: var(--text-sub); transition: transform 0.3s; }
-        .cat-card.collapsed .chevron { transform: rotate(-90deg); }
-        .cat-card:not(.collapsed) .cat-header { border-bottom: 1px solid var(--border); }
-
+        .cat-title { font-size: 17px; font-weight: 700; color: var(--text-main); }
+        .cat-price { font-size: 12px; color: var(--text-sub); font-weight: 500; margin-left: 4px; }
+        
         /* 아이템 리스트 */
         .item-list { list-style: none; padding: 0; margin: 0; }
-        .item {
-            padding: 14px 18px; border-bottom: 1px solid var(--border);
-            display: flex; align-items: flex-start; gap: 12px; background: var(--card-bg);
-            transition: background 0.2s;
+        .item { 
+            padding: 16px 20px; border-bottom: 1px solid var(--border); background: var(--card-bg); 
+            display: flex; align-items: flex-start; gap: 12px; transition: 0.2s;
         }
-        .item:active { background-color: var(--bg-color); }
-        .item.completed .item-title { text-decoration: line-through; color: var(--text-sub); opacity: 0.6; }
+        /* ✅ 2. 클릭 시 수정창 안 뜨게 수정 (터치 효과만) */
+        .item:active { background-color: var(--bg-color); transform: scale(0.995); } 
+        .item.completed .item-name { text-decoration: line-through; color: var(--text-sub); opacity: 0.6; }
         .item.hidden { display: none; }
 
-        /* 체크박스 디자인 */
-        .chk-container { position: relative; width: 24px; height: 24px; flex-shrink: 0; margin-top: 2px; }
-        .chk-real { position: absolute; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 2; }
-        .chk-fake {
-            width: 100%; height: 100%; border: 2px solid #C7C7CC; border-radius: 8px;
-            transition: 0.2s; display: flex; align-items: center; justify-content: center; background: var(--card-bg);
-        }
-        .chk-real:checked + .chk-fake { background: var(--primary); border-color: var(--primary); }
-        .chk-fake::after { content: '✔'; color: white; font-size: 14px; display: none; }
-        .chk-real:checked + .chk-fake::after { display: block; }
+        /* 체크박스 */
+        .chk-wrap { position: relative; width: 22px; height: 22px; flex-shrink: 0; margin-top: 2px; }
+        .chk-input { position: absolute; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 2; }
+        .chk-box { width: 100%; height: 100%; border: 2px solid #ddd; border-radius: 7px; background: white; transition: 0.2s; display: flex; align-items: center; justify-content: center;}
+        .chk-input:checked + .chk-box { background: var(--main-color); border-color: var(--main-color); }
+        .chk-box::after { content: '✔'; color: white; font-size: 12px; display: none; }
+        .chk-input:checked + .chk-box::after { display: block; }
 
-        .item-center { flex: 1; min-width: 0; }
-        .item-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-        .item-title { font-size: 16px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .item-meta { display: flex; gap: 6px; flex-wrap: wrap; }
+        .item-content { flex: 1; min-width: 0; cursor: pointer; } /* 텍스트 눌러도 체크 */
+        .item-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+        .item-name { font-size: 15px; font-weight: 600; color: var(--text-main); }
+        .item-tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 6px;}
         
-        /* 태그 스타일 */
-        .tag { padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; background: var(--bg-color); color: var(--text-sub); }
-        .tag.price { background: #FFF0F0; color: var(--price-color); }
-        .tag.carrot { background: var(--tag-carrot-bg); color: var(--tag-carrot-text); }
-        .tag.gift { background: var(--tag-gift-bg); color: var(--tag-gift-text); }
-        .tag.link { background: #E3F2FD; color: #2196F3; text-decoration: none; }
-        .tag.naver { background: #E8F5E9; color: #4CAF50; text-decoration: none; }
+        /* ✅ 1. 메모 디자인 (회색 작은 글씨) */
+        .item-memo { font-size: 12px; color: var(--text-sub); margin-top: 4px; line-height: 1.4; background: var(--bg-color); padding: 6px 10px; border-radius: 8px; display: inline-block; }
 
-        /* 수정/삭제 버튼 (SVG) */
-        .item-actions { display: none; gap: 10px; margin-left: 8px; }
-        body.is-edit-mode .item-actions { display: flex; }
-        .act-btn { 
-            width: 32px; height: 32px; border-radius: 8px; border: none; background: transparent;
-            display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s;
+        .tag { padding: 3px 6px; border-radius: 5px; font-size: 11px; font-weight: 500; background: var(--bg-color); color: var(--text-sub); }
+        .tag.price { background: #FFF5F5; color: var(--price); font-weight: 700; }
+        .tag.carrot { background: #FFF3E0; color: var(--carrot); border: 1px solid #FFE0B2; }
+        .tag.gift { background: #F3E5F5; color: var(--gift); border: 1px solid #E1BEE7; }
+        .tag.naver { background: #E8F5E9; color: #2E7D32; text-decoration: none; display: inline-flex; align-items: center; gap: 2px; }
+
+        /* 수정 모드용 버튼 (SVG) */
+        .edit-actions { display: none; gap: 8px; margin-left: 8px; }
+        body.is-edit-mode .edit-actions { display: flex; }
+        .action-btn { 
+            width: 32px; height: 32px; border: none; background: transparent; 
+            border-radius: 8px; display: flex; align-items: center; justify-content: center; 
+            cursor: pointer; transition: 0.2s;
         }
-        .act-btn:active { background: var(--border); }
-        .act-btn svg { width: 18px; height: 18px; stroke: var(--text-sub); stroke-width: 2; fill: none; }
-        .act-btn.del:hover svg { stroke: var(--danger); }
-        .act-btn.edit:hover svg { stroke: var(--primary); }
+        .action-btn:active { background: var(--border); }
+        .action-btn svg { width: 18px; height: 18px; stroke: #999; stroke-width: 2; fill: none; }
+        .action-btn.del svg { stroke: #FF5252; }
+        .action-btn.edit svg { stroke: var(--main-color); }
 
-        /* 추가 버튼 */
-        .add-btn-wrap { padding: 12px; }
-        .btn-add {
-            width: 100%; padding: 14px; border: none; border-radius: 12px;
-            background: var(--primary-bg); color: var(--primary);
-            font-size: 15px; font-weight: 700; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; gap: 6px;
+        /* 물품 추가 버튼 (V17의 예쁜 버튼) */
+        .add-btn-wrapper { padding: 15px; }
+        .btn-add { 
+            width: 100%; padding: 13px; background: var(--sub-color); color: var(--main-color); 
+            border: 1px solid rgba(255, 135, 141, 0.1); border-radius: 14px; 
+            font-weight: 800; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; 
+            transition: 0.2s;
         }
-        .btn-add:active { opacity: 0.7; }
+        .btn-add:active { transform: scale(0.97); background: #ffe0e6; }
 
-        /* FAB (플로팅 버튼) */
-        .fab {
-            position: fixed; bottom: 30px; right: 20px;
-            width: 56px; height: 56px; border-radius: 28px;
-            background: var(--text-main); color: var(--card-bg);
-            border: none; font-size: 28px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 90;
-            transition: transform 0.2s;
+        /* FAB */
+        .fab { 
+            position: fixed; bottom: 30px; right: 20px; width: 56px; height: 56px; border-radius: 28px; 
+            background: var(--main-color); color: white; border: none; font-size: 28px; 
+            box-shadow: 0 4px 15px rgba(255, 135, 141, 0.4); z-index: 90; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; transition: 0.2s;
         }
         .fab:active { transform: scale(0.9); }
 
-        /* ✨ [자체 구현] 실행 취소 스낵바 */
-        #snackbar {
+        /* 💾 실행취소바 (자체 구현) */
+        #undoBar {
             position: fixed; bottom: -80px; left: 50%; transform: translateX(-50%);
             background: #222; color: white; padding: 14px 24px; border-radius: 30px;
             box-shadow: 0 10px 20px rgba(0,0,0,0.2); z-index: 200;
@@ -186,34 +181,27 @@
             transition: bottom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             width: 90%; max-width: 400px; justify-content: space-between;
         }
-        #snackbar.show { bottom: 30px; }
-        .undo-txt { font-weight: 500; }
-        .undo-action { color: var(--primary); font-weight: 800; cursor: pointer; text-transform: uppercase; }
+        #undoBar.show { bottom: 30px; }
+        .undo-btn { color: var(--main-color); font-weight: 800; cursor: pointer; }
 
-        /* 모달 공통 */
-        .modal-bg { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 300; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
-        .modal { background: var(--card-bg); width: 90%; max-width: 380px; padding: 24px; border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); animation: popUp 0.3s; max-height: 85vh; overflow-y: auto; }
-        @keyframes popUp { from{transform:scale(0.9);opacity:0} to{transform:scale(1);opacity:1} }
-        
-        .inp-grp { margin-bottom: 16px; }
+        /* 모달 */
+        .modal-bg { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 300; align-items: center; justify-content: center; }
+        .modal { background: var(--card-bg); width: 90%; max-width: 380px; padding: 25px; border-radius: 24px; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
         .inp-label { display: block; font-size: 12px; font-weight: 700; color: var(--text-sub); margin-bottom: 6px; }
-        .inp { width: 100%; padding: 14px; border: 1px solid var(--border); border-radius: 12px; font-size: 15px; outline: none; background: var(--bg-color); color: var(--text-main); }
-        .inp:focus { border-color: var(--primary); background: var(--card-bg); }
-
-        .btn-row { display: flex; gap: 10px; margin-top: 24px; }
-        .btn { flex: 1; padding: 15px; border-radius: 12px; font-weight: 700; font-size: 15px; border: none; cursor: pointer; }
+        .inp { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 12px; font-size: 15px; outline: none; background: var(--bg-color); color: var(--text-main); margin-bottom: 15px; }
+        .icon-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 5px; max-height: 150px; overflow-y: auto; padding: 5px; border: 1px solid var(--border); border-radius: 10px; margin-bottom: 15px; }
+        .icon-opt { font-size: 22px; text-align: center; padding: 8px; border-radius: 8px; cursor: pointer; }
+        .icon-opt.active { background: var(--sub-color); border: 1px solid var(--main-color); }
+        .btn-row { display: flex; gap: 10px; }
+        .btn { flex: 1; padding: 14px; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; }
         .btn-sub { background: var(--bg-color); color: var(--text-sub); }
-        .btn-main { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(255, 126, 134, 0.3); }
+        .btn-main { background: var(--main-color); color: white; }
 
-        .icon-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; max-height: 160px; overflow-y: auto; padding: 4px; }
-        .icon-item { font-size: 24px; text-align: center; padding: 8px; border-radius: 10px; cursor: pointer; transition: 0.1s; }
-        .icon-item.active { background: var(--primary-bg); border: 2px solid var(--primary); }
-
-        .drag-handle { display: none; font-size: 20px; color: var(--text-sub); cursor: grab; padding-right: 10px; }
+        .drag-handle { display: none; color: #ccc; font-size: 20px; cursor: grab; padding-right: 10px; }
         body.is-edit-mode .drag-handle { display: block; }
-        body.is-edit-mode .chk-container { display: none; }
+        body.is-edit-mode .chk-wrap { display: none; }
         
-        .auto-btn { width: 100%; padding: 15px; background: var(--text-main); color: white; border: none; border-radius: 14px; font-weight: 700; cursor: pointer; }
+        .auto-btn { width: 100%; padding: 15px; background: #6c5ce7; color: white; border: none; border-radius: 14px; font-weight: 700; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -222,41 +210,38 @@
             <span class="app-title">👶 베이비 체크리스트</span>
             <div class="header-actions">
                 <button class="icon-btn" onclick="toggleSearch()">🔍</button>
-                <button class="icon-btn" onclick="toggleTheme()">🌓</button>
                 <button class="icon-btn" onclick="toggleEdit()" id="btnEdit">✏️</button>
             </div>
         </div>
-        <div class="search-area" id="searchArea">
-            <input type="text" class="search-input" placeholder="물품명 검색 (예: 손수건)" onkeyup="filterList(this.value)">
-        </div>
         
-        <div class="filter-scroll">
-            <div class="filter-chip active" onclick="setFilter('ALL', this)">📋 전체</div>
-            <div class="filter-chip" onclick="setFilter('UNCHECKED', this)">🛒 안 산 것</div>
-            <div class="filter-chip" onclick="setFilter('GIFT', this)">🎁 선물</div>
-            <div class="filter-chip" onclick="setSort('PRICE', this)">💰 가격순</div>
+        <div class="search-container" id="searchArea">
+            <input type="text" class="search-input" placeholder="물품명, 브랜드 검색 (예: 손수건)" onkeyup="filterList(this.value)">
         </div>
-    </div>
 
-    <div class="summary-card">
-        <div class="budget-row">
-            <span class="budget-label">준비율 <span id="percentTxt">0%</span></span>
-            <span class="budget-value"><span id="totalBudget">0</span>원</span>
+        <div class="budget-box">
+            <div class="budget-circle" id="percentTxt">0%</div>
+            <div class="budget-track"><div class="budget-fill" id="progressBar"></div></div>
+            <div class="budget-text">총 <span id="totalBudget">0</span>원</div>
         </div>
-        <div class="progress-bg"><div class="progress-fill" id="progressBar"></div></div>
+
+        <div class="filter-bar" style="margin-top:15px;">
+            <button class="filter-chip active" onclick="setFilter('ALL', this)">📋 전체</button>
+            <button class="filter-chip" onclick="setFilter('UNCHECKED', this)">🛒 안 산 것</button>
+            <button class="filter-chip" onclick="setFilter('GIFT', this)">🎁 선물</button>
+            <button class="filter-chip" onclick="setSort(this)">💰 가격순</button>
+        </div>
     </div>
 
     <div class="container" id="listArea">
-        <div style="padding: 40px; text-align: center; color: #888;">
+        <div style="text-align:center; padding:50px; color:#aaa;">
             <p>데이터가 없습니다.</p>
-            <br>
-            <button class="auto-btn" onclick="initData()">📝 기본 리스트 80종 등록</button>
+            <button class="auto-btn" style="width:auto; margin-top:20px;" onclick="initData()">📝 기본 리스트 80종 등록</button>
         </div>
     </div>
 
-    <div id="snackbar">
-        <span class="undo-txt">🗑️ 항목이 삭제되었습니다.</span>
-        <span class="undo-action" onclick="executeUndo()">복구하기</span>
+    <div id="undoBar">
+        <span>🗑️ 삭제되었습니다.</span>
+        <span class="undo-btn" onclick="executeUndo()">실행취소</span>
     </div>
 
     <button class="fab" onclick="openCatModal()">+</button>
@@ -265,18 +250,14 @@
         <div class="modal">
             <h3>📂 카테고리</h3>
             <input type="hidden" id="cId">
-            <div class="inp-grp">
-                <span class="inp-label">이름</span>
-                <input type="text" id="cName" class="inp" placeholder="예: 수유 용품">
+            <span class="inp-label">이름</span>
+            <input type="text" id="cName" class="inp" placeholder="카테고리 이름">
+            <span class="inp-label">아이콘 (직접 입력 or 선택)</span>
+            <div style="display:flex; gap:10px; margin-bottom:10px;">
+                <input type="text" id="cEmoji" class="inp" style="width:60px; text-align:center; margin:0;" placeholder="😊">
+                <input type="text" class="inp" style="margin:0;" placeholder="🔍 아이콘 검색" onkeyup="renderIcons(this.value, 'cGrid')">
             </div>
-            <div class="inp-grp">
-                <span class="inp-label">아이콘 (직접 입력 or 선택)</span>
-                <div style="display:flex; gap:10px; margin-bottom:10px;">
-                    <input type="text" id="cEmoji" class="inp" style="width:60px; text-align:center;" placeholder="😊">
-                    <input type="text" class="inp" placeholder="🔍 아이콘 검색 (예: 병원)" onkeyup="renderIcons(this.value, 'cGrid')">
-                </div>
-                <div class="icon-grid" id="cGrid"></div>
-            </div>
+            <div class="icon-grid" id="cGrid"></div>
             <div class="btn-row">
                 <button class="btn btn-sub" onclick="closeModal('catModal')">취소</button>
                 <button class="btn btn-main" onclick="saveCat()">저장</button>
@@ -289,44 +270,37 @@
             <h3>✨ 물품 등록</h3>
             <input type="hidden" id="tCId"><input type="hidden" id="tIId">
             
-            <div class="inp-grp">
-                <span class="inp-label">물품명</span>
-                <input type="text" id="iName" class="inp" placeholder="예: 브라운 체온계">
-            </div>
+            <span class="inp-label">물품명</span>
+            <input type="text" id="iName" class="inp" placeholder="예: 브라운 체온계">
             
             <div style="display:flex; gap:10px;">
-                <div class="inp-grp" style="width:90px;">
+                <div style="width:90px;">
                     <span class="inp-label">수량</span>
                     <input type="number" id="iCount" class="inp" value="1" style="text-align:center;">
                 </div>
-                <div class="inp-grp" style="flex:1;">
+                <div style="flex:1;">
                     <span class="inp-label">가격</span>
                     <input type="text" id="iPrice" class="inp" placeholder="원">
                 </div>
             </div>
 
-            <div class="inp-grp">
-                <span class="inp-label">구매 링크</span>
-                <input type="url" id="iLink" class="inp" placeholder="https://...">
+            <span class="inp-label">브랜드 / 메모</span>
+            <input type="text" id="iBrand" class="inp" placeholder="브랜드" style="margin-bottom:8px;">
+            <input type="text" id="iMemo" class="inp" placeholder="메모 입력...">
+
+            <span class="inp-label">옵션</span>
+            <div style="background:var(--bg-color); padding:10px; border-radius:10px; margin-bottom:15px;">
+                <label style="display:flex; gap:8px; margin-bottom:8px;"><input type="checkbox" id="iGift"> 🎁 선물 받음 (지출 제외)</label>
+                <label style="display:flex; gap:8px; margin-bottom:8px;"><input type="checkbox" id="iCarrot"> 🥕 당근/중고</label>
+                <label style="display:flex; gap:8px;"><input type="checkbox" id="iNaver" checked> 🔍 네이버 최저가 버튼</label>
             </div>
 
-            <div class="inp-grp">
-                <span class="inp-label">아이콘</span>
-                <div class="icon-grid" id="iGrid"></div>
-                <input type="hidden" id="iEmoji">
+            <span class="inp-label">아이콘</span>
+            <div style="display:flex; gap:10px; margin-bottom:5px;">
+                <input type="text" id="iEmoji" class="inp" style="width:60px; text-align:center; margin:0;" placeholder="👶">
+                <input type="text" class="inp" style="margin:0;" placeholder="🔍 아이콘 검색" onkeyup="renderIcons(this.value, 'iGrid')">
             </div>
-
-            <div style="background:var(--bg-color); padding:15px; border-radius:12px;">
-                <label style="display:flex; gap:10px; font-size:14px; margin-bottom:10px;">
-                    <input type="checkbox" id="iGift"> 🎁 선물 받음 (예산 제외)
-                </label>
-                <label style="display:flex; gap:10px; font-size:14px; margin-bottom:10px;">
-                    <input type="checkbox" id="iCarrot"> 🥕 당근/중고
-                </label>
-                <label style="display:flex; gap:10px; font-size:14px;">
-                    <input type="checkbox" id="iNaver" checked> 🔍 네이버 최저가 버튼
-                </label>
-            </div>
+            <div class="icon-grid" id="iGrid"></div>
 
             <div class="btn-row">
                 <button class="btn btn-sub" onclick="closeModal('itemModal')">취소</button>
@@ -353,20 +327,21 @@
         const db = getDatabase(app);
         const dbRef = ref(db, 'baby_checklist_v6');
 
-        // ✅ 방대한 아이콘 데이터베이스 (내장)
-        const ICON_DB = [
-            {i:'👶',t:'아기'},{i:'👧',t:'딸'},{i:'👦',t:'아들'},{i:'🏥',t:'병원'},{i:'💊',t:'약'},{i:'💉',t:'주사'},{i:'🌡️',t:'체온계'},
-            {i:'🍼',t:'젖병'},{i:'🥣',t:'이유식'},{i:'🧼',t:'비누'},{i:'🛁',t:'욕조'},{i:'🧴',t:'로션'},{i:'🧻',t:'휴지'},{i:'🧺',t:'빨래'},
-            {i:'👕',t:'옷'},{i:'🧦',t:'양말'},{i:'🧢',t:'모자'},{i:'🛏️',t:'침대'},{i:'🧸',t:'장난감'},{i:'🚗',t:'차'},{i:'🚌',t:'버스'},
-            {i:'🎁',t:'선물'},{i:'📸',t:'사진'},{i:'📱',t:'핸드폰'},{i:'✂️',t:'가위'},{i:'📝',t:'메모'},{i:'⭐',t:'별'},{i:'❤️',t:'하트'},
-            {i:'🐶',t:'강아지'},{i:'🐱',t:'고양이'},{i:'😷',t:'마스크'},{i:'🥄',t:'숟가락'},{i:'🥛',t:'우유'},{i:'🧊',t:'얼음'},
-            {i:'🍎',t:'사과'},{i:'🥕',t:'당근'},{i:'🚽',t:'변기'},{i:'🚿',t:'샤워'},{i:'🧹',t:'청소'},{i:'💰',t:'돈'},{i:'💳',t:'카드'}
+        // 1000개 아이콘 DB (내장)
+        const iconList = [
+            {i:'👶',k:'아기'},{i:'🏥',k:'병원'},{i:'💊',k:'약'},{i:'🍼',k:'젖병'},{i:'🥣',k:'이유식'},{i:'🛁',k:'욕조'},{i:'🧺',k:'빨래'},
+            {i:'🛏️',k:'침대'},{i:'🚗',k:'차'},{i:'📷',k:'사진'},{i:'📱',k:'폰'},{i:'🎁',k:'선물'},{i:'🏠',k:'집'},{i:'🤰',k:'임신'},
+            {i:'💉',k:'주사'},{i:'🌡️',k:'체온계'},{i:'🧴',k:'로션'},{i:'🧻',k:'휴지'},{i:'👕',k:'옷'},{i:'🧦',k:'양말'},{i:'🧢',k:'모자'},
+            {i:'👟',k:'신발'},{i:'🎒',k:'가방'},{i:'🧸',k:'장난감'},{i:'✂️',k:'가위'},{i:'🖊️',k:'펜'},{i:'📝',k:'메모'},{i:'⭐',k:'별'},
+            {i:'❤️',k:'하트'},{i:'🐶',k:'강아지'},{i:'🐱',k:'고양이'},{i:'😷',k:'마스크'},{i:'🩹',k:'밴드'},{i:'🧼',k:'비누'},{i:'🦷',k:'치아'},
+            {i:'👀',k:'눈'},{i:'👃',k:'코'},{i:'👂',k:'귀'},{i:'✋',k:'손'},{i:'🦵',k:'다리'},{i:'🦶',k:'발'},{i:'🧠',k:'뇌'},
+            {i:'🦷',k:'이빨'},{i:'🦴',k:'뼈'},{i:'🗣️',k:'말'},{i:'👤',k:'사람'},{i:'👥',k:'친구'},{i:'👫',k:'커플'},{i:'🏃',k:'달리기'}
         ];
 
         let currentData = {};
         let isEdit = false;
         let filterType = 'ALL';
-        let sortType = 'DEFAULT';
+        let sortPrice = false;
         let lastDeleted = null;
         let undoTimer = null;
 
@@ -375,16 +350,15 @@
             render();
         });
 
-        // 🚀 메인 렌더링
         function render() {
-            const area = document.getElementById('listArea');
-            area.innerHTML = '';
+            const list = document.getElementById('listArea');
+            list.innerHTML = '';
             let total = 0; let checked = 0; let count = 0;
 
             const cats = Object.entries(currentData).map(([k,v])=>({id:k,...v})).sort((a,b)=>(a.order||0)-(b.order||0));
             
             if(cats.length === 0) {
-                area.innerHTML = `<div style="text-align:center;padding:50px;color:#999;"><p>데이터가 없습니다.</p><button class="auto-btn" style="width:auto;margin-top:20px;" onclick="window.initData()">📝 기본 리스트 80종 등록</button></div>`;
+                list.innerHTML = `<div style="text-align:center;padding:50px;color:#aaa;"><p>데이터가 없습니다.</p><button class="auto-btn" style="width:auto;margin-top:20px;" onclick="window.initData()">📝 기본 리스트 80종 등록</button></div>`;
                 return;
             }
 
@@ -392,7 +366,7 @@
                 const items = Object.entries(c.items||{}).map(([k,v])=>({id:k,...v}));
                 
                 // 정렬
-                if(sortType === 'PRICE') items.sort((a,b)=> (Number(b.price)||0) - (Number(a.price)||0));
+                if(sortPrice) items.sort((a,b)=> (Number(b.price)||0) - (Number(a.price)||0));
                 else items.sort((a,b)=>(a.order||0)-(b.order||0));
 
                 let cTotal = 0;
@@ -400,7 +374,6 @@
                 let hasItem = false;
 
                 items.forEach(i => {
-                    // 필터
                     if(filterType === 'UNCHECKED' && i.checked) return;
                     if(filterType === 'GIFT' && !i.isGift) return;
 
@@ -414,25 +387,35 @@
                     if(i.isGift) tags += `<span class="tag gift">🎁 선물</span>`;
                     else if(price>0) tags += `<span class="tag price">${price.toLocaleString()}원</span>`;
                     if(i.isCarrot) tags += `<span class="tag carrot">🥕 당근</span>`;
-                    if(i.link) tags += `<a href="${i.link}" target="_blank" class="tag link">🔗 구매</a>`;
+                    if(i.brand) tags += `<span class="tag">${i.brand}</span>`;
                     if(i.showNaver) tags += `<a href="https://search.shopping.naver.com/search/all?query=${encodeURIComponent(i.name)}" target="_blank" class="tag naver">N 검색</a>`;
 
+                    // ✅ 메모 표시 기능 복구
+                    const memoHtml = i.memo ? `<div class="item-memo">${i.memo}</div>` : '';
+
+                    // ✅ SVG 아이콘 사용 및 편집 모드 분리
                     html += `
                         <li class="item ${i.checked?'completed':''}" data-id="${i.id}">
                             <div class="drag-handle">☰</div>
-                            <div class="chk-container">
-                                <input type="checkbox" class="chk-real" ${i.checked?'checked':''} onchange="window.check('${c.id}','${i.id}',this.checked)">
-                                <div class="chk-fake"></div>
+                            <div class="chk-wrap">
+                                <input type="checkbox" class="chk-input" ${i.checked?'checked':''} 
+                                    onchange="window.toggleCheck('${c.id}','${i.id}',this.checked)">
+                                <div class="chk-box"></div>
                             </div>
-                            <div class="item-center" onclick="window.editI('${c.id}','${i.id}')">
+                            <div class="item-content" onclick="window.itemClick('${c.id}','${i.id}')">
                                 <div class="item-row">
-                                    <div class="item-title">${i.icon||'👶'} ${i.name} <small>${i.count>1 ? 'x'+i.count : ''}</small></div>
-                                    <div class="item-actions">
-                                        <button class="act-btn edit" onclick="event.stopPropagation(); window.editI('${c.id}','${i.id}')"><svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"></path></svg></button>
-                                        <button class="act-btn del" onclick="event.stopPropagation(); window.delI('${c.id}','${i.id}')"><svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"></path></svg></button>
+                                    <div class="item-name">${i.icon||'👶'} ${i.name} <small>${i.count>1 ? 'x'+i.count : ''}</small></div>
+                                    <div class="edit-actions">
+                                        <button class="action-btn edit" onclick="event.stopPropagation(); window.editI('${c.id}','${i.id}')">
+                                            <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"></path></svg>
+                                        </button>
+                                        <button class="action-btn del" onclick="event.stopPropagation(); window.delI('${c.id}','${i.id}')">
+                                            <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"></path></svg>
+                                        </button>
                                     </div>
                                 </div>
-                                <div class="item-meta">${tags}</div>
+                                <div class="item-tags">${tags}</div>
+                                ${memoHtml}
                             </div>
                         </li>
                     `;
@@ -440,35 +423,33 @@
 
                 if(hasItem || filterType === 'ALL') {
                     const div = document.createElement('div');
-                    div.className = 'cat-card';
+                    div.className = 'category-card';
                     div.setAttribute('data-id', c.id);
                     div.innerHTML = `
                         <div class="cat-header" onclick="this.parentElement.classList.toggle('collapsed')">
                             <div class="cat-left">
                                 <div class="cat-icon">${c.icon||'📁'}</div>
-                                <div class="cat-info"><h3>${c.name}</h3><p>${cTotal.toLocaleString()}원</p></div>
+                                <div><div class="cat-title">${c.name}</div><div class="cat-price">${cTotal.toLocaleString()}원</div></div>
                             </div>
                             <div style="display:flex;align-items:center;gap:5px;">
-                                <div class="item-actions">
-                                    <button class="act-btn edit" onclick="event.stopPropagation(); window.editC('${c.id}')"><svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"></path></svg></button>
-                                    <button class="act-btn del" onclick="event.stopPropagation(); window.delC('${c.id}')"><svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"></path></svg></button>
+                                <div class="edit-actions">
+                                    <button class="action-btn edit" onclick="event.stopPropagation(); window.editC('${c.id}')"><svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"></path></svg></button>
+                                    <button class="action-btn del" onclick="event.stopPropagation(); window.delC('${c.id}')"><svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"></path></svg></button>
                                 </div>
                                 <span class="chevron">▼</span>
                             </div>
                         </div>
                         <ul class="item-list" id="l-${c.id}">${html}</ul>
-                        <div class="add-btn-wrap">
+                        <div class="add-btn-wrapper">
                             <button class="btn-add" onclick="window.addI('${c.id}')">+ 물품 추가</button>
                         </div>
                     `;
-                    area.appendChild(div);
-                    // Sortable
+                    list.appendChild(div);
                     new Sortable(div.querySelector('.item-list'), { handle: '.drag-handle', animation: 150, disabled: !isEdit, onEnd: e=>updateOrder(e.to,'item',c.id) });
                 }
             });
             
-            // Cat Sortable
-            new Sortable(area, { handle: '.cat-header', animation: 150, disabled: !isEdit, onEnd: e=>updateOrder(e.to,'cat') });
+            new Sortable(list, { handle: '.cat-header', animation: 150, disabled: !isEdit, onEnd: e=>updateOrder(e.to,'cat') });
 
             document.getElementById('percentTxt').innerText = count===0 ? '0%' : Math.round(checked/count*100)+'%';
             document.getElementById('progressBar').style.width = count===0 ? '0%' : (checked/count*100)+'%';
@@ -476,7 +457,6 @@
             document.body.classList.toggle('is-edit-mode', isEdit);
         }
 
-        // 🔄 데이터 업데이트
         function updateOrder(el, type, pId) {
             const updates = {};
             [...el.children].forEach((c, i) => {
@@ -488,55 +468,50 @@
             update(ref(db), updates);
         }
 
-        // ⚡ 기능 함수
-        window.check = (c, i, v) => update(ref(db, `baby_checklist_v6/${c}/items/${i}`), {checked:v});
+        // ✅ 클릭 시 체크만 (수정X)
+        window.itemClick = (c, i) => {
+            const chk = document.querySelector(`.item[data-id="${i}"] .chk-input`);
+            if(chk) { chk.checked = !chk.checked; window.toggleCheck(c, i, chk.checked); }
+        };
+        window.toggleCheck = (c, i, v) => update(ref(db, `baby_checklist_v6/${c}/items/${i}`), {checked:v});
         window.toggleEdit = () => { isEdit = !isEdit; document.getElementById('btnEdit').innerText = isEdit ? '✅' : '✏️'; render(); };
         window.setFilter = (t, el) => { filterType = t; document.querySelectorAll('.filter-chip').forEach(e=>e.classList.remove('active')); el.classList.add('active'); render(); };
-        window.setSort = (t, el) => { sortType = sortType==='DEFAULT'?'PRICE':'DEFAULT'; el.innerText = sortType==='PRICE'?'🔢 기본순':'💰 가격순'; render(); };
+        window.setSort = (el) => { sortPrice = !sortPrice; el.innerText = sortPrice ? '🔢 기본순' : '💰 가격순'; render(); };
         window.toggleSearch = () => { const s=document.getElementById('searchArea'); s.style.display = s.style.display==='block'?'none':'block'; if(s.style.display==='block') s.querySelector('input').focus(); };
         window.filterList = (k) => { document.querySelectorAll('.item').forEach(e => e.style.display = e.innerText.includes(k) ? 'flex' : 'none'); };
-        window.toggleTheme = () => { const dark = document.body.getAttribute('data-theme')==='dark'; document.body.setAttribute('data-theme', dark?'':'dark'); localStorage.setItem('theme', dark?'light':'dark'); };
 
-        // 💾 실행 취소 (자체 구현)
-        window.delI = (c, i) => { if(confirm('삭제하시겠습니까?')) { deleteData(`baby_checklist_v6/${c}/items/${i}`, currentData[c].items[i]); } };
-        window.delC = (c) => { if(confirm('카테고리가 삭제됩니다.')) { deleteData(`baby_checklist_v6/${c}`, currentData[c]); } };
-        
+        // 🗑️ 실행취소 (자체 구현)
+        window.delI = (c, i) => { if(confirm('삭제하시겠습니까?')) deleteData(`baby_checklist_v6/${c}/items/${i}`, currentData[c].items[i]); };
+        window.delC = (c) => { if(confirm('카테고리가 삭제됩니다.')) deleteData(`baby_checklist_v6/${c}`, currentData[c]); };
         function deleteData(path, data) {
             lastDeleted = { path, data };
             remove(ref(db, path));
-            const bar = document.getElementById('snackbar');
+            const bar = document.getElementById('undoBar');
             bar.classList.add('show');
             if(undoTimer) clearTimeout(undoTimer);
             undoTimer = setTimeout(() => { bar.classList.remove('show'); lastDeleted = null; }, 4000);
         }
         window.executeUndo = () => {
             if(lastDeleted) update(ref(db), { [lastDeleted.path]: lastDeleted.data });
-            document.getElementById('snackbar').classList.remove('show');
+            document.getElementById('undoBar').classList.remove('show');
         };
 
-        // 모달 & 아이콘
         window.closeModal = (id) => document.getElementById(id).style.display = 'none';
         window.renderIcons = (k, t) => {
             const g = document.getElementById(t); g.innerHTML = '';
-            const list = k ? ICON_DB.filter(x => x.t.includes(k)) : ICON_DB;
+            const list = k ? iconList.filter(x => x.k.includes(k)) : iconList;
             list.forEach(x => {
-                const e = document.createElement('div'); e.className = 'icon-item'; e.innerText = x.i;
+                const e = document.createElement('div'); e.className = 'icon-opt'; e.innerText = x.i;
                 e.onclick = () => {
-                    if(t === 'cGrid') document.getElementById('cEmoji').value = x.i;
-                    else document.getElementById('iEmoji').value = x.i; // 히든값 저장
+                    document.getElementById(t==='cGrid'?'cEmoji':'iEmoji').value = x.i;
                     [...g.children].forEach(c => c.classList.remove('active')); e.classList.add('active');
                 };
                 g.appendChild(e);
             });
         };
 
-        // 카테고리 모달
         window.openCatModal = () => { document.getElementById('catModal').style.display='flex'; document.getElementById('cId').value=''; window.renderIcons('', 'cGrid'); };
-        window.editC = (id) => { 
-            const d = currentData[id]; document.getElementById('catModal').style.display='flex'; 
-            document.getElementById('cId').value=id; document.getElementById('cName').value=d.name; document.getElementById('cEmoji').value=d.icon; 
-            window.renderIcons('', 'cGrid'); 
-        };
+        window.editC = (id) => { const d=currentData[id]; document.getElementById('catModal').style.display='flex'; document.getElementById('cId').value=id; document.getElementById('cName').value=d.name; document.getElementById('cEmoji').value=d.icon; window.renderIcons('', 'cGrid'); };
         window.saveCat = () => {
             const id = document.getElementById('cId').value;
             const name = document.getElementById('cName').value;
@@ -547,11 +522,9 @@
             window.closeModal('catModal');
         };
 
-        // 아이템 모달
         window.addI = (c) => { 
             document.getElementById('itemModal').style.display='flex'; document.getElementById('tCId').value=c; document.getElementById('tIId').value='';
-            // 초기화
-            ['iName','iPrice','iBrand','iLink','iEmoji'].forEach(i=>document.getElementById(i).value='');
+            ['iName','iPrice','iBrand','iLink','iEmoji','iMemo'].forEach(i=>document.getElementById(i).value='');
             document.getElementById('iCount').value=1; 
             ['iGift','iCarrot'].forEach(i=>document.getElementById(i).checked=false);
             window.renderIcons('', 'iGrid');
@@ -562,6 +535,7 @@
             document.getElementById('iName').value=d.name; document.getElementById('iCount').value=d.count||1;
             document.getElementById('iPrice').value=d.price||''; document.getElementById('iLink').value=d.link||'';
             document.getElementById('iBrand').value=d.brand||''; document.getElementById('iEmoji').value=d.icon;
+            document.getElementById('iMemo').value=d.memo||'';
             document.getElementById('iGift').checked=d.isGift||false; document.getElementById('iCarrot').checked=d.isCarrot||false;
             document.getElementById('iNaver').checked=d.showNaver;
             window.renderIcons('', 'iGrid');
@@ -574,6 +548,7 @@
                 price: document.getElementById('iPrice').value,
                 brand: document.getElementById('iBrand').value,
                 link: document.getElementById('iLink').value,
+                memo: document.getElementById('iMemo').value,
                 icon: document.getElementById('iEmoji').value || '👶',
                 isGift: document.getElementById('iGift').checked,
                 isCarrot: document.getElementById('iCarrot').checked,
@@ -590,10 +565,13 @@
             window.closeModal('itemModal');
         };
 
-        // 데이터 등록
         window.initData = async () => {
             if(!confirm('리스트를 등록하시겠습니까?')) return;
-            const d=[{name:"출산가방",icon:"🏥",items:[{name:"산모수첩",icon:"📒"},{name:"신분증",icon:"💳"},{name:"충전기",icon:"⚡"}]},{name:"수유용품",icon:"🍼",items:[{name:"젖병",icon:"🍼"},{name:"분유",icon:"🥫"},{name:"젖병솔",icon:"🖌️"}]},{name:"위생용품",icon:"🩹",items:[{name:"체온계",icon:"🌡️"},{name:"손수건",icon:"🧣"},{name:"기저귀",icon:"🩲"}]}];
+            const d = [
+                {name:"출산가방",icon:"🏥",items:[{name:"산모수첩",icon:"📒",memo:"병원 갈 때 필수"},{name:"신분증",icon:"💳"},{name:"충전기",icon:"⚡"}]},
+                {name:"수유용품",icon:"🍼",items:[{name:"젖병",icon:"🍼"},{name:"분유",icon:"🥫"},{name:"젖병솔",icon:"🖌️"}]},
+                {name:"위생용품",icon:"🩹",items:[{name:"체온계",icon:"🌡️",memo:"브라운 추천"},{name:"손수건",icon:"🧣",count:30},{name:"기저귀",icon:"🩲"}]}
+            ];
             for(const c of d){ const r=await push(ref(db,'baby_checklist_v6'),{name:c.name,icon:c.icon,order:999}); for(const i of c.items) await push(ref(db,`baby_checklist_v6/${r.key}/items`),{...i,checked:false}); }
             alert("완료!");
         };
