@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>👶 우리 아기 맞이 준비물 (V24)</title>
+    <title>👶 우리 아기 맞이 준비물 (V25)</title>
     <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -12,7 +12,6 @@
     
     <style>
         :root {
-            /* V20 오리지널 컬러 복구 */
             --main-color: #FF878D;
             --sub-color: #FFF0F5;
             --bg-color: #F7F8FA;
@@ -34,20 +33,25 @@
             --sub-color: #2C2C2C;
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Pretendard', sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 0; padding-bottom: 100px;}
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
+        body { font-family: 'Pretendard', sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 0; padding-bottom: 100px; transition: background-color 0.3s; }
         .container { max-width: 600px; margin: 0 auto; }
 
-        /* 헤더 (V20 스타일 복구) */
-        .header { background: linear-gradient(135deg, var(--main-color), #ff9a9e); padding: 20px 20px 25px; color: white; border-radius: 0 0 25px 25px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
+        /* 헤더 */
+        .header { background: linear-gradient(135deg, var(--main-color), #ff9a9e); padding: 20px 20px 25px; color: white; border-radius: 0 0 25px 25px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); position: sticky; top: 0; z-index: 100; }
         .header-top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .header h2 { margin: 0; font-size: 20px; font-weight: 800; }
         
         .header-actions { display: flex; align-items: center; gap: 8px; }
-        .icon-btn { background: rgba(255,255,255,0.25); border: none; color: white; width: 34px; height: 34px; border-radius: 50%; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+        .icon-btn { 
+            background: rgba(255,255,255,0.25); border: none; color: white; width: 34px; height: 34px; 
+            border-radius: 50%; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; 
+            backdrop-filter: blur(4px); transition: transform 0.1s; /* 애니메이션 추가 */
+        }
+        .icon-btn:active { transform: scale(0.9); background: rgba(255,255,255,0.4); } /* 누름 효과 */
         
         .filter-sort-bar { display: flex; gap: 10px; margin-top: 15px; overflow-x: auto; padding-bottom: 5px; }
-        .filter-select { background: rgba(255,255,255,0.9); border: none; padding: 6px 10px; border-radius: 15px; font-size: 12px; font-weight: bold; color: var(--main-color); outline: none; }
+        .filter-select { background: rgba(255,255,255,0.9); border: none; padding: 6px 10px; border-radius: 15px; font-size: 12px; font-weight: bold; color: var(--main-color); outline: none; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
 
         .global-search-box { display: none; background: var(--card-bg); padding: 10px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-top:10px; }
         .global-search-input { width: 100%; border: 1px solid var(--border-color); padding: 10px; border-radius: 8px; font-size: 14px; outline: none; background: var(--bg-color); color: var(--text-color); }
@@ -60,10 +64,19 @@
         .total-info { font-size: 12px; font-weight: 600; text-align: right; color: white; }
 
         /* 카테고리 카드 */
-        .category-card { background: var(--card-bg); margin: 20px; border-radius: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); overflow: hidden; }
+        .category-card { 
+            background: var(--card-bg); margin: 20px; border-radius: 16px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05); overflow: hidden; 
+            transition: transform 0.1s; /* 애니메이션 */
+        }
         .category-card.collapsed .item-list, .category-card.collapsed .btn-add-item { display: none; }
         
-        .cat-header { padding: 15px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+        .cat-header { 
+            padding: 15px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; cursor: pointer; 
+            transition: background-color 0.1s;
+        }
+        .cat-header:active { background-color: var(--bg-color); } /* 누름 효과 */
+
         .cat-left { display: flex; align-items: center; gap: 10px; }
         .cat-icon { font-size: 18px; background: var(--sub-color); width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
         .cat-title { font-size: 16px; font-weight: 700; }
@@ -72,7 +85,11 @@
         .category-card.collapsed .chevron { transform: rotate(-90deg); }
 
         .item-list { list-style: none; padding: 0; margin: 0; }
-        .item { padding: 15px 20px; border-bottom: 1px solid var(--border-color); background: var(--card-bg); }
+        .item { 
+            padding: 15px 20px; border-bottom: 1px solid var(--border-color); background: var(--card-bg); 
+            transition: transform 0.1s, background-color 0.1s; /* 애니메이션 */
+        }
+        .item:active { transform: scale(0.98); background-color: #fafafa; } /* ✨ 항목 누름 효과 복구 */
         .item.hidden { display: none; }
         
         .item-top { display: flex; align-items: flex-start; }
@@ -101,26 +118,40 @@
         .item.completed .item-name { text-decoration: line-through; color: #aaa; }
         .item.completed .item-icon { opacity: 0.5; }
 
-        /* ✅ 수정된 SVG 액션 버튼 (촌스러운 이모지 대체) */
+        /* SVG 아이콘 버튼 (세련된 스타일) */
         .item-actions { display: none; gap: 8px; margin-left: 10px; }
         body.is-edit-mode .item-actions { display: flex; }
         .action-btn { 
-            width: 28px; height: 28px; border-radius: 6px; border: none; 
+            width: 30px; height: 30px; border-radius: 8px; border: none; 
             background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center;
             transition: background 0.2s;
         }
-        .action-btn:hover { background: var(--border-color); }
-        .action-btn svg { width: 16px; height: 16px; stroke: #888; stroke-width: 2; fill: none; }
+        .action-btn:active { transform: scale(0.9); background: var(--border-color); }
+        .action-btn svg { width: 18px; height: 18px; stroke: #888; stroke-width: 2; fill: none; }
         .action-btn.del:hover svg { stroke: #FF5252; }
         .action-btn.edit:hover svg { stroke: var(--main-color); }
 
-        .btn-add-item { width: calc(100% - 30px); margin: 15px auto 5px; padding: 12px; background: var(--sub-color); color: var(--main-color); border: none; border-radius: 12px; font-weight: 800; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; transition: all 0.2s; }
-        .btn-add-item:active { transform: scale(0.98); background: #ffe0e6; }
-        .fab-btn { position: fixed; bottom: 30px; right: 25px; background: var(--main-color); color: white; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); border: none; cursor: pointer; z-index: 99; }
+        .btn-add-item { 
+            width: calc(100% - 30px); margin: 15px auto 5px; padding: 12px; 
+            background: var(--sub-color); color: var(--main-color); 
+            border: none; border-radius: 12px; font-weight: 800; font-size: 14px; 
+            cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; 
+            transition: all 0.2s; /* 버튼 애니메이션 */
+        }
+        .btn-add-item:active { transform: scale(0.95); background: #ffe0e6; } /* 버튼 누름 효과 */
+        
+        .fab-btn { 
+            position: fixed; bottom: 30px; right: 25px; 
+            background: var(--main-color); color: white; width: 55px; height: 55px; border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; font-size: 28px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3); border: none; cursor: pointer; z-index: 99; 
+            transition: transform 0.2s;
+        }
+        .fab-btn:active { transform: scale(0.9); }
 
         /* 모달 스타일 */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 200; align-items: center; justify-content: center; }
-        .modal { background: var(--card-bg); width: 90%; max-width: 400px; padding: 25px; border-radius: 20px; max-height: 90vh; overflow-y: auto; color: var(--text-color); }
+        .modal { background: var(--card-bg); width: 90%; max-width: 400px; padding: 25px; border-radius: 20px; max-height: 90vh; overflow-y: auto; color: var(--text-color); box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
         .input-group { margin-bottom: 12px; }
         .input-label { display: block; font-size: 12px; color: var(--text-sub); margin-bottom: 5px; }
         .input-field { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 10px; font-size: 15px; outline: none; background: var(--bg-color); color: var(--text-color); }
@@ -135,16 +166,18 @@
         .option-chk { width: 18px; height: 18px; margin-right: 8px; accent-color: var(--main-color); }
 
         .theme-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-        .theme-circle { width: 40px; height: 40px; border-radius: 50%; cursor: pointer; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .theme-circle { width: 40px; height: 40px; border-radius: 50%; cursor: pointer; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.2); transition: transform 0.1s; }
+        .theme-circle:active { transform: scale(0.9); }
 
-        /* ✅ 아이콘 검색 및 그리드 복구 */
         .icon-search-box { position: sticky; top: 0; background: var(--card-bg); padding-bottom: 10px; z-index: 10; }
         .icon-grid { height: 150px; overflow-y: scroll; border: 1px solid var(--border-color); border-radius: 10px; padding: 10px; display: grid; grid-template-columns: repeat(6, 1fr); gap: 5px; margin-bottom: 10px; }
-        .icon-opt { font-size: 22px; text-align: center; padding: 8px; border-radius: 8px; cursor: pointer; }
+        .icon-opt { font-size: 22px; text-align: center; padding: 8px; border-radius: 8px; cursor: pointer; transition: background 0.1s; }
+        .icon-opt:active { transform: scale(0.9); background: #eee; }
         .icon-opt.selected { background: var(--sub-color); border: 1px solid var(--main-color); }
 
         .btn-row { display: flex; gap: 10px; margin-top: 20px; }
-        .btn { flex: 1; padding: 14px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
+        .btn { flex: 1; padding: 14px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; transition: opacity 0.2s; }
+        .btn:active { opacity: 0.8; }
         .btn-cancel { background: var(--border-color); color: var(--text-sub); }
         .btn-confirm { background: var(--main-color); color: white; }
 
@@ -154,6 +187,7 @@
         body.is-edit-mode .chk-wrap { display: none; }
         
         .auto-fill-btn { display: block; width: 90%; margin: 20px auto; padding: 15px; background: #6c5ce7; color: white; border: none; border-radius: 12px; font-weight: bold; font-size: 16px; cursor: pointer; }
+        .auto-fill-btn:active { transform: scale(0.98); }
     </style>
 </head>
 <body>
@@ -210,7 +244,7 @@
         <div class="modal">
             <h3 id="catModalTitle">📂 카테고리 설정</h3>
             <input type="hidden" id="editCatId">
-            <div class="input-label">아이콘</div>
+            <div class="input-label">아이콘 (직접 입력 가능)</div>
             <div style="display:flex; gap:10px; margin-bottom:10px;">
                 <input type="text" id="catCustomIcon" class="input-field" style="width:60px; text-align:center;" placeholder="😊" maxlength="2">
                 <input type="text" class="input-field" placeholder="🔍 아이콘 검색 (예: 병원)" onkeyup="filterIcons(this.value, 'catIconGrid')">
@@ -308,6 +342,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
         import { getDatabase, ref, onValue, push, update, remove } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
 
+        // 🔴🔴 본인 키값 교체 🔴🔴
         const firebaseConfig = {
             apiKey: "AIzaSyCovHk7sYoMTkZ8H5RwKjUWMXAqi50l2L-k",
             authDomain: "checklist-3c59d.firebaseapp.com",
@@ -322,7 +357,7 @@
         const db = getDatabase(app);
         const dbRef = ref(db, 'baby_checklist_v6'); 
 
-        // ✅ 방대한 아이콘 DB 복구 (검색 완벽 지원)
+        // ✅ 방대한 아이콘 데이터베이스 (복구 완료)
         const iconDB = [
             {i:'👶',t:'아기 베이비'},{i:'👧',t:'딸 여자'},{i:'🧒',t:'어린이'},{i:'👦',t:'아들 남자'},{i:'🤰',t:'임산부 엄마'},{i:'🤱',t:'수유 모유'},{i:'👼',t:'천사'},
             {i:'🏥',t:'병원 소아과'},{i:'🚑',t:'구급차 응급'},{i:'🩺',t:'청진기 의사'},{i:'💊',t:'약 영양제'},{i:'💉',t:'주사 접종'},{i:'🩹',t:'밴드 상처'},{i:'🌡️',t:'체온계 열'},
@@ -418,7 +453,7 @@
                     if(item.link) tags += `<a href="${item.link}" target="_blank" class="link-btn">🔗 구매</a>`;
                     if(item.link2) tags += `<a href="${item.link2}" target="_blank" class="link-btn review">🔗 후기</a>`;
                     
-                    // ✅ 네이버 최저가 버튼 복구
+                    // ✅ 네이버 검색 버튼 복구
                     if(item.showNaver !== false) {
                         const query = [item.brand, item.model, item.name].filter(Boolean).join(' ');
                         tags += `<a href="https://search.shopping.naver.com/search/all?query=${encodeURIComponent(query)}" target="_blank" class="naver-btn">N 검색</a>`;
@@ -426,7 +461,7 @@
 
                     const memoHTML = item.memo ? `<div class="item-memo">${item.memo}</div>` : '';
 
-                    // ✨ 디자인 수정: SVG 아이콘 적용
+                    // ✅ 아이콘 디자인 개선 (SVG)
                     visibleItemsHTML += `
                     <li class="item ${item.checked ? 'completed' : ''}" data-id="${item.id}">
                         <div class="item-top">
@@ -436,7 +471,7 @@
                                 <div class="chk-box"></div>
                             </div>
                             <div class="item-icon">${item.icon || '👶'}</div>
-                            <div class="item-content">
+                            <div class="item-content" onclick="window.openEditItem('${cat.id}', '${item.id}')">
                                 <div class="item-header-row">
                                     <span class="item-name">${item.name}</span>
                                     <span class="star-rating">${starStr}</span>
@@ -446,10 +481,10 @@
                                 ${memoHTML}
                             </div>
                             <div class="item-actions">
-                                <button class="action-btn edit" onclick="window.openEditItem('${cat.id}', '${item.id}')">
+                                <button class="action-btn edit" onclick="event.stopPropagation(); window.openEditItem('${cat.id}', '${item.id}')">
                                     <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"></path></svg>
                                 </button>
-                                <button class="action-btn del" onclick="window.deleteItemWithUndo('${cat.id}', '${item.id}')">
+                                <button class="action-btn del" onclick="event.stopPropagation(); window.deleteItemWithUndo('${cat.id}', '${item.id}')">
                                     <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"></path></svg>
                                 </button>
                             </div>
@@ -473,8 +508,12 @@
                             </div>
                             <div style="display:flex; align-items:center; gap:10px;">
                                 <div class="item-actions">
-                                    <button class="action-btn edit" onclick="event.stopPropagation(); window.openEditCategory('${cat.id}')"><svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"></path></svg></button>
-                                    <button class="action-btn del" onclick="event.stopPropagation(); window.deleteCategory('${cat.id}')"><svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"></path></svg></button>
+                                    <button class="action-btn edit" onclick="event.stopPropagation(); window.openEditCategory('${cat.id}')">
+                                        <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"></path></svg>
+                                    </button>
+                                    <button class="action-btn del" onclick="event.stopPropagation(); window.deleteCategory('${cat.id}')">
+                                        <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"></path></svg>
+                                    </button>
                                 </div>
                                 <span class="chevron">▼</span>
                             </div>
@@ -513,7 +552,7 @@
             window.closeModal('themeModal');
         };
 
-        // ✅ 실행 취소 기능 복구
+        // ✅ 실행 취소 (Toastify)
         window.deleteItemWithUndo = (catId, itemId) => {
             const itemData = currentData[catId].items[itemId];
             if(confirm('삭제하시겠습니까?')) {
@@ -525,6 +564,19 @@
                     gravity: "bottom",
                     position: "center",
                     style: { background: "#333", color: "#fff", borderRadius: "8px", fontWeight: "bold" },
+                    onClick: function(){ if(lastDeleted) { update(ref(db), { [lastDeleted.path]: lastDeleted.data }); lastDeleted = null; } }
+                }).showToast();
+            }
+        };
+        window.deleteCategory = (id) => {
+            if(confirm('카테고리와 내부 아이템이 모두 삭제됩니다.')) {
+                lastDeleted = { path: `baby_checklist_v6/${id}`, data: currentData[id] };
+                remove(ref(db, lastDeleted.path));
+                Toastify({
+                    text: "🗑️ 카테고리가 삭제되었습니다. (클릭하여 복구)",
+                    duration: 4000,
+                    gravity: "bottom", position: "center",
+                    style: { background: "#d63031", color: "#fff", borderRadius: "8px" },
                     onClick: function(){ if(lastDeleted) { update(ref(db), { [lastDeleted.path]: lastDeleted.data }); lastDeleted = null; } }
                 }).showToast();
             }
@@ -621,7 +673,6 @@
         };
 
         window.toggleCheck=(c,i,v)=>update(ref(db,`baby_checklist_v6/${c}/items/${i}`),{checked:v});
-        window.deleteCategory=(id)=>{if(confirm('삭제?'))remove(ref(db,`baby_checklist_v6/${id}`));};
         window.closeModal=(id)=>document.getElementById(id).style.display='none';
         
         window.openEditCategory=(id)=>{const c=currentData[id];if(!c)return;document.getElementById('catModal').style.display='flex';document.getElementById('editCatId').value=id;document.getElementById('catName').value=c.name;document.getElementById('catCustomIcon').value='';selectedIcon=c.icon||'👶';renderIcons(iconDB,'catIconGrid');};
@@ -636,7 +687,6 @@
         
         window.openCatModal = () => { document.getElementById('catModal').style.display = 'flex'; document.getElementById('catModalTitle').innerText = '📂 카테고리 추가'; document.getElementById('editCatId').value = ''; document.getElementById('catName').value = ''; document.getElementById('catCustomIcon').value = ''; selectedIcon = '👶'; renderIcons(iconDB, 'catIconGrid'); };
 
-        // ✅ 확실하게 복구된 아이콘 검색 로직
         window.filterIcons=(k,t)=>{const g=document.getElementById(t);g.innerHTML='';iconDB.filter(i=>!k||i.t.includes(k)).forEach(i=>{const e=document.createElement('div');e.className='icon-opt';e.innerText=i.i;e.onclick=()=>{Array.from(g.children).forEach(c=>c.classList.remove('selected'));e.classList.add('selected');selectedIcon=i.i;};g.appendChild(e);});};
         function renderIcons(l,t){window.filterIcons('',t);}
 
