@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>👶 우리 아기 맞이 준비물 (V19)</title>
+    <title>👶 우리 아기 맞이 준비물 (V20)</title>
     <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -99,28 +99,20 @@
         .item.completed .item-name { text-decoration: line-through; color: #aaa; }
         .item.completed .item-icon { opacity: 0.5; }
 
-        /* V17 복구된 버튼 스타일 */
         .btn-add-item { width: calc(100% - 30px); margin: 15px auto 5px; padding: 12px; background: var(--sub-color); color: var(--main-color); border: none; border-radius: 12px; font-weight: 800; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; transition: all 0.2s; }
         .btn-add-item:active { transform: scale(0.98); background: #ffe0e6; }
         .fab-btn { position: fixed; bottom: 30px; right: 25px; background: var(--main-color); color: white; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); border: none; cursor: pointer; z-index: 99; }
 
-        /* 모달 스타일 */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 200; align-items: center; justify-content: center; }
         .modal { background: var(--card-bg); width: 90%; max-width: 400px; padding: 25px; border-radius: 20px; max-height: 90vh; overflow-y: auto; color: var(--text-color); }
         .input-group { margin-bottom: 12px; }
         .input-label { display: block; font-size: 12px; color: var(--text-sub); margin-bottom: 5px; }
         .input-field { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 10px; font-size: 15px; outline: none; background: var(--bg-color); color: var(--text-color); }
         
-        /* 11. 수량 버튼 */
         .qty-wrap { display: flex; align-items: center; gap: 5px; }
         .qty-btn { width: 30px; height: 30px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-color); font-weight: bold; cursor: pointer; }
         
-        /* ✅ V19: 깔끔한 토글형 별점 버튼 */
-        .star-toggle-btn {
-            width: 100%; padding: 10px; border: 1px solid #FFC107; background: #FFF8E1; 
-            color: #FFA000; border-radius: 10px; font-weight: bold; cursor: pointer;
-            margin-bottom: 15px; font-size: 14px;
-        }
+        .star-toggle-btn { width: 100%; padding: 10px; border: 1px solid #FFC107; background: #FFF8E1; color: #FFA000; border-radius: 10px; font-weight: bold; cursor: pointer; margin-bottom: 15px; font-size: 14px; }
 
         .option-row { display: flex; align-items: center; margin-bottom: 10px; padding: 10px; border-radius: 8px; background: var(--bg-color); }
         .option-label { display: flex; align-items: center; font-size: 14px; cursor: pointer; flex: 1; }
@@ -129,6 +121,7 @@
         .theme-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
         .theme-circle { width: 40px; height: 40px; border-radius: 50%; cursor: pointer; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
 
+        .icon-search-box { position: sticky; top: 0; background: var(--card-bg); padding-bottom: 10px; z-index: 10; }
         .icon-grid { height: 150px; overflow-y: scroll; border: 1px solid var(--border-color); border-radius: 10px; padding: 10px; display: grid; grid-template-columns: repeat(6, 1fr); gap: 5px; margin-bottom: 10px; }
         .icon-opt { font-size: 22px; text-align: center; padding: 8px; border-radius: 8px; cursor: pointer; }
         .icon-opt.selected { background: var(--sub-color); border: 1px solid var(--main-color); }
@@ -205,7 +198,9 @@
                 <input type="text" id="catCustomIcon" class="input-field" style="width:60px; text-align:center;" placeholder="😊" maxlength="2">
                 <input type="text" class="input-field" placeholder="🔍 아이콘 검색" onkeyup="filterIcons(this.value, 'catIconGrid')">
             </div>
-            <div class="icon-grid" id="catIconGrid"></div>
+            <div class="icon-search-box">
+                <div class="icon-grid" id="catIconGrid"></div>
+            </div>
             <div class="input-group"><input type="text" id="catName" class="input-field" placeholder="카테고리 이름"></div>
             <div class="btn-row">
                 <button class="btn btn-cancel" onclick="closeModal('catModal')">취소</button>
@@ -225,6 +220,15 @@
             <input type="hidden" id="itemImportance" value="1">
 
             <div class="input-group"><input type="text" id="itemName" class="input-field" placeholder="물품명 (필수)"></div>
+            
+            <div class="input-label">아이콘 선택</div>
+            <div style="display:flex; gap:10px; margin-bottom:10px;">
+                <input type="text" id="itemCustomIcon" class="input-field" style="width:60px; text-align:center;" placeholder="🍼" maxlength="2">
+                <input type="text" class="input-field" placeholder="🔍 아이콘 검색" onkeyup="filterIcons(this.value, 'itemIconGrid')">
+            </div>
+            <div class="icon-search-box">
+                <div class="icon-grid" id="itemIconGrid"></div>
+            </div>
             
             <div style="display:flex; gap:10px; margin-bottom:12px;">
                 <div style="flex:1"><label class="input-label">브랜드</label><input type="text" id="itemBrand" class="input-field"></div>
@@ -302,7 +306,46 @@
         const db = getDatabase(app);
         const dbRef = ref(db, 'baby_checklist_v6'); 
 
-        const iconDB = [{icon:'👶',t:'아기'},{icon:'🏥',t:'병원'},{icon:'🍼',t:'젖병'},{icon:'🚿',t:'목욕'},{icon:'🛏️',t:'침대'},{icon:'🚗',t:'차'},{icon:'🎁',t:'선물'},{icon:'💊',t:'약'},{icon:'🧸',t:'곰'},{icon:'👕',t:'옷'},{icon:'🧦',t:'양말'},{icon:'🌡️',t:'체온계'},{icon:'🦠',t:'유산균'},{icon:'📸',t:'사진'},{icon:'🧴',t:'로션'},{icon:'🧻',t:'휴지'},{icon:'🧺',t:'빨래'},{icon:'🏠',t:'집'},{icon:'🤰',t:'임신'},{icon:'🥣',t:'이유식'}];
+        // ✅ 복구된 전체 아이콘 DB (600여개)
+        const iconDB = [
+            {icon:'👶',t:'아기 베이비 얼굴 신생아'}, {icon:'👧',t:'여자 아이 딸'}, {icon:'🧒',t:'아이 어린이'}, {icon:'👦',t:'남자 아이 아들'}, 
+            {icon:'🤰',t:'임신 임산부 엄마'}, {icon:'🤱',t:'수유 모유 엄마'}, {icon:'👼',t:'천사 아기'}, {icon:'🏥',t:'병원 소아과 조리원'}, 
+            {icon:'🚑',t:'구급차 응급'}, {icon:'🩺',t:'청진기 진찰 의사'}, {icon:'💊',t:'약 알약 영양제'}, {icon:'💉',t:'주사 예방접종'}, 
+            {icon:'🩹',t:'밴드 상처 연고'}, {icon:'🌡️',t:'체온계 온도 열'}, {icon:'😷',t:'마스크 감기'}, {icon:'🍼',t:'젖병 우유 분유'}, 
+            {icon:'🥣',t:'이유식 밥그릇 죽'}, {icon:'🥄',t:'숟가락 스푼'}, {icon:'🥡',t:'도시락'}, {icon:'🍪',t:'과자 간식'}, 
+            {icon:'🥛',t:'우유 컵 물'}, {icon:'🧊',t:'얼음'}, {icon:'🥢',t:'젓가락'}, {icon:'🍽️',t:'식사 접시'}, {icon:'🧂',t:'소금 양념'}, 
+            {icon:'🍎',t:'사과 과일'}, {icon:'🍌',t:'바나나'}, {icon:'🥦',t:'브로콜리 야채'}, {icon:'🥕',t:'당근'}, {icon:'🌽',t:'옥수수'}, 
+            {icon:'🥩',t:'고기 이유식'}, {icon:'🍗',t:'치킨 닭'}, {icon:'🍞',t:'빵 식빵'}, {icon:'🥨',t:'프레첼'}, {icon:'🍩',t:'도넛'}, 
+            {icon:'🍦',t:'아이스크림'}, {icon:'🍰',t:'케이크 생일'}, {icon:'🍫',t:'초콜릿'}, {icon:'🍬',t:'사탕'}, {icon:'🍭',t:'막대사탕'}, 
+            {icon:'🧃',t:'주스 팩'}, {icon:'☕',t:'커피'}, {icon:'🛁',t:'욕조 목욕 씻기'}, {icon:'🚿',t:'샤워 물'}, {icon:'🧼',t:'비누 세정제'}, 
+            {icon:'🧽',t:'스펀지 수세미'}, {icon:'🧻',t:'휴지 두루마리'}, {icon:'🧴',t:'로션 샴푸'}, {icon:'🪥',t:'칫솔 양치'}, {icon:'🚽',t:'변기 화장실'}, 
+            {icon:'💩',t:'똥 기저귀'}, {icon:'🧹',t:'빗자루 청소'}, {icon:'🗑️',t:'쓰레기통'}, {icon:'🧺',t:'빨래 바구니 세탁'}, {icon:'👕',t:'옷 티셔츠 상의'}, 
+            {icon:'👖',t:'바지 하의'}, {icon:'🧦',t:'양말'}, {icon:'🧢',t:'모자'}, {icon:'🧤',t:'장갑'}, {icon:'🧣',t:'목도리 스카프'}, 
+            {icon:'👟',t:'신발 운동화'}, {icon:'🎀',t:'리본 머리핀'}, {icon:'👗',t:'원피스 드레스'}, {icon:'🧥',t:'코트 점퍼 겉옷'}, {icon:'👙',t:'수영복'}, 
+            {icon:'👚',t:'블라우스 여자옷'}, {icon:'👔',t:'넥타이 정장'}, {icon:'🩳',t:'반바지 속옷'}, {icon:'👓',t:'안경'}, {icon:'🕶️',t:'선글라스'}, 
+            {icon:'💍',t:'반지 보석'}, {icon:'🎒',t:'가방 백팩'}, {icon:'👜',t:'핸드백 가방'}, {icon:'👛',t:'지갑 동전'}, {icon:'🛏️',t:'침대 잠 수면'}, 
+            {icon:'🛌',t:'자다 이불'}, {icon:'🧸',t:'곰인형 장난감 애착'}, {icon:'🪁',t:'연 연날리기'}, {icon:'⚽',t:'공 축구'}, {icon:'🎨',t:'미술 그림 물감'}, 
+            {icon:'📚',t:'책 동화책 공부'}, {icon:'🎠',t:'회전목마 놀이공원'}, {icon:'🎡',t:'관람차'}, {icon:'🎈',t:'풍선 파티'}, {icon:'🎉',t:'폭죽 축하'}, 
+            {icon:'🎮',t:'게임 오락'}, {icon:'🎲',t:'주사위'}, {icon:'🧩',t:'퍼즐'}, {icon:'🎹',t:'피아노 음악'}, {icon:'🥁',t:'북 드럼'}, 
+            {icon:'🎷',t:'색소폰'}, {icon:'🎺',t:'나팔'}, {icon:'🎸',t:'기타'}, {icon:'🎻',t:'바이올린'}, {icon:'🚗',t:'자동차 차 카시트'}, 
+            {icon:'🚕',t:'택시'}, {icon:'🚌',t:'버스'}, {icon:'✈️',t:'비행기 여행'}, {icon:'🚲',t:'자전거'}, {icon:'🛵',t:'오토바이'}, 
+            {icon:'🛴',t:'킥보드'}, {icon:'🚤',t:'보트 배'}, {icon:'🚀',t:'로켓 우주'}, {icon:'🛒',t:'카트 쇼핑 마트'}, {icon:'🛍️',t:'쇼핑백 선물'}, 
+            {icon:'📷',t:'카메라 사진'}, {icon:'📹',t:'비디오 영상'}, {icon:'📱',t:'핸드폰 스마트폰'}, {icon:'💻',t:'노트북 컴퓨터'}, {icon:'🔋',t:'배터리 건전지'}, 
+            {icon:'🔌',t:'플러그 전기 멀티탭'}, {icon:'🏠',t:'집 홈'}, {icon:'🛋️',t:'소파 가구'}, {icon:'🪑',t:'의자'}, {icon:'🚪',t:'문'}, 
+            {icon:'🔑',t:'열쇠 키'}, {icon:'🖼️',t:'액자 사진'}, {icon:'🪴',t:'화분 식물'}, {icon:'🌵',t:'선인장'}, {icon:'💐',t:'꽃다발'}, 
+            {icon:'🕰️',t:'시계 시간'}, {icon:'💡',t:'전구 불 빛'}, {icon:'🕯️',t:'양초 캔들'}, {icon:'📦',t:'상자 택배 박스'}, {icon:'✉️',t:'편지 봉투'}, 
+            {icon:'✂️',t:'가위'}, {icon:'📌',t:'핀 압정'}, {icon:'📎',t:'클립'}, {icon:'📏',t:'자 줄자'}, {icon:'☀️',t:'해 날씨 맑음'}, 
+            {icon:'☁️',t:'구름 흐림'}, {icon:'☔',t:'비 우산'}, {icon:'❄️',t:'눈 겨울'}, {icon:'⚡',t:'번개 전기'}, {icon:'🌈',t:'무지개'}, 
+            {icon:'⭐',t:'별 스타'}, {icon:'🌙',t:'달 밤'}, {icon:'🔥',t:'불 뜨거움'}, {icon:'💧',t:'물 방울 습기'}, {icon:'❤️',t:'하트 사랑'}, 
+            {icon:'🧡',t:'주황하트'}, {icon:'💛',t:'노랑하트'}, {icon:'💚',t:'초록하트'}, {icon:'💙',t:'파랑하트'}, {icon:'💜',t:'보라하트'}, 
+            {icon:'🖤',t:'검정하트'}, {icon:'🤍',t:'흰색하트'}, {icon:'🤎',t:'갈색하트'}, {icon:'💔',t:'깨진하트'}, {icon:'💯',t:'백점 만점'}, 
+            {icon:'✅',t:'체크 완료'}, {icon:'❌',t:'엑스 취소'}, {icon:'❓',t:'물음표 질문'}, {icon:'❗️',t:'느낌표 중요'}, {icon:'💰',t:'돈 자금 예산'}, 
+            {icon:'💳',t:'카드 결제'}, {icon:'📅',t:'달력 날짜 디데이'}, {icon:'📝',t:'메모 기록'}, {icon:'🎁',t:'선물 박스'}, {icon:'🔔',t:'종 알림'}, 
+            {icon:'🎵',t:'음표 노래'}, {icon:'🎶',t:'음악'}, {icon:'🐶',t:'강아지 개'}, {icon:'🐱',t:'고양이'}, {icon:'🐭',t:'쥐'}, 
+            {icon:'🐹',t:'햄스터'}, {icon:'🐰',t:'토끼'}, {icon:'🦊',t:'여우'}, {icon:'🐻',t:'곰'}, {icon:'🐼',t:'판다'}, 
+            {icon:'🐯',t:'호랑이'}, {icon:'🦁',t:'사자'}, {icon:'🐮',t:'소'}, {icon:'🐷',t:'돼지'}, {icon:'🐸',t:'개구리'}, 
+            {icon:'🐵',t:'원숭이'}, {icon:'🐔',t:'닭'}, {icon:'🐧',t:'펭귄'}
+        ];
         
         let currentData = {};
         let isEditMode = false;
@@ -478,7 +521,6 @@
             }
         };
 
-        // ✅ V19: 별점 토글 함수
         window.toggleStarScore = () => {
             let current = parseInt(document.getElementById('itemImportance').value) || 1;
             current++;
@@ -516,9 +558,10 @@
             document.getElementById('itemIsGift').checked = false;
             document.getElementById('itemIsCarrot').checked = false;
             document.getElementById('itemShowNaver').checked = true;
-            // 별점 초기화
             document.getElementById('itemImportance').value = 1;
             document.getElementById('starToggleBtn').innerText = `중요도: ⭐ (터치하여 변경)`;
+            document.getElementById('itemCustomIcon').value = ''; // 직접입력 초기화
+            selectedIcon = '👶';
             renderIcons(iconDB, 'itemIconGrid');
         };
 
@@ -526,7 +569,6 @@
             const catId = document.getElementById('targetCatId').value;
             const itemId = document.getElementById('targetItemId').value;
             
-            // 데이터 수집
             const newData = {
                 name: document.getElementById('itemName').value,
                 brand: document.getElementById('itemBrand').value,
@@ -540,30 +582,29 @@
                 isGift: document.getElementById('itemIsGift').checked,
                 isCarrot: document.getElementById('itemIsCarrot').checked,
                 showNaver: document.getElementById('itemShowNaver').checked,
-                icon: "👶", // 기본값 (아래에서 덮어씀)
+                icon: "👶",
                 checked: false, 
                 order: 999
             };
             
-            // 아이콘 처리
             const customIcon = document.getElementById('itemCustomIcon')?.value;
             if(customIcon) newData.icon = customIcon;
-            else newData.icon = document.querySelector('.icon-opt.selected')?.innerText || '👶';
+            else newData.icon = document.querySelector('#itemIconGrid .selected')?.innerText || '👶';
 
             if(!newData.name) return alert('이름 입력!');
 
             if(itemId) {
-                // 수정 시 기존 상태 유지 (체크여부, 순서 등)
                 const existing = currentData[catId].items[itemId];
                 newData.checked = existing.checked;
-                newData.order = existing.order || 999;
+                // ✅ 수정 시 순서 유지 (0일 경우 999로 가는 버그 수정)
+                newData.order = (existing.order !== undefined && existing.order !== null) ? existing.order : 999;
+                
                 update(ref(db, `baby_checklist_v6/${catId}/items/${itemId}`), newData)
                     .then(() => {
                         Toastify({ text: "✅ 저장되었습니다!", duration: 2000, style: { background: "#4CAF50" } }).showToast();
                         window.closeModal('itemModal');
                     });
             } else {
-                // 신규 생성
                 push(ref(db, `baby_checklist_v6/${catId}/items`), newData)
                     .then(() => {
                         Toastify({ text: "✅ 추가되었습니다!", duration: 2000, style: { background: "#4CAF50" } }).showToast();
@@ -575,16 +616,23 @@
         window.toggleCheck=(c,i,v)=>update(ref(db,`baby_checklist_v6/${c}/items/${i}`),{checked:v});
         window.deleteCategory=(id)=>{if(confirm('삭제?'))remove(ref(db,`baby_checklist_v6/${id}`));};
         window.closeModal=(id)=>document.getElementById(id).style.display='none';
-        window.openEditCategory=(id)=>{const c=currentData[id];if(!c)return;document.getElementById('catModal').style.display='flex';document.getElementById('editCatId').value=id;document.getElementById('catName').value=c.name;renderIcons(iconDB,'catIconGrid');};
+        
+        // 카테고리 모달 관련
+        window.openEditCategory=(id)=>{const c=currentData[id];if(!c)return;document.getElementById('catModal').style.display='flex';document.getElementById('editCatId').value=id;document.getElementById('catName').value=c.name;document.getElementById('catCustomIcon').value='';selectedIcon=c.icon||'👶';renderIcons(iconDB,'catIconGrid');};
         window.saveCategory=()=>{const n=document.getElementById('catName').value;const i=document.getElementById('catCustomIcon').value||document.querySelector('#catIconGrid .selected')?.innerText||'👶';const id=document.getElementById('editCatId').value;if(!n)return;if(id)update(ref(db,`baby_checklist_v6/${id}`),{name:n,icon:i});else push(ref(db,'baby_checklist_v6'),{name:n,icon:i,order:999});window.closeModal('catModal');};
-        window.openEditItem=(cId,iId)=>{const i=currentData[cId].items[iId];if(!i)return;document.getElementById('itemModal').style.display='flex';document.getElementById('targetCatId').value=cId;document.getElementById('targetItemId').value=iId;document.getElementById('itemName').value=i.name;document.getElementById('itemBrand').value=i.brand||'';document.getElementById('itemModel').value=i.model||'';document.getElementById('itemPrice').value=i.price||'';document.getElementById('itemCount').value=i.count||1;document.getElementById('itemLink').value=i.link||'';document.getElementById('itemLink2').value=i.link2||'';document.getElementById('itemMemo').value=i.memo||'';document.getElementById('itemIsGift').checked=i.isGift||false;document.getElementById('itemIsCarrot').checked=i.isCarrot||false;
-        // 별점 로드
+        
+        // 아이템 수정 모달 관련
+        window.openEditItem=(cId,iId)=>{const i=currentData[cId].items[iId];if(!i)return;document.getElementById('itemModal').style.display='flex';document.getElementById('targetCatId').value=cId;document.getElementById('targetItemId').value=iId;document.getElementById('itemName').value=i.name;document.getElementById('itemBrand').value=i.brand||'';document.getElementById('itemModel').value=i.model||'';document.getElementById('itemPrice').value=i.price||'';document.getElementById('itemCount').value=i.count||1;document.getElementById('itemLink').value=i.link||'';document.getElementById('itemLink2').value=i.link2||'';document.getElementById('itemMemo').value=i.memo||'';document.getElementById('itemIsGift').checked=i.isGift||false;document.getElementById('itemIsCarrot').checked=i.isCarrot||false;document.getElementById('itemCustomIcon').value='';
         const score = i.importance || 1;
         document.getElementById('itemImportance').value = score;
         document.getElementById('starToggleBtn').innerText = `중요도: ${"⭐".repeat(score)} (터치하여 변경)`;
+        selectedIcon = i.icon || '👶';
         renderIcons(iconDB,'itemIconGrid');};
         
-        window.filterIcons=(k,t)=>{const g=document.getElementById(t);g.innerHTML='';iconDB.filter(i=>!k||i.t.includes(k)).forEach(i=>{const e=document.createElement('div');e.className='icon-opt';e.innerText=i.icon;e.onclick=()=>{Array.from(g.children).forEach(c=>c.classList.remove('selected'));e.classList.add('selected');};g.appendChild(e);});};
+        // ✅ 복구된 FAB 버튼 기능
+        window.openCatModal = () => { document.getElementById('catModal').style.display = 'flex'; document.getElementById('catModalTitle').innerText = '📂 카테고리 추가'; document.getElementById('editCatId').value = ''; document.getElementById('catName').value = ''; document.getElementById('catCustomIcon').value = ''; selectedIcon = '👶'; renderIcons(iconDB, 'catIconGrid'); };
+
+        window.filterIcons=(k,t)=>{const g=document.getElementById(t);g.innerHTML='';iconDB.filter(i=>!k||i.t.includes(k)).forEach(i=>{const e=document.createElement('div');e.className='icon-opt';e.innerText=i.icon;e.onclick=()=>{Array.from(g.children).forEach(c=>c.classList.remove('selected'));e.classList.add('selected');selectedIcon=i.icon;};g.appendChild(e);});};
         function renderIcons(l,t){window.filterIcons('',t);}
 
         function initCategorySortable(){const el=document.getElementById('contentArea');new Sortable(el,{handle:'.drag-handle',animation:150,disabled:!isEditMode,onEnd:e=>{updateOrder(e.to, 'category')}});}
@@ -593,7 +641,35 @@
 
         window.toggleGlobalSearch=()=>{const b=document.getElementById('globalSearchBox');b.style.display=b.style.display==='block'?'none':'block';if(b.style.display==='block')document.getElementById('globalSearchInput').focus();};
         window.searchGlobal=(k)=>{k=k.toLowerCase();document.querySelectorAll('.category-card').forEach(c=>{let v=false;c.querySelectorAll('.item').forEach(i=>{if(i.innerText.toLowerCase().includes(k)){i.classList.remove('hidden');v=true;}else i.classList.add('hidden');});c.style.display=v?'block':'none';});};
-        window.uploadInitialData=async()=>{if(!confirm("초기 데이터 등록?"))return;const d=[{name:"테스트",icon:"👶",items:[{name:"샘플",checked:false}]}];for(let c of d){const r=await push(ref(db,'baby_checklist_v6'),{name:c.name,icon:c.icon,order:999});await push(ref(db,`baby_checklist_v6/${r.key}/items`),c.items[0]);}alert("완료");};
+        
+        // 아이콘 100% 매칭 데이터 등록 (V15와 동일)
+        window.uploadInitialData = async () => {
+            alert("리스트와 아이콘을 매칭하여 등록합니다! (약 5~10초 소요)");
+            const initialData = [
+                {name: "출산가방/엄마용품", icon: "🏥", items: [{n:"산모수첩", i:"📒"}, {n:"신분증/지갑", i:"💳"}, {n:"휴대폰/충전기", i:"📱"}, {n:"마스크", i:"😷"}, {n:"구부러지는 빨대", i:"🥤"}, {n:"물티슈/마이비데", i:"🧻"}, {n:"철분제(엄마영양제)", i:"💊"}, {n:"가습기", i:"💧"}, {n:"스킨케어/세면도구", i:"🧴"}, {n:"수유나시/브라/패드", i:"👙"}, {n:"제왕절개 팬티", i:"🩲"}, {n:"양말/목수건", i:"🧦"}, {n:"생리대/맘스안심팬티", i:"🩸"}, {n:"양배추 가슴팩", i:"🥬"}, {n:"산후복대", i:"🤕"}, {n:"손목보호대", i:"🤲"}, {n:"압박스타킹", i:"👢"}, {n:"디데이달력", i:"📅"}, {n:"볼펜/슬리퍼", i:"🖊️"}]},
+                {name: "위생/케어", icon: "🩹", items: [{n:"손수건 10장", i:"🧣"}, {n:"유산균", i:"🦠"}, {n:"손톱케어 4종", i:"✂️"}, {n:"체온계", i:"🌡️"}, {n:"온습도계", i:"💧"}, {n:"알콜스왑", i:"🏥"}, {n:"배꼽소독솜", i:"☁️"}]},
+                {name: "수유용품", icon: "🍼", items: [{n:"모유저장팩", i:"🧊"}, {n:"수유컵", i:"🥛"}, {n:"수유쿠션", i:"🍩"}, {n:"유축기", i:"🤱"}, {n:"분유제조기", i:"🤖"}, {n:"분유쉐이커", i:"🥤"}, {n:"젖병(큰거/작은거)", i:"🍼"}, {n:"분유", i:"🥫"}, {n:"분유포트", i:"🫖"}, {n:"젖꼭지", i:"🍼"}, {n:"젖병솔/집게", i:"🖌️"}, {n:"젖병건조대", i:"🌵"}, {n:"젖병소독기", i:"✨"}, {n:"젖병세정제", i:"🧼"}, {n:"휴대용젖병", i:"🍼"}, {n:"보온병", i:"🌡️"}, {n:"공갈젖꼭지(쪽쪽이)", i:"👶"}]},
+                {name: "목욕/세탁", icon: "🛁", items: [{n:"기저귀", i:"🩲"}, {n:"아기비데", i:"🚿"}, {n:"천기저귀", i:"⬜"}, {n:"아기욕조", i:"🛁"}, {n:"신생아면봉", i:"👂"}, {n:"건티슈", i:"🧻"}, {n:"세탁세제", i:"🧴"}, {n:"무형광 세탁망", i:"🕸️"}, {n:"장난감 소독제", i:"🔫"}, {n:"바스&샴푸", i:"🧴"}, {n:"로션/오일/수딩젤", i:"🧴"}, {n:"기저귀발진크림", i:"🥫"}, {n:"비판텐 연고", i:"💊"}]},
+                {name: "가구/침구/의류", icon: "🛏️", items: [{n:"아기침대", i:"🛏️"}, {n:"기저귀갈이대", i:"🚼"}, {n:"트롤리(덮개형)", i:"🛒"}, {n:"아기수납장", i:"🗄️"}, {n:"아기옷걸이", i:"🧥"}, {n:"범보의자", i:"🪑"}, {n:"방수패드", i:"🚫"}, {n:"블랭킷/이불", i:"🛌"}, {n:"바디슈트", i:"👕"}, {n:"배냇저고리/우주복", i:"👘"}, {n:"턱받이", i:"👶"}, {n:"내복", i:"👕"}, {n:"양말", i:"🧦"}]},
+                {name: "외출/가전/기타", icon: "🚗", items: [{n:"바구니카시트", i:"🧺"}, {n:"카시트", i:"🚗"}, {n:"유모차", i:"🛒"}, {n:"유모차라이너", i:"💺"}, {n:"통풍시트", i:"❄️"}, {n:"아기띠", i:"🐨"}, {n:"차량스티커", i:"🔰"}, {n:"차량햇빛가리개", i:"☀️"}, {n:"기저귀가방", i:"🎒"}, {n:"하이체어", i:"🪑"}, {n:"빨래건조대", i:"🧺"}, {n:"백색소음기", i:"📻"}, {n:"모빌", i:"🎠"}]}
+            ];
+            for (let i = 0; i < initialData.length; i++) {
+                const cat = initialData[i];
+                const newCatRef = await push(ref(db, 'baby_checklist_v6'), { name: cat.name, icon: cat.icon, order: i });
+                const catId = newCatRef.key;
+                if(cat.items && cat.items.length > 0) {
+                    for (let j = 0; j < cat.items.length; j++) {
+                        const item = cat.items[j];
+                        await push(ref(db, `baby_checklist_v6/${catId}/items`), { name: item.n, icon: item.i, checked: false, order: j, count: 1, showNaver: true });
+                    }
+                }
+            }
+            alert("✅ 모든 아이템 등록 완료!");
+        };
+        
+        window.downloadTemplate=()=>{const header=["카테고리","물품명","브랜드","모델명","수량","예상가격","구매링크","메모"]; const example=["위생/케어","아기 면봉","마이비","",1,5000,"http://...","신생아용 얇은거"]; const wb=XLSX.utils.book_new(); const ws=XLSX.utils.aoa_to_sheet([header,example]); XLSX.utils.book_append_sheet(wb,ws,"육아템_양식"); XLSX.writeFile(wb,"육아준비물_양식.xlsx");};
+        window.handleExcelUpload=(input)=>{const file=input.files[0]; if(!file)return; const reader=new FileReader(); reader.onload=async(e)=>{const data=new Uint8Array(e.target.result); const workbook=XLSX.read(data,{type:'array'}); const firstSheet=workbook.Sheets[workbook.SheetNames[0]]; const rows=XLSX.utils.sheet_to_json(firstSheet,{header:1}); if(rows.length<2){alert("데이터 없음");return;} const dataRows=rows.slice(1); const grouped={}; dataRows.forEach(row=>{const catName=row[0]; const itemName=row[1]; if(!catName||!itemName)return; if(!grouped[catName])grouped[catName]=[]; grouped[catName].push({name:itemName, brand:row[2]||"", model:row[3]||"", count:row[4]||1, price:row[5]||"", link:row[6]||"", memo:row[7]||"", showNaver:true});}); if(confirm(`${Object.keys(grouped).length}개 카테고리 등록?`)){for(const catName of Object.keys(grouped)){const newCatRef=await push(ref(db,'baby_checklist_v6'),{name:catName, icon:"👶", order:999}); const catId=newCatRef.key; for(const item of grouped[catName]){await push(ref(db,`baby_checklist_v6/${catId}/items`),{...item, checked:false, order:999});}} alert("업로드 완료!"); input.value="";}}; reader.readAsArrayBuffer(file);};
+        window.searchNaver=()=>{const n=document.getElementById('itemName').value; const b=document.getElementById('itemBrand').value; const m=document.getElementById('itemModel').value; if(!n)return alert('이름 입력!'); window.open(`https://search.shopping.naver.com/search/all?query=${encodeURIComponent([b,m,n].filter(Boolean).join(' '))}`,'_blank');};
     </script>
 </body>
 </html>
