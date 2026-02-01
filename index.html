@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>👶 베이비 체크리스트 (V30)</title>
+    <title>👶 베이비 체크리스트 (V31)</title>
     <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -35,11 +35,9 @@
         body { font-family: 'Pretendard', sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 0; padding-bottom: 120px; transition: background-color 0.3s; }
         .container { max-width: 600px; margin: 0 auto; }
 
-        /* 헤더 */
         .header { background: linear-gradient(135deg, var(--main-color), #ff9a9e); padding: 20px 20px 25px; color: white; border-radius: 0 0 25px 25px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); position: sticky; top: 0; z-index: 100; }
         .header-top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .header h2 { margin: 0; font-size: 20px; font-weight: 800; }
-        
         .header-actions { display: flex; align-items: center; gap: 8px; }
         .icon-btn { background: rgba(255,255,255,0.25); border: none; color: white; width: 34px; height: 34px; border-radius: 50%; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); transition: transform 0.1s; }
         .icon-btn:active { transform: scale(0.9); background: rgba(255,255,255,0.4); }
@@ -57,15 +55,9 @@
         .progress-bar { height: 100%; background: white; width: 0%; transition: width 0.5s ease; }
         .total-info { font-size: 12px; font-weight: 600; text-align: right; color: white; }
 
-        /* 카테고리 카드 */
-        .category-card { 
-            background: var(--card-bg); margin: 20px; border-radius: 16px; 
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05); overflow: hidden; 
-            transition: transform 0.1s;
-        }
-        .category-card:active { transform: scale(0.995); } /* 카드 눌림 애니메이션 */
+        .category-card { background: var(--card-bg); margin: 20px; border-radius: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); overflow: hidden; transition: transform 0.1s; }
+        .category-card:active { transform: scale(0.995); }
         .category-card.collapsed .item-list, .category-card.collapsed .btn-add-item { display: none; }
-        
         .cat-header { padding: 15px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
         .cat-left { display: flex; align-items: center; gap: 10px; }
         .cat-icon { font-size: 18px; background: var(--sub-color); width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
@@ -75,11 +67,7 @@
         .category-card.collapsed .chevron { transform: rotate(-90deg); }
 
         .item-list { list-style: none; padding: 0; margin: 0; }
-        .item { 
-            padding: 15px 20px; border-bottom: 1px solid var(--border-color); background: var(--card-bg); 
-            transition: background 0.1s;
-        }
-        /* ✅ 항목 눌림 애니메이션 */
+        .item { padding: 15px 20px; border-bottom: 1px solid var(--border-color); background: var(--card-bg); transition: background 0.1s; }
         .item:active { background-color: var(--bg-color); transform: scale(0.99); }
         .item.hidden { display: none; }
         
@@ -91,72 +79,42 @@
         .chk-box::after { content: '✔'; color: white; font-size: 12px; display: none; }
         .chk-wrap input:checked + .chk-box::after { display: block; }
 
-        /* ✅ 클릭 시 체크만 되도록 (수정X) */
-        .item-content { flex: 1; cursor: pointer; }
-        .item-header-row { display: flex; align-items: center; gap: 5px; margin-bottom: 4px; }
+        .item-content { flex: 1; cursor: pointer; } 
+        .item-header-row { display: flex; align-items: center; gap: 5px; margin-bottom: 6px; }
         .item-name { font-size: 15px; font-weight: 600; color: var(--text-color); }
         .star-rating { font-size: 12px; color: #FFC107; letter-spacing: 0; font-weight: bold; }
-        
-        /* ✅ 메모 디자인 (작고 깔끔하게) */
         .item-memo { font-size: 12px; color: var(--text-sub); background: var(--bg-color); padding: 4px 8px; border-radius: 6px; margin-top: 5px; line-height: 1.4; display: inline-block; }
 
-        .tag-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 4px; }
-        .tag { padding: 2px 6px; border-radius: 4px; font-size: 11px; color: #666; background: var(--border-color); }
+        .tag-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+        .tag { padding: 3px 6px; border-radius: 4px; font-size: 11px; color: #666; background: var(--border-color); }
         .tag.brand { background: #FFF3E0; color: #E65100; font-weight: 600; }
         .tag.price { background: #fff0f0; color: var(--price-color); font-weight: 600; }
         .tag.carrot { background: #FFF3E0; color: var(--carrot-color); font-weight: 800; border: 1px solid #FFCCBC; }
         .tag.gift { background: #F3E5F5; color: var(--gift-color); font-weight: 800; border: 1px solid #E1BEE7; }
-        
-        .link-btn { text-decoration: none; background: #E3F2FD; color: #1565C0; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: bold; }
-        .naver-btn { text-decoration: none; background: #03C75A; color: white; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: bold; display: inline-flex; align-items: center; gap: 2px; }
+        .link-btn { text-decoration: none; background: #E3F2FD; color: #1565C0; padding: 3px 6px; border-radius: 4px; font-size: 11px; font-weight: bold; }
+        .naver-btn { text-decoration: none; background: #03C75A; color: white; padding: 3px 6px; border-radius: 4px; font-size: 11px; font-weight: bold; display: inline-flex; align-items: center; gap: 2px; }
         
         .item.completed .item-name { text-decoration: line-through; color: #aaa; }
         .item.completed .item-icon { opacity: 0.5; }
 
-        /* ✅ 수정/삭제 아이콘 (SVG) */
         .item-actions { display: none; gap: 12px; margin-left: 10px; align-items: flex-start; }
         body.is-edit-mode .item-actions { display: flex; }
-        
-        .action-btn { 
-            width: 28px; height: 28px; border: none; background: transparent; 
-            border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center;
-            transition: background 0.2s;
-        }
+        .action-btn { width: 28px; height: 28px; border: none; background: transparent; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
         .action-btn:active { background: var(--border-color); transform: scale(0.9); }
         .action-btn svg { width: 18px; height: 18px; stroke: #999; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
         .action-btn.del:hover svg { stroke: #FF5252; }
         .action-btn.edit:hover svg { stroke: var(--main-color); }
 
-        .btn-add-item { 
-            width: calc(100% - 30px); margin: 15px auto 5px; padding: 12px; 
-            background: var(--sub-color); color: var(--main-color); border: none; border-radius: 12px; 
-            font-weight: 800; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; 
-            transition: all 0.2s; 
-        }
+        .btn-add-item { width: calc(100% - 30px); margin: 15px auto 5px; padding: 12px; background: var(--sub-color); color: var(--main-color); border: none; border-radius: 12px; font-weight: 800; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; transition: all 0.2s; }
         .btn-add-item:active { transform: scale(0.95); background: #ffe0e6; }
 
-        .fab-btn { 
-            position: fixed; bottom: 30px; right: 25px; 
-            background: var(--main-color); color: white; width: 55px; height: 55px; border-radius: 50%; 
-            display: flex; align-items: center; justify-content: center; font-size: 28px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3); border: none; cursor: pointer; z-index: 99; 
-            transition: transform 0.2s;
-        }
+        .fab-btn { position: fixed; bottom: 30px; right: 25px; background: var(--main-color); color: white; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); border: none; cursor: pointer; z-index: 99; transition: transform 0.2s; }
         .fab-btn:active { transform: scale(0.9); }
 
-        /* ✅ 실행 취소 바 (자체 구현) */
-        #undoBar {
-            position: fixed; bottom: -80px; left: 50%; transform: translateX(-50%);
-            background: #222; color: white; padding: 14px 24px; border-radius: 30px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2); z-index: 200;
-            display: flex; align-items: center; gap: 20px; font-size: 14px;
-            transition: bottom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            width: 90%; max-width: 400px; justify-content: space-between;
-        }
+        #undoBar { position: fixed; bottom: -80px; left: 50%; transform: translateX(-50%); background: #222; color: white; padding: 14px 24px; border-radius: 30px; box-shadow: 0 10px 20px rgba(0,0,0,0.2); z-index: 200; display: flex; align-items: center; gap: 20px; font-size: 14px; transition: bottom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); width: 90%; max-width: 400px; justify-content: space-between; }
         #undoBar.show { bottom: 30px; }
         .undo-btn { color: var(--main-color); font-weight: 800; cursor: pointer; text-transform: uppercase; }
 
-        /* 모달 스타일 */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 200; align-items: center; justify-content: center; }
         .modal { background: var(--card-bg); width: 90%; max-width: 400px; padding: 25px; border-radius: 20px; max-height: 90vh; overflow-y: auto; color: var(--text-color); }
         .input-group { margin-bottom: 12px; }
@@ -189,9 +147,7 @@
         
         .theme-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
         .theme-circle { width: 40px; height: 40px; border-radius: 50%; cursor: pointer; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        
         .auto-fill-btn { display: block; width: 90%; margin: 20px auto; padding: 15px; background: #6c5ce7; color: white; border: none; border-radius: 12px; font-weight: bold; font-size: 16px; cursor: pointer; }
-        .auto-fill-btn:active { transform: scale(0.98); }
     </style>
 </head>
 <body>
@@ -243,7 +199,7 @@
     </div>
 
     <div id="undoBar">
-        <span id="undoMsg">🗑️ 작업이 완료되었습니다.</span>
+        <span id="undoMsg">🗑️ 삭제되었습니다.</span>
         <span class="undo-btn" onclick="executeUndo()">실행 취소</span>
     </div>
 
@@ -256,7 +212,7 @@
             <div class="input-label">아이콘</div>
             <div style="display:flex; gap:10px; margin-bottom:10px;">
                 <input type="text" id="catCustomIcon" class="input-field" style="width:60px; text-align:center;" placeholder="😊" maxlength="2">
-                <input type="text" class="input-field" placeholder="🔍 아이콘 검색" onkeyup="filterIcons(this.value, 'catIconGrid')">
+                <input type="text" class="input-field" placeholder="🔍 아이콘 검색 (예: 병원)" onkeyup="filterIcons(this.value, 'catIconGrid')">
             </div>
             <div class="icon-search-box">
                 <div class="icon-grid" id="catIconGrid"></div>
@@ -284,7 +240,7 @@
             <div class="input-label">아이콘 선택</div>
             <div style="display:flex; gap:10px; margin-bottom:10px;">
                 <input type="text" id="itemCustomIcon" class="input-field" style="width:60px; text-align:center;" placeholder="🍼" maxlength="2">
-                <input type="text" class="input-field" placeholder="🔍 아이콘 검색" onkeyup="filterIcons(this.value, 'itemIconGrid')">
+                <input type="text" class="input-field" placeholder="🔍 아이콘 검색 (예: 젖병)" onkeyup="filterIcons(this.value, 'itemIconGrid')">
             </div>
             <div class="icon-search-box">
                 <div class="icon-grid" id="itemIconGrid"></div>
@@ -365,33 +321,63 @@
         const db = getDatabase(app);
         const dbRef = ref(db, 'baby_checklist_v6'); 
 
-        // 1000개 아이콘 (내장 데이터)
+        // ✅ 방대한 아이콘 DB 복구
         const ICON_DB = [
-            {i:'👶',t:'아기'},{i:'🏥',t:'병원'},{i:'💊',t:'약'},{i:'🍼',t:'젖병'},{i:'🥣',t:'이유식'},{i:'🛁',t:'욕조'},{i:'🧺',t:'빨래'},
-            {i:'🛏️',t:'침대'},{i:'🚗',t:'차'},{i:'📷',t:'사진'},{i:'📱',t:'폰'},{i:'🎁',t:'선물'},{i:'🏠',t:'집'},{i:'🤰',t:'임신'},
-            {i:'💉',t:'주사'},{i:'🌡️',t:'체온계'},{i:'🧴',t:'로션'},{i:'🧻',t:'휴지'},{i:'👕',t:'옷'},{i:'🧦',t:'양말'},{i:'🧢',t:'모자'},
-            {i:'👟',t:'신발'},{i:'🎒',t:'가방'},{i:'🧸',t:'장난감'},{i:'✂️',t:'가위'},{i:'🖊️',t:'펜'},{i:'📝',t:'메모'},{i:'⭐',t:'별'},
-            {i:'❤️',t:'하트'},{i:'🐶',t:'강아지'},{i:'🐱',t:'고양이'},{i:'😷',t:'마스크'},{i:'🩹',t:'밴드'},{i:'🧼',t:'비누'},{i:'🦷',t:'치아'},
-            {i:'🍗',t:'치킨'},{i:'🥩',t:'고기'},{i:'🍎',t:'사과'},{i:'🍌',t:'바나나'},{i:'🥕',t:'당근'},{i:'🥦',t:'야채'},{i:'🌽',t:'옥수수'},
-            {i:'🥢',t:'젓가락'},{i:'🥄',t:'숟가락'},{i:'🥛',t:'우유'},{i:'☕',t:'커피'},{i:'🍺',t:'맥주'},{i:'🍰',t:'케이크'},{i:'🍫',t:'초콜릿'},
-            {i:'🚽',t:'변기'},{i:'🚿',t:'샤워'},{i:'🪥',t:'칫솔'},{i:'🧹',t:'청소'},{i:'🗑️',t:'쓰레기통'},{i:'🕶️',t:'선글라스'},{i:'☂️',t:'우산'},
-            {i:'🎧',t:'헤드셋'},{i:'🎤',t:'마이크'},{i:'🎮',t:'게임'},{i:'⚽',t:'축구'},{i:'🧩',t:'퍼즐'},{i:'🎨',t:'그림'},{i:'🎹',t:'피아노'},
-            {i:'🚌',t:'버스'},{i:'✈️',t:'비행기'},{i:'🚲',t:'자전거'},{i:'🛒',t:'카트'},{i:'📦',t:'박스'},{i:'💰',t:'돈'},{i:'💳',t:'카드'},
-            {i:'📅',t:'달력'},{i:'🔔',t:'종'},{i:'🎉',t:'폭죽'},{i:'💡',t:'전구'},{i:'🔌',t:'플러그'},{i:'🔋',t:'배터리'},{i:'🔑',t:'열쇠'}
+            {i:'👶',t:'아기 베이비 얼굴 신생아'}, {i:'👧',t:'여자 아이 딸'}, {i:'🧒',t:'아이 어린이'}, {i:'👦',t:'남자 아이 아들'}, 
+            {i:'🤰',t:'임신 임산부 엄마'}, {i:'🤱',t:'수유 모유 엄마'}, {i:'👼',t:'천사 아기'}, {i:'🏥',t:'병원 소아과 조리원'}, 
+            {i:'🚑',t:'구급차 응급'}, {i:'🩺',t:'청진기 진찰 의사'}, {i:'💊',t:'약 알약 영양제'}, {i:'💉',t:'주사 예방접종'}, 
+            {i:'🩹',t:'밴드 상처 연고'}, {i:'🌡️',t:'체온계 온도 열'}, {i:'😷',t:'마스크 감기'}, {i:'🍼',t:'젖병 우유 분유'}, 
+            {i:'🥣',t:'이유식 밥그릇 죽'}, {i:'🥄',t:'숟가락 스푼'}, {i:'🥡',t:'도시락'}, {i:'🍪',t:'과자 간식'}, 
+            {i:'🥛',t:'우유 컵 물'}, {i:'🧊',t:'얼음'}, {i:'🥢',t:'젓가락'}, {i:'🍽️',t:'식사 접시'}, {i:'🧂',t:'소금 양념'}, 
+            {i:'🍎',t:'사과 과일'}, {i:'🍌',t:'바나나'}, {i:'🥦',t:'브로콜리 야채'}, {i:'🥕',t:'당근'}, {i:'🌽',t:'옥수수'}, 
+            {i:'🥩',t:'고기 이유식'}, {i:'🍗',t:'치킨 닭'}, {i:'🍞',t:'빵 식빵'}, {i:'🥨',t:'프레첼'}, {i:'🍩',t:'도넛'}, 
+            {i:'🍦',t:'아이스크림'}, {i:'🍰',t:'케이크 생일'}, {i:'🍫',t:'초콜릿'}, {i:'🍬',t:'사탕'}, {i:'🍭',t:'막대사탕'}, 
+            {i:'🧃',t:'주스 팩'}, {i:'☕',t:'커피'}, {i:'🛁',t:'욕조 목욕 씻기'}, {i:'🚿',t:'샤워 물'}, {i:'🧼',t:'비누 세정제'}, 
+            {i:'🧽',t:'스펀지 수세미'}, {i:'🧻',t:'휴지 두루마리'}, {i:'🧴',t:'로션 샴푸'}, {i:'🪥',t:'칫솔 양치'}, {i:'🚽',t:'변기 화장실'}, 
+            {i:'💩',t:'똥 기저귀'}, {i:'🧹',t:'빗자루 청소'}, {i:'🗑️',t:'쓰레기통'}, {i:'🧺',t:'빨래 바구니 세탁'}, {i:'👕',t:'옷 티셔츠 상의'}, 
+            {i:'👖',t:'바지 하의'}, {i:'🧦',t:'양말'}, {i:'🧢',t:'모자'}, {i:'🧤',t:'장갑'}, {i:'🧣',t:'목도리 스카프'}, 
+            {i:'👟',t:'신발 운동화'}, {i:'🎀',t:'리본 머리핀'}, {i:'👗',t:'원피스 드레스'}, {i:'🧥',t:'코트 점퍼 겉옷'}, {i:'👙',t:'수영복'}, 
+            {i:'👚',t:'블라우스 여자옷'}, {i:'👔',t:'넥타이 정장'}, {i:'🩳',t:'반바지 속옷'}, {i:'👓',t:'안경'}, {i:'🕶️',t:'선글라스'}, 
+            {i:'💍',t:'반지 보석'}, {i:'🎒',t:'가방 백팩'}, {i:'👜',t:'핸드백 가방'}, {i:'👛',t:'지갑 동전'}, {i:'🛏️',t:'침대 잠 수면'}, 
+            {i:'🛌',t:'자다 이불'}, {i:'🧸',t:'곰인형 장난감 애착'}, {i:'🪁',t:'연 연날리기'}, {i:'⚽',t:'공 축구'}, {i:'🎨',t:'미술 그림 물감'}, 
+            {i:'📚',t:'책 동화책 공부'}, {i:'🎠',t:'회전목마 놀이공원'}, {i:'🎡',t:'관람차'}, {i:'🎈',t:'풍선 파티'}, {i:'🎉',t:'폭죽 축하'}, 
+            {i:'🎮',t:'게임 오락'}, {i:'🎲',t:'주사위'}, {i:'🧩',t:'퍼즐'}, {i:'🎹',t:'피아노 음악'}, {i:'🥁',t:'북 드럼'}, 
+            {i:'🎷',t:'색소폰'}, {i:'🎺',t:'나팔'}, {i:'🎸',t:'기타'}, {i:'🎻',t:'바이올린'}, {i:'🚗',t:'자동차 차 카시트'}, 
+            {i:'🚕',t:'택시'}, {i:'🚌',t:'버스'}, {i:'✈️',t:'비행기 여행'}, {i:'🚲',t:'자전거'}, {i:'🛵',t:'오토바이'}, 
+            {i:'🛴',t:'킥보드'}, {i:'🚤',t:'보트 배'}, {i:'🚀',t:'로켓 우주'}, {i:'🛒',t:'카트 쇼핑 마트'}, {i:'🛍️',t:'쇼핑백 선물'}, 
+            {i:'📷',t:'카메라 사진'}, {i:'📹',t:'비디오 영상'}, {i:'📱',t:'핸드폰 스마트폰'}, {i:'💻',t:'노트북 컴퓨터'}, {i:'🔋',t:'배터리 건전지'}, 
+            {i:'🔌',t:'플러그 전기 멀티탭'}, {i:'🏠',t:'집 홈'}, {i:'🛋️',t:'소파 가구'}, {i:'🪑',t:'의자'}, {i:'🚪',t:'문'}, 
+            {i:'🔑',t:'열쇠 키'}, {i:'🖼️',t:'액자 사진'}, {i:'🪴',t:'화분 식물'}, {i:'🌵',t:'선인장'}, {i:'💐',t:'꽃다발'}, 
+            {i:'🕰️',t:'시계 시간'}, {i:'💡',t:'전구 불 빛'}, {i:'🕯️',t:'양초 캔들'}, {i:'📦',t:'상자 택배 박스'}, {i:'✉️',t:'편지 봉투'}, 
+            {i:'✂️',t:'가위'}, {i:'📌',t:'핀 압정'}, {i:'📎',t:'클립'}, {i:'📏',t:'자 줄자'}, {i:'☀️',t:'해 날씨 맑음'}, 
+            {i:'☁️',t:'구름 흐림'}, {i:'☔',t:'비 우산'}, {i:'❄️',t:'눈 겨울'}, {i:'⚡',t:'번개 전기'}, {i:'🌈',t:'무지개'}, 
+            {i:'⭐',t:'별 스타'}, {i:'🌙',t:'달 밤'}, {i:'🔥',t:'불 뜨거움'}, {i:'💧',t:'물 방울 습기'}, {i:'❤️',t:'하트 사랑'}, 
+            {i:'🧡',t:'주황하트'}, {i:'💛',t:'노랑하트'}, {i:'💚',t:'초록하트'}, {i:'💙',t:'파랑하트'}, {i:'💜',t:'보라하트'}, 
+            {i:'🖤',t:'검정하트'}, {i:'🤍',t:'흰색하트'}, {i:'🤎',t:'갈색하트'}, {i:'💔',t:'깨진하트'}, {i:'💯',t:'백점 만점'}, 
+            {i:'✅',t:'체크 완료'}, {i:'❌',t:'엑스 취소'}, {i:'❓',t:'물음표 질문'}, {i:'❗️',t:'느낌표 중요'}, {i:'💰',t:'돈 자금 예산'}, 
+            {i:'💳',t:'카드 결제'}, {i:'📅',t:'달력 날짜 디데이'}, {i:'📝',t:'메모 기록'}, {i:'🎁',t:'선물 박스'}, {i:'🔔',t:'종 알림'}, 
+            {i:'🎵',t:'음표 노래'}, {i:'🎶',t:'음악'}, {i:'🐶',t:'강아지 개'}, {i:'🐱',t:'고양이'}, {i:'🐭',t:'쥐'}, 
+            {i:'🐹',t:'햄스터'}, {i:'🐰',t:'토끼'}, {i:'🦊',t:'여우'}, {i:'🐻',t:'곰'}, {i:'🐼',t:'판다'}, 
+            {i:'🐯',t:'호랑이'}, {i:'🦁',t:'사자'}, {i:'🐮',t:'소'}, {i:'🐷',t:'돼지'}, {i:'🐸',t:'개구리'}, 
+            {i:'🐵',t:'원숭이'}, {i:'🐔',t:'닭'}, {i:'🐧',t:'펭귄'}
         ];
-
+        
         let currentData = {};
         let isEditMode = false;
-        // ✅ 실행취소용 변수 (수정 시에도 저장)
+        // ✅ 실행취소 변수 (수정 및 삭제 모두 저장)
         let lastAction = null; 
         let undoTimer = null;
 
-        onValue(dbRef, (snap) => {
-            currentData = snap.val() || {};
+        const savedTheme = localStorage.getItem('appTheme') || '#FF878D';
+        document.documentElement.style.setProperty('--main-color', savedTheme);
+        if(localStorage.getItem('darkMode') === 'true') document.body.setAttribute('data-theme', 'dark');
+
+        onValue(dbRef, (snapshot) => {
+            currentData = snapshot.val() || {};
             renderApp();
         });
 
-        function renderApp() {
+        window.renderApp = () => {
             const data = currentData;
             const contentArea = document.getElementById('contentArea');
             contentArea.innerHTML = '';
@@ -447,6 +433,7 @@
                     if(item.isCarrot) tags += `<span class="tag carrot">🥕 당근</span> `;
                     if(item.link) tags += `<a href="${item.link}" target="_blank" class="link-btn">🔗 구매</a>`;
                     if(item.link2) tags += `<a href="${item.link2}" target="_blank" class="link-btn review">🔗 후기</a>`;
+                    
                     if(item.showNaver !== false) {
                         const query = [item.brand, item.model, item.name].filter(Boolean).join(' ');
                         tags += `<a href="https://search.shopping.naver.com/search/all?query=${encodeURIComponent(query)}" target="_blank" class="naver-btn">N 검색</a>`;
@@ -454,9 +441,7 @@
 
                     const memoHTML = item.memo ? `<div class="item-memo">${item.memo}</div>` : '';
 
-                    // ✅ 핵심 수정: 
-                    // 1. item-content 클릭 시 toggleCheck 호출 (수정창 X)
-                    // 2. 우측에 SVG 아이콘 버튼 배치 (수정은 오직 여기서만)
+                    // ✅ 핵심: item-content 클릭 시 toggleCheck 호출 (수정X)
                     visibleItemsHTML += `
                     <li class="item ${item.checked ? 'completed' : ''}" data-id="${item.id}">
                         <div class="item-top">
